@@ -65,7 +65,7 @@ Paper: [link1](https://arxiv.org/pdf/2503.09516), [link2](https://arxiv.org/abs/
 conda create -n searchr1 python=3.9 -y
 conda activate searchr1
 # install torch [or you can skip this step and let vllm to install the correct version for you]
-pip install torch==2.4.0
+pip install torch==2.4.0  --index-url https://download.pytorch.org/whl/cu121
 # install vllm
 pip3 install vllm==0.6.3 # or you can install 0.5.4, 0.4.2 and 0.3.1
 
@@ -80,11 +80,11 @@ pip install wandb
 ### Retriever environment (optional)
 If you would like to call a local retriever as the search engine, you can install the environment as follows. (We recommend using a seperate environment.)
 ```bash
-conda create -n retriever python=3.10
+conda create -n retriever python=3.10 -y
 conda activate retriever
 
 # we recommend installing torch with conda for faiss-gpu
-pip install torch==2.4.0 torchvision==0.19.0 torchaudio==2.4.0
+conda install pytorch==2.4.0 torchvision==0.19.0 torchaudio==2.4.0 pytorch-cuda=12.1 -c pytorch -c nvidia
 pip install transformers datasets pyserini
 
 ## install the gpu version faiss to guarantee efficient RL rollout
@@ -92,6 +92,7 @@ conda install -c pytorch -c nvidia faiss-gpu=1.8.0 -y
 
 ## API function
 pip install uvicorn fastapi
+pip install torch==2.4.0 torchvision==0.19.0 torchaudio==2.4.0 --index-url https://download.pytorch.org/whl/cu121
 ```
 
 
