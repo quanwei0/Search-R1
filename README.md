@@ -85,14 +85,14 @@ conda activate retriever
 
 # we recommend installing torch with conda for faiss-gpu
 conda install pytorch==2.4.0 torchvision==0.19.0 torchaudio==2.4.0 pytorch-cuda=12.1 -c pytorch -c nvidia
-pip install transformers datasets pyserini
+pip install transformers==4.49.0 datasets pyserini
 
 ## install the gpu version faiss to guarantee efficient RL rollout
 conda install -c pytorch -c nvidia faiss-gpu=1.8.0 -y
 
 ## API function
 pip install uvicorn fastapi
-pip install torch==2.4.0 torchvision==0.19.0 torchaudio==2.4.0 --index-url https://download.pytorch.org/whl/cu121
+# pip install torch==2.4.0 torchvision==0.19.0 torchaudio==2.4.0 --index-url https://download.pytorch.org/whl/cu121
 ```
 
 
@@ -103,7 +103,7 @@ Train a reasoning + search LLM on NQ dataset with e5 as the retriever and wikipe
 (1) Download the indexing and corpus.
 ```bash
 # bash scripts/download.sh
-save_path=/root/Search-R1/data
+save_path=./data
 python scripts/download.py --save_path $save_path
 cat $save_path/part_* > $save_path/e5_Flat.index
 gzip -d $save_path/wiki-18.jsonl.gz
@@ -111,7 +111,7 @@ gzip -d $save_path/wiki-18.jsonl.gz
 
 (2) Process the NQ dataset.
 ```bash
-python scripts/data_process/nq_search.py
+python scripts/data_process/nq_search.py --local_dir ./data/nq_search
 ```
 
 (3) Launch a local retrieval server.

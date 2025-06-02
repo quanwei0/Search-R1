@@ -1,5 +1,5 @@
 
-file_path=/root/Search-R1/data
+file_path=./data
 index_file=$file_path/e5_Flat.index
 corpus_file=$file_path/wiki-18.jsonl
 retriever_name=e5
