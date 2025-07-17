@@ -27,6 +27,7 @@ from typing import Type, Dict
 import re
 import json
 from collections import defaultdict
+from tqdm import tqdm
 
 import numpy as np
 from codetiming import Timer
@@ -669,6 +670,9 @@ class RayPPOTrainer(object):
             if self.config.trainer.get('val_only', False):
                 return
 
+        # add tqdm
+        progress_bar = tqdm(total=self.total_training_steps, initial=self.global_steps, desc="Training Progress")
+
         # we start from step 1
         self.global_steps += 1
 
@@ -840,6 +844,7 @@ class RayPPOTrainer(object):
                 # TODO: make a canonical logger that supports various backend
                 logger.log(data=metrics, step=self.global_steps)
 
+                progress_bar.update(1)
                 self.global_steps += 1
 
                 if self.global_steps >= self.total_training_steps:
@@ -849,6 +854,9 @@ class RayPPOTrainer(object):
                         val_metrics = self._validate()
                         pprint(f'Final validation metrics: {val_metrics}')
                         logger.log(data=val_metrics, step=self.global_steps)
+                    
+                    progress_bar.close()
+                    
                     return
     
     def _create_loss_mask(self, batch, metrics):
