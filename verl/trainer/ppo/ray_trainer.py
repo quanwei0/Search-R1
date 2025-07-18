@@ -423,7 +423,7 @@ class RayPPOTrainer(object):
         # inject total_training_steps to actor/critic optim_config. This is hacky.
         total_training_steps = len(self.train_dataloader) * self.config.trainer.total_epochs
 
-        if self.config.trainer.total_training_steps is not None:
+        if self.config.trainer.total_training_steps < total_training_steps:
             total_training_steps = self.config.trainer.total_training_steps
 
         self.total_training_steps = total_training_steps
