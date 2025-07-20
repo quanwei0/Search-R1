@@ -149,6 +149,8 @@ class DataParallelPPOCritic(BasePPOCritic):
         metrics = {}
 
         select_keys = ['input_ids', 'responses', 'attention_mask', 'position_ids', 'values', 'returns']
+        if self.config.is_critic_masking:
+            select_keys.append('loss_mask')
         batch = data.select(batch_keys=select_keys).batch
         # Split to make minibatch iterator for updating the actor
         # See PPO paper for details. https://arxiv.org/abs/1707.06347
@@ -177,6 +179,11 @@ class DataParallelPPOCritic(BasePPOCritic):
 
                 eos_mask = attention_mask[:, -response_length - 1:-1]
 
+                if self.config.is_critic_masking:
+                    response_mask = data['loss_mask']
+                else:
+                    response_mask = eos_mask
+
                 vpreds = self._forward_micro_batch(data)
 
                 # assert not torch.any(torch.isnan(vpreds)).item()
@@ -184,7 +191,7 @@ class DataParallelPPOCritic(BasePPOCritic):
                 vf_loss, vf_clipfrac = core_algos.compute_value_loss(vpreds=vpreds,
                                                                      values=values,
                                                                      returns=returns,
-                                                                     eos_mask=eos_mask,
+                                                                     eos_mask=response_mask,
                                                                      cliprange_value=self.config.cliprange_value)
                 loss = vf_loss / self.gradient_accumulation
                 loss.backward()

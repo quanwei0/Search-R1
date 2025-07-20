@@ -106,6 +106,39 @@ def compute_gae_advantage_return(token_level_rewards: torch.Tensor, values: torc
         advantages = verl_F.masked_whiten(advantages, eos_mask)
     return advantages, returns
 
+def compute_masked_gae_advantage_return(
+    token_level_rewards: torch.Tensor,
+    values: torch.Tensor,
+    loss_mask: torch.Tensor,
+    gamma: float,
+    lam: float,
+):
+    with torch.no_grad():
+        
+        advantages = torch.zeros_like(token_level_rewards)
+        returns = torch.zeros_like(token_level_rewards)
+        batch_size, gen_len = token_level_rewards.shape
+
+        for b in range(batch_size):
+            lastgaelam = 0
+            valid_positions = loss_mask[b].nonzero(as_tuple=True)[0]
+
+            for i in range(len(valid_positions) - 1, -1, -1):
+                curr_pos = valid_positions[i]
+                
+                if i != len(valid_positions) - 1:
+                    next_pos = valid_positions[i + 1]
+                    nextvalues = values[b, next_pos]
+                else:
+                    nextvalues = 0.0
+                
+                delta = token_level_rewards[b, curr_pos] + gamma * nextvalues - values[b, curr_pos]
+                lastgaelam = delta + gamma * lam * lastgaelam
+                advantages[b, curr_pos] = lastgaelam
+                returns[b, curr_pos] = advantages[b, curr_pos] + values[b, curr_pos]
+            
+        advantages = verl_F.masked_whiten(advantages, loss_mask)
+    return advantages, returns
 
 # NOTE(sgm): this implementation only consider outcome supervision, where the reward is a scalar.
 def compute_grpo_outcome_advantage(token_level_rewards: torch.Tensor,

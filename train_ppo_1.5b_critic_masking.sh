@@ -8,7 +8,7 @@ WAND_PROJECT='Search-R1'
 
 
 export BASE_MODEL='Qwen/Qwen2.5-1.5B'
-export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-1.5b-em
+export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-1.5b-em-critic-masking
 # export BASE_MODEL='Qwen/Qwen2.5-1.5B-Instruct'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-1.5b-it-em
 # export BASE_MODEL='Qwen/Qwen2.5-3B'
@@ -66,6 +66,7 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     critic.model.fsdp_config.param_offload=False \
     critic.model.fsdp_config.grad_offload=False \
     critic.model.fsdp_config.optimizer_offload=False \
+    +critic.is_critic_masking=True \
     algorithm.kl_ctrl.kl_coef=0.001 \
     algorithm.no_think_rl=False \
     trainer.critic_warmup=0 \
