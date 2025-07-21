@@ -7,10 +7,10 @@ export WANDB_ENTITY="rl_agent"
 WAND_PROJECT='Search-R1'
 
 
-export BASE_MODEL='Qwen/Qwen2.5-1.5B'
-export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-1.5b-em
-# export BASE_MODEL='Qwen/Qwen2.5-1.5B-Instruct'
-# export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-1.5b-it-em
+# export BASE_MODEL='Qwen/Qwen2.5-1.5B'
+# export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-1.5b-em
+export BASE_MODEL='Qwen/Qwen2.5-1.5B-Instruct'
+export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-1.5b-it-em
 # export BASE_MODEL='Qwen/Qwen2.5-3B'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-3b-em
 # export BASE_MODEL='Qwen/Qwen2.5-3B-Instruct'

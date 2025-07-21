@@ -7,10 +7,10 @@ export WANDB_ENTITY="rl_agent"
 WAND_PROJECT='Search-R1'
 
 
-export BASE_MODEL='Qwen/Qwen2.5-1.5B'
-export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-1.5b-em
-# export BASE_MODEL='Qwen/Qwen2.5-1.5B-Instruct'
-# export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-1.5b-it-em
+# export BASE_MODEL='Qwen/Qwen2.5-1.5B'
+# export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-1.5b-em-masked-gae-critic-masking
+export BASE_MODEL='Qwen/Qwen2.5-1.5B-Instruct'
+export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-1.5b-it-em-masked-gae
 # export BASE_MODEL='Qwen/Qwen2.5-3B'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-3b-em
 # export BASE_MODEL='Qwen/Qwen2.5-3B-Instruct'
@@ -37,7 +37,7 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     data.max_start_length=2048 \
     data.max_obs_length=500 \
     data.shuffle_train_dataloader=True \
-    algorithm.adv_estimator=gae \
+    algorithm.adv_estimator=masked_gae \
     actor_rollout_ref.model.path=$BASE_MODEL \
     actor_rollout_ref.actor.optim.lr=1e-6 \
     actor_rollout_ref.model.enable_gradient_checkpointing=True \
