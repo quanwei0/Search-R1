@@ -14,7 +14,7 @@ WAND_PROJECT='Search-R1'
 
 # export BASE_MODEL='Qwen/Qwen2.5-1.5B'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-1.5b-em
-export BASE_MODEL='Qwen/Qwen2.5-1.5B-Instruct'
+export BASE_MODEL='/code/hongpaul-sandbox/temp//Search-R1/qwen_models/qwen-1.5b-instruct'
 export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-1.5b-it-em-gae
 # export BASE_MODEL='Qwen/Qwen2.5-3B'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-3b-em
