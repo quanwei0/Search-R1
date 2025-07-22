@@ -11,4 +11,4 @@ python search_r1/search/retrieval_server.py --index_path $index_file \
                                             --retriever_name $retriever_name \
                                             --retriever_model $retriever_path \
                                             --faiss_gpu \
-                                            --port 8001
+                                            --port 8001 &
