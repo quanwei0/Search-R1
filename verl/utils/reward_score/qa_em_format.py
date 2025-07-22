@@ -151,7 +151,7 @@ def is_retrieval_correct(text: str, golden_answers: list[str]) -> list[str]:
     return False
 
 
-def compute_score_em(solution_str, ground_truth, method='strict', structure_format_score=0, final_format_score=0, retrieval_score=0, format_score=0, score=1.):
+def compute_score_em(solution_str, ground_truth, method='strict', structure_format_score=0.2, final_format_score=0.1, retrieval_score=0.1, format_score=0, score=1.):
     """The scoring function for exact match (EM).
 
     Args:
