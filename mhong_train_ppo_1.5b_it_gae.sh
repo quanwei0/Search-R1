@@ -1,3 +1,8 @@
+conda activate retriever
+bash retrieval_launch.sh
+
+conda activate searchr1
+
 export CUDA_VISIBLE_DEVICES=0,1,2,3
 export DATA_DIR='./data/nq_search'
 
