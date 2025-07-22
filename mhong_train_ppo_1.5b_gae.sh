@@ -2,7 +2,7 @@ source /code/hongpaul-sandbox/search/miniconda/bin/activate
 conda activate retriever
 bash retrieval_launch.sh
 
-conda activate searchr1
+conda activate search
 
 export CUDA_VISIBLE_DEVICES=0,1,2,3
 export DATA_DIR='./data/nq_search'
