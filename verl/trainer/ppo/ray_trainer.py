@@ -809,6 +809,24 @@ class RayPPOTrainer(object):
                         reward_tensor = self.reward_fn(batch)
                         batch.batch['token_level_scores'] = reward_tensor
 
+                        # compute training reward metrics by data source
+                        train_reward_tensor = batch.batch['token_level_scores'].sum(-1).cpu()
+                        train_data_sources = batch.non_tensor_batch.get('data_source', ['unknown'] * train_reward_tensor.shape[0])
+                        train_data_source_reward = {}
+                        for i in range(train_reward_tensor.shape[0]):
+                            data_source = train_data_sources[i]
+                            if data_source not in train_data_source_reward:
+                                train_data_source_reward[data_source] = []
+                            train_data_source_reward[data_source].append(train_reward_tensor[i].item())
+
+                        train_metric_dict = {}
+                        for data_source, rewards in train_data_source_reward.items():
+                            train_metric_dict[f'train/reward/{data_source}'] = np.mean(rewards)
+                            
+                        metrics.update(train_metric_dict)
+
+                        logger.log(data=train_metric_dict, step=self.global_steps)
+
                         # compute rewards. apply_kl_penalty if available
                         if not self.config.actor_rollout_ref.actor.use_kl_loss:
                             batch, kl_metrics = apply_kl_penalty(batch,
