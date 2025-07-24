@@ -140,6 +140,63 @@ def compute_masked_gae_advantage_return(
         advantages = verl_F.masked_whiten(advantages, loss_mask)
     return advantages, returns
 
+def compute_turn_level_gae_advantage_return(
+    token_level_rewards: torch.Tensor,
+    values: torch.Tensor,
+    eos_mask: torch.Tensor,
+    loss_mask: torch.Tensor,
+    turn_level_gamma: float,
+    turn_level_lam: float,
+):
+    with torch.no_grad():
+        
+        advantages = torch.zeros_like(token_level_rewards)
+        returns = torch.zeros_like(token_level_rewards)
+        batch_size, gen_len = token_level_rewards.shape
+
+        for b in range(batch_size):
+            
+            turn_end_pos = ((loss_mask[b][1:] == 1) & (loss_mask[b][:-1] == 0)).nonzero(as_tuple=True)[0]
+            turn_start_pos = turn_end_pos + 1            
+            if loss_mask[b][0] == 1:
+                turn_start_pos = torch.cat([torch.tensor([0], device=loss_mask.device), turn_start_pos])
+            
+            valid_response_length = values[b].nonzero(as_tuple=True)[0].shape[0] - 1
+            turn_end_pos = torch.cat([turn_end_pos, torch.tensor([valid_response_length - 1], device=loss_mask.device)])
+            
+            lastgaelam = 0
+            
+            # valid_positions = loss_mask[b].nonzero(as_tuple=True)[0]
+            valid_positions = torch.cat([turn_start_pos, torch.tensor([valid_response_length - 1], device=loss_mask.device)])
+            
+            for i in range(len(valid_positions) - 1, -1, -1):
+                curr_pos = valid_positions[i]
+                
+                if i < len(valid_positions) - 1:
+                    next_pos = valid_positions[i+1]
+                    nextvalues = values[b, next_pos]
+                else:
+                    nextvalues = 0.0
+                
+                delta = token_level_rewards[b, curr_pos] + turn_level_gamma * nextvalues - values[b, curr_pos]
+                lastgaelam = delta + turn_level_gamma * turn_level_lam * lastgaelam
+                advantages[b, curr_pos] = lastgaelam
+
+            breakpoint()
+            # each token in the sequence has the same advantage
+            for start, end in zip(turn_start_pos, turn_end_pos):
+                if end < valid_response_length - 1:
+                    adv_value = advantages[b, end+1]
+                else:
+                    adv_value = advantages[b, end]
+                for pos in range(start, end + 1):
+                    if loss_mask[b, pos]:
+                        advantages[b, pos] = adv_value
+                        returns[b, pos] = adv_value + values[b, pos]
+
+        advantages = verl_F.masked_whiten(advantages, loss_mask)
+    return advantages, returns
+
 # NOTE(sgm): this implementation only consider outcome supervision, where the reward is a scalar.
 def compute_grpo_outcome_advantage(token_level_rewards: torch.Tensor,
                                    eos_mask: torch.Tensor,

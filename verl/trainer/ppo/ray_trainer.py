@@ -152,6 +152,22 @@ def compute_advantage(data: DataProto, adv_estimator, gamma=1.0, lam=1.0, num_re
                                                                              lam=lam)
         data.batch['advantages'] = advantages
         data.batch['returns'] = returns
+    elif adv_estimator == 'turn_level_gae':
+        values = data.batch['values']
+        responses = data.batch['responses']
+        response_length = responses.size(-1)
+        attention_mask = data.batch['attention_mask']
+        response_mask = attention_mask[:, -response_length:]
+        loss_mask = data.batch['loss_mask']
+        token_level_rewards = data.batch['token_level_rewards']
+        advantages, returns = core_algos.compute_turn_level_gae_advantage_return(token_level_rewards=token_level_rewards,
+                                                                                 values=values,
+                                                                                 eos_mask=response_mask,
+                                                                                 loss_mask=loss_mask,
+                                                                                 turn_level_gamma=gamma,
+                                                                                 turn_level_lam=lam)
+        data.batch['advantages'] = advantages
+        data.batch['returns'] = returns
     elif adv_estimator == 'grpo':
         token_level_rewards = data.batch['token_level_rewards']
         index = data.non_tensor_batch['uid']
@@ -579,7 +595,8 @@ class RayPPOTrainer(object):
             raise NotImplementedError
 
         # create critic
-        if self.config.algorithm.adv_estimator == 'gae' or self.config.algorithm.adv_estimator == 'masked_gae':
+        if self.config.algorithm.adv_estimator == 'gae' or self.config.algorithm.adv_estimator == 'masked_gae' or \
+                self.config.algorithm.adv_estimator == 'turn_level_gae':
             resource_pool = self.resource_pool_manager.get_resource_pool(Role.Critic)
             critic_cls = RayClassWithInitArgs(cls=self.role_worker_mapping[Role.Critic], config=self.config.critic)
             self.resource_pool_to_cls[resource_pool]['critic'] = critic_cls
