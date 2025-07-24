@@ -1,6 +1,8 @@
-source /code/hongpaul-sandbox/search/miniconda/bin/activate
+eval "$(/code/hongpaul-sandbox/search/miniconda/bin/conda shell.bash hook)"
+
 conda activate retriever
 bash retrieval_launch.sh
+sleep 60
 
 conda activate search
 
