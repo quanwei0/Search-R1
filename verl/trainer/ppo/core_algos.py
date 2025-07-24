@@ -182,7 +182,6 @@ def compute_turn_level_gae_advantage_return(
                 lastgaelam = delta + turn_level_gamma * turn_level_lam * lastgaelam
                 advantages[b, curr_pos] = lastgaelam
 
-            breakpoint()
             # each token in the sequence has the same advantage
             for start, end in zip(turn_start_pos, turn_end_pos):
                 if end < valid_response_length - 1:
