@@ -114,9 +114,21 @@ def compute_masked_gae_advantage_return(
     lam: float,
 ):
     with torch.no_grad():
+                
+        lastgaelam = 0
+        advantages_reversed = []
+        gen_len = token_level_rewards.shape[-1]
+
+        for t in reversed(range(gen_len)):
+            nextvalues = values[:, t + 1] if t < gen_len - 1 else 0.0
+            delta = token_level_rewards[:, t] + gamma * nextvalues - values[:, t]
+            lastgaelam = delta + gamma * lam * lastgaelam
+            advantages_reversed.append(lastgaelam)
+        advantages = torch.stack(advantages_reversed[::-1], dim=1)
+
+        returns = advantages + values
         
         advantages = torch.zeros_like(token_level_rewards)
-        returns = torch.zeros_like(token_level_rewards)
         batch_size, gen_len = token_level_rewards.shape
 
         for b in range(batch_size):
@@ -135,8 +147,7 @@ def compute_masked_gae_advantage_return(
                 delta = token_level_rewards[b, curr_pos] + gamma * nextvalues - values[b, curr_pos]
                 lastgaelam = delta + gamma * lam * lastgaelam
                 advantages[b, curr_pos] = lastgaelam
-                returns[b, curr_pos] = advantages[b, curr_pos] + values[b, curr_pos]
-            
+
         advantages = verl_F.masked_whiten(advantages, loss_mask)
     return advantages, returns
 
@@ -150,8 +161,20 @@ def compute_turn_level_gae_advantage_return(
 ):
     with torch.no_grad():
         
+        lastgaelam = 0
+        advantages_reversed = []
+        gen_len = token_level_rewards.shape[-1]
+
+        for t in reversed(range(gen_len)):
+            nextvalues = values[:, t + 1] if t < gen_len - 1 else 0.0
+            delta = token_level_rewards[:, t] + turn_level_gamma * nextvalues - values[:, t]
+            lastgaelam = delta + turn_level_gamma * turn_level_lam * lastgaelam
+            advantages_reversed.append(lastgaelam)
+        advantages = torch.stack(advantages_reversed[::-1], dim=1)
+
+        returns = advantages + values
+        
         advantages = torch.zeros_like(token_level_rewards)
-        returns = torch.zeros_like(token_level_rewards)
         batch_size, gen_len = token_level_rewards.shape
 
         for b in range(batch_size):
@@ -189,9 +212,7 @@ def compute_turn_level_gae_advantage_return(
                 else:
                     adv_value = advantages[b, end]
                 for pos in range(start, end + 1):
-                    if loss_mask[b, pos]:
-                        advantages[b, pos] = adv_value
-                        returns[b, pos] = adv_value + values[b, pos]
+                    advantages[b, pos] = adv_value
 
         advantages = verl_F.masked_whiten(advantages, loss_mask)
     return advantages, returns
