@@ -1,6 +1,6 @@
 eval "$(/mnt/home/siliang/miniconda3/bin/conda shell.bash hook)"
 
-conda activate retriever
+conda activate searchr1
 
 save_path=./data
 python scripts/download.py --save_path $save_path
