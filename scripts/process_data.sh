@@ -1,3 +1,5 @@
+eval "$(/mnt/home/siliang/miniconda3/bin/conda shell.bash hook)"
+
 conda activate retriever
 
 save_path=./data
