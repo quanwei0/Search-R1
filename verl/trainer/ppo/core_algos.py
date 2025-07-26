@@ -156,6 +156,8 @@ def compute_turn_level_gae_advantage_return(
     values: torch.Tensor,
     eos_mask: torch.Tensor,
     loss_mask: torch.Tensor,
+    gamma: float,
+    lam: float,
     turn_level_gamma: float,
     turn_level_lam: float,
 ):
@@ -167,14 +169,14 @@ def compute_turn_level_gae_advantage_return(
 
         for t in reversed(range(gen_len)):
             nextvalues = values[:, t + 1] if t < gen_len - 1 else 0.0
-            delta = token_level_rewards[:, t] + turn_level_gamma * nextvalues - values[:, t]
-            lastgaelam = delta + turn_level_gamma * turn_level_lam * lastgaelam
+            delta = token_level_rewards[:, t] + gamma * nextvalues - values[:, t]
+            lastgaelam = delta + gamma * lam * lastgaelam
             advantages_reversed.append(lastgaelam)
         advantages = torch.stack(advantages_reversed[::-1], dim=1)
 
         returns = advantages + values
         
-        advantages = torch.zeros_like(token_level_rewards)
+        turn_level_adv = torch.zeros_like(token_level_rewards)
         batch_size, gen_len = token_level_rewards.shape
 
         for b in range(batch_size):
@@ -203,18 +205,89 @@ def compute_turn_level_gae_advantage_return(
                 
                 delta = token_level_rewards[b, curr_pos] + turn_level_gamma * nextvalues - values[b, curr_pos]
                 lastgaelam = delta + turn_level_gamma * turn_level_lam * lastgaelam
-                advantages[b, curr_pos] = lastgaelam
+                turn_level_adv[b, curr_pos] = lastgaelam
 
             # each token in the sequence has the same advantage
             for start, end in zip(turn_start_pos, turn_end_pos):
                 if end < valid_response_length - 1:
-                    adv_value = advantages[b, end+1]
+                    adv_value = turn_level_adv[b, end+1]
                 else:
-                    adv_value = advantages[b, end]
+                    adv_value = turn_level_adv[b, end]
                 for pos in range(start, end + 1):
-                    advantages[b, pos] = adv_value
+                    turn_level_adv[b, pos] = adv_value
 
-        advantages = verl_F.masked_whiten(advantages, loss_mask)
+        advantages = verl_F.masked_whiten(turn_level_adv, loss_mask)
+    return advantages, returns
+
+def compute_weighted_gae_advantage_return(
+    token_level_rewards: torch.Tensor,
+    values: torch.Tensor,
+    eos_mask: torch.Tensor,
+    loss_mask: torch.Tensor,
+    gamma: float,
+    lam: float,
+    turn_level_gamma: float,
+    turn_level_lam: float,
+    turn_level_weight: float = 0.1,
+):
+    with torch.no_grad():
+        
+        lastgaelam = 0
+        advantages_reversed = []
+        gen_len = token_level_rewards.shape[-1]
+
+        for t in reversed(range(gen_len)):
+            nextvalues = values[:, t + 1] if t < gen_len - 1 else 0.0
+            delta = token_level_rewards[:, t] + gamma * nextvalues - values[:, t]
+            lastgaelam = delta + gamma * lam * lastgaelam
+            advantages_reversed.append(lastgaelam)
+        advantages = torch.stack(advantages_reversed[::-1], dim=1)
+
+        returns = advantages + values
+        
+        turn_level_adv = torch.zeros_like(token_level_rewards)
+        batch_size, gen_len = token_level_rewards.shape
+
+        for b in range(batch_size):
+            
+            turn_end_pos = ((loss_mask[b][1:] == 1) & (loss_mask[b][:-1] == 0)).nonzero(as_tuple=True)[0]
+            turn_start_pos = turn_end_pos + 1            
+            if loss_mask[b][0] == 1:
+                turn_start_pos = torch.cat([torch.tensor([0], device=loss_mask.device), turn_start_pos])
+            
+            valid_response_length = values[b].nonzero(as_tuple=True)[0].shape[0] - 1
+            turn_end_pos = torch.cat([turn_end_pos, torch.tensor([valid_response_length - 1], device=loss_mask.device)])
+            
+            lastgaelam = 0
+            
+            # valid_positions = loss_mask[b].nonzero(as_tuple=True)[0]
+            valid_positions = torch.cat([turn_start_pos, torch.tensor([valid_response_length - 1], device=loss_mask.device)])
+            
+            for i in range(len(valid_positions) - 1, -1, -1):
+                curr_pos = valid_positions[i]
+                
+                if i < len(valid_positions) - 1:
+                    next_pos = valid_positions[i+1]
+                    nextvalues = values[b, next_pos]
+                else:
+                    nextvalues = 0.0
+                
+                delta = token_level_rewards[b, curr_pos] + turn_level_gamma * nextvalues - values[b, curr_pos]
+                lastgaelam = delta + turn_level_gamma * turn_level_lam * lastgaelam
+                turn_level_adv[b, curr_pos] = lastgaelam
+
+            # each token in the sequence has the same advantage
+            for start, end in zip(turn_start_pos, turn_end_pos):
+                if end < valid_response_length - 1:
+                    adv_value = turn_level_adv[b, end+1]
+                else:
+                    adv_value = turn_level_adv[b, end]
+                for pos in range(start, end + 1):
+                    turn_level_adv[b, pos] = adv_value
+
+        weighted_advantages = (1 - turn_level_weight) * advantages + turn_level_weight * turn_level_adv
+
+        advantages = verl_F.masked_whiten(weighted_advantages, loss_mask)
     return advantages, returns
 
 # NOTE(sgm): this implementation only consider outcome supervision, where the reward is a scalar.
