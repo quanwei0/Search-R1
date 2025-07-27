@@ -1,4 +1,5 @@
-eval "$(/code/hongpaul-sandbox/search/miniconda/bin/conda shell.bash hook)"
+source /code/hongpaul-sandbox/search/miniconda/bin/activate
+conda init
 
 conda activate retriever
 bash retrieval_launch.sh
