@@ -955,7 +955,7 @@ class RayPPOTrainer(object):
         
         return batch, metrics
 
-    def _track_reward_metrics(reward_tensor: torch.Tensor, data_sources: List[str], prefix: str) -> Dict[str, float]:
+    def _track_reward_metrics(self, reward_tensor: torch.Tensor, data_sources: List[str], prefix: str) -> Dict[str, float]:
 
         reward_tensor_sum = reward_tensor.sum(-1).cpu()
         data_source_reward_map = {}
