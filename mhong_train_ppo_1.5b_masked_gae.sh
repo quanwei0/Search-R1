@@ -1,5 +1,6 @@
 source /code/hongpaul-sandbox/search/miniconda/bin/activate
 conda init
+
 conda activate retriever
 bash retrieval_launch.sh
 sleep 60
