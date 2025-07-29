@@ -596,9 +596,11 @@ class RayPPOTrainer(object):
         data_source_format = {}
         data_source_retrieval = {}
         for i in range(reward_tensor.shape[0]):
-            data_source = data_sources[i]
-            if data_source not in data_source_reward:
-                data_source_reward[data_source] = []
+            source = data_sources[i]
+            if source not in data_source_reward:
+                data_source_reward[source] = []
+                data_source_format[source] = []
+                data_source_retrieval[source] = []
             data_source_reward[source].append(reward_tensor[i].item())
             data_source_format[source].append(format_reward_tensor[i].item())
             data_source_retrieval[source].append(retrieval_reward_tensor[i].item())
