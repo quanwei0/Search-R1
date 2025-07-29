@@ -22,7 +22,7 @@ from contextlib import contextmanager
 from dataclasses import dataclass, field
 from enum import Enum
 from pprint import pprint
-from typing import Type, Dict
+from typing import Type, Dict, List, Union, Optional
 
 import re
 import json
@@ -491,6 +491,8 @@ class RayPPOTrainer(object):
         """
         import torch
         reward_tensor_lst = []
+        format_reward_tensor_lst = []
+        retrieval_reward_tensor_lst = []
         data_source_lst = []
 
         gen_config = GenerationConfig(
@@ -575,25 +577,37 @@ class RayPPOTrainer(object):
                     
                     # evaluate using reward_function
                     # for certain reward function (e.g. sandbox), the generation can overlap with reward
-                    reward_tensor = self.val_reward_fn(test_batch)
+                    reward_tensor, format_reward_tensor, retrieval_reward_tensor = self.val_reward_fn(test_batch)
 
                     reward_tensor_lst.append(reward_tensor)
+                    format_reward_tensor_lst.append(format_reward_tensor)
+                    retrieval_reward_tensor_lst.append(retrieval_reward_tensor)
                     data_source_lst.append(test_batch.non_tensor_batch.get('data_source', ['unknown'] * reward_tensor.shape[0]))
 
-        reward_tensor = torch.cat([rw.sum(-1) for rw in reward_tensor_lst], dim=0).cpu()  # (batch_size,)
+        # reward_tensor = torch.cat([rw.sum(-1) for rw in reward_tensor_lst], dim=0).cpu()  # (batch_size,)
         # reward_tensor = torch.cat(reward_tensor_lst, dim=0).sum(-1).cpu()  # (batch_size,)
+        reward_tensor = torch.cat([rw.sum(-1) for rw in reward_tensor_lst], dim=0).cpu()
+        format_reward_tensor = torch.cat([rw.sum(-1) for rw in format_reward_tensor_lst], dim=0).cpu()
+        retrieval_reward_tensor = torch.cat([rw.sum(-1) for rw in retrieval_reward_tensor_lst], dim=0).cpu()
+    
         data_sources = np.concatenate(data_source_lst, axis=0)
         # evaluate test_score based on data source
         data_source_reward = {}
+        data_source_format = {}
+        data_source_retrieval = {}
         for i in range(reward_tensor.shape[0]):
             data_source = data_sources[i]
             if data_source not in data_source_reward:
                 data_source_reward[data_source] = []
-            data_source_reward[data_source].append(reward_tensor[i].item())
+            data_source_reward[source].append(reward_tensor[i].item())
+            data_source_format[source].append(format_reward_tensor[i].item())
+            data_source_retrieval[source].append(retrieval_reward_tensor[i].item())
 
         metric_dict = {}
-        for data_source, rewards in data_source_reward.items():
-            metric_dict[f'val/test_score/{data_source}'] = np.mean(rewards)
+        for source in data_source_reward:
+            metric_dict[f'val/test_score/{source}'] = np.mean(data_source_reward[source])
+            metric_dict[f'val/format_score/{source}'] = np.mean(data_source_format[source])
+            metric_dict[f'val/retrieval_score/{source}'] = np.mean(data_source_retrieval[source])
 
         return metric_dict
 
@@ -843,25 +857,20 @@ class RayPPOTrainer(object):
                             batch = batch.union(reward_tensor)
 
                         # we combine with rule-based rm
-                        reward_tensor = self.reward_fn(batch)
+                        reward_tensor, format_reward_tensor, retrieval_reward_tensor = self.reward_fn(batch)
                         batch.batch['token_level_scores'] = reward_tensor
 
                         # compute training reward metrics by data source
-                        train_reward_tensor = batch.batch['token_level_scores'].sum(-1).cpu()
-                        train_data_sources = batch.non_tensor_batch.get('data_source', ['unknown'] * train_reward_tensor.shape[0])
-                        train_data_source_reward = {}
-                        for i in range(train_reward_tensor.shape[0]):
-                            data_source = train_data_sources[i]
-                            if data_source not in train_data_source_reward:
-                                train_data_source_reward[data_source] = []
-                            train_data_source_reward[data_source].append(train_reward_tensor[i].item())
+                        train_data_sources = batch.non_tensor_batch.get(
+                            'data_source', ['unknown'] * reward_tensor.shape[0]
+                        )
 
                         train_metric_dict = {}
-                        for data_source, rewards in train_data_source_reward.items():
-                            train_metric_dict[f'train/reward/{data_source}'] = np.mean(rewards)
-                            
-                        metrics.update(train_metric_dict)
+                        train_metric_dict.update(self._track_reward_metrics(reward_tensor, train_data_sources, prefix="train/reward"))
+                        train_metric_dict.update(self._track_reward_metrics(format_reward_tensor, train_data_sources, prefix="train/format_reward"))
+                        train_metric_dict.update(self._track_reward_metrics(retrieval_reward_tensor, train_data_sources, prefix="train/retrieval_reward"))
 
+                        metrics.update(train_metric_dict)
                         logger.log(data=train_metric_dict, step=self.global_steps)
 
                         # compute rewards. apply_kl_penalty if available
@@ -943,3 +952,20 @@ class RayPPOTrainer(object):
         })
         
         return batch, metrics
+
+    def _track_reward_metrics(reward_tensor: torch.Tensor, data_sources: List[str], prefix: str) -> Dict[str, float]:
+
+        reward_tensor_sum = reward_tensor.sum(-1).cpu()
+        data_source_reward_map = {}
+
+        for i in range(reward_tensor_sum.shape[0]):
+            source = data_sources[i]
+            if source not in data_source_reward_map:
+                data_source_reward_map[source] = []
+            data_source_reward_map[source].append(reward_tensor_sum[i].item())
+
+        metric_dict = {}
+        for source, reward_list in data_source_reward_map.items():
+            metric_dict[f"{prefix}/{source}"] = np.mean(reward_list)
+
+        return metric_dict

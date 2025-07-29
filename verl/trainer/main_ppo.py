@@ -17,14 +17,22 @@ Note that we don't combine the main with ray_trainer as ray_trainer is used by o
 
 from verl import DataProto
 import torch
-from verl.utils.reward_score import qa_em, qa_em_format
+from verl.utils.reward_score import qa_em, qa_em_format, qa_em_new
 from verl.trainer.ppo.ray_trainer import RayPPOTrainer
 import re
 import numpy as np
 
-def _select_rm_score_fn(data_source):
+def _select_rm_score_fn(data_source, reward_type='answer_correctness'):
     if data_source in ['nq', 'triviaqa', 'popqa', 'hotpotqa', '2wikimultihopqa', 'musique', 'bamboogle']:
-        return qa_em.compute_score_em
+        if reward_type == 'answer_correctness':
+            return qa_em_new.compute_score_em
+        elif reward_type == 'format_correctness':
+            return qa_em_new.compute_score_format
+        elif reward_type == 'retrieval_correctness':
+            return qa_em_new.compute_score_retrieval
+        else:
+            raise NotImplementedError(f"Unsupported reward type: {reward_type} for data source: {data_source}")
+        
     else:
         raise NotImplementedError
 
@@ -46,6 +54,8 @@ class RewardManager():
             return data.batch['rm_scores']
 
         reward_tensor = torch.zeros_like(data.batch['responses'], dtype=torch.float32)
+        format_reward_tensor = torch.zeros_like(data.batch['responses'], dtype=torch.float32)
+        retrieval_reward_tensor = torch.zeros_like(data.batch['responses'], dtype=torch.float32)
 
         # all_scores = []
 
@@ -73,11 +83,18 @@ class RewardManager():
 
             # select rm_score
             data_source = data_item.non_tensor_batch['data_source']
-            compute_score_fn = _select_rm_score_fn(data_source)
+            compute_answer_score = _select_rm_score_fn(data_source, reward_type='answer_correctness')
+            compute_format_score = _select_rm_score_fn(data_source, reward_type='format_correctness')
+            compute_retrieval_score = _select_rm_score_fn(data_source, reward_type='retrieval_correctness')
 
-            score = compute_score_fn(solution_str=sequences_str, ground_truth=ground_truth, format_score=self.format_score)
+            answer_score = compute_answer_score(solution_str=sequences_str, ground_truth=ground_truth, format_score=self.format_score)
+            format_score = compute_format_score(solution_str=sequences_str)
+            retrieval_score = compute_retrieval_score(solution_str=sequences_str, ground_truth=ground_truth)
 
-            reward_tensor[i, valid_response_length - 1] = score
+            reward_tensor[i, valid_response_length - 1] = answer_score
+            format_reward_tensor[i, valid_response_length - 1] = format_score
+            retrieval_reward_tensor[i, valid_response_length - 1] = retrieval_score
+
             # all_scores.append(score)
 
             if data_source not in already_print_data_sources:
@@ -94,7 +111,7 @@ class RewardManager():
         # print(f"[DEBUG] all_scores min: {np.min(all_scores)}")
         # print(f"[DEBUG] all_scores std: {np.std(all_scores)}")
 
-        return reward_tensor
+        return reward_tensor, format_reward_tensor, retrieval_reward_tensor
 
 
 import ray
