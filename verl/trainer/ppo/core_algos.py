@@ -315,7 +315,13 @@ def compute_policy_loss(
     # Compute importance weights based on the specified level
     if importance_sampling_level == "token":
         log_importance_weights = log_ratio
+        print("="*80)
+        print(f"[Debug] token-level importance sampling")
+        print("="*80)
     elif importance_sampling_level == "sequence":
+        print("="*80)
+        print(f"[Debug] sequence-level importance sampling")
+        print("="*80)
         # Sequence-level importance sampling: average log_ratio over sequence
         log_importance_weights = (log_ratio * eos_mask).sum(-1) / eos_mask.sum(-1).clamp(min=1.0)
         log_importance_weights = log_importance_weights.unsqueeze(-1)
@@ -342,7 +348,7 @@ def compute_policy_loss(
 
         pg_loss = verl_F.masked_mean(torch.max(pg_losses1, pg_losses2), eos_mask)
         pg_clipfrac = verl_F.masked_mean((pg_losses2 > pg_losses1).float(), eos_mask)
-    if detach_ratio=='soft':
+    elif detach_ratio=='soft':
         print("="*80)
         print(f"[Debug] soft detach ratio with {importance_sampling_level}-level importance sampling and the cliprange is",cliprange)
         print("="*80)
