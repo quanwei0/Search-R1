@@ -748,6 +748,12 @@ class RayPPOTrainer(object):
             config=gen_config,
         )
 
+        from datetime import datetime
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')  # 20250730_153045
+        save_dir = f"./outputs/log_train_traj/{self.config.trainer.experiment_name}_{timestamp}"
+        os.makedirs(save_dir, exist_ok=True)
+
+
         # start training loop
         for epoch in range(self.config.trainer.total_epochs):
             for batch_dict in self.train_dataloader:
@@ -814,6 +820,9 @@ class RayPPOTrainer(object):
 
                     # compute global_valid tokens
                     batch.meta_info['global_token_num'] = torch.sum(batch.batch['attention_mask'], dim=-1).tolist()
+
+                    decoded_sequences, ground_truths, data_sources = self._save_trajectories(batch, save_dir)
+
 
                     # batch.batch.apply(lambda x, key: x.long() if key != "old_log_probs" else x, inplace=True, key=True)
                     for key in batch.batch.keys():
@@ -960,3 +969,49 @@ class RayPPOTrainer(object):
             metric_dict[f"{prefix}/{source}"] = np.mean(reward_list)
 
         return metric_dict
+    
+    def _save_trajectories(self, data, dir):
+
+        decoded_sequences = []
+        ground_truths = []
+        data_sources = []
+        trajectories = []
+
+        for i in range(len(data)):
+            data_item = data[i]
+
+            prompt_ids = data_item.batch['prompts']
+            prompt_length = prompt_ids.shape[-1]
+
+            attention_mask = data_item.batch['attention_mask']
+            valid_prompt_length = attention_mask[:prompt_length].sum()
+            valid_prompt_ids = prompt_ids[-valid_prompt_length:]
+
+            response_ids = data_item.batch['responses']
+            valid_response_length = attention_mask[prompt_length:].sum()
+            valid_response_ids = response_ids[:valid_response_length]
+
+            sequences = torch.cat((valid_prompt_ids, valid_response_ids))
+            sequences_str = self.tokenizer.decode(sequences, skip_special_tokens=True)
+
+            ground_truth = data_item.non_tensor_batch['reward_model']['ground_truth']['target']
+            data_source = data_item.non_tensor_batch['data_source']
+            ground_truth = ground_truth.tolist() if isinstance(ground_truth, np.ndarray) else ground_truth
+            data_source = data_source.tolist() if isinstance(data_source, np.ndarray) else data_source
+
+            decoded_sequences.append(sequences_str)
+            ground_truths.append(ground_truth)
+            data_sources.append(data_source)
+
+            trajectory = {
+                "data_source": data_source,
+                "ground_truth": ground_truth,
+                "text": sequences_str,
+            }
+            trajectories.append(trajectory)
+
+        save_path = os.path.join(dir, f'trajectories_step_{self.global_steps}.json')
+        with open(save_path, 'w', encoding='utf-8') as f:
+            json.dump(trajectories, f, ensure_ascii=False, indent=2)
+
+        return decoded_sequences, ground_truths, data_sources
