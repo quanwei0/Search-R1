@@ -262,6 +262,8 @@ class MegatronPPOActor(BasePPOActor):
 
             clip_ratio = meta_info['clip_ratio']
             entropy_coeff = meta_info['entropy_coeff']
+            detach_ratio = self.config.get('detach_ratio', 'soft')  # default to 'soft' if not specified
+            importance_sampling_level = self.config.get('importance_sampling_level', 'token')  # default to 'token' if not specified
 
             # compute policy loss
             logits = output.logits
@@ -271,7 +273,9 @@ class MegatronPPOActor(BasePPOActor):
                                                                           log_prob=log_prob,
                                                                           advantages=advantages,
                                                                           eos_mask=response_mask,
-                                                                          cliprange=clip_ratio)
+                                                                          cliprange=clip_ratio,
+                                                                          detach_ratio=detach_ratio,
+                                                                          importance_sampling_level=importance_sampling_level)
             entropy_loss = vocab_parallel_compute_entropy_loss(logits, eos_mask=response_mask)
             policy_loss = pg_loss - entropy_loss * entropy_coeff
             # return loss and stats
