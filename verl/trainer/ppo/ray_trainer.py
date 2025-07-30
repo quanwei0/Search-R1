@@ -586,30 +586,16 @@ class RayPPOTrainer(object):
 
         # reward_tensor = torch.cat([rw.sum(-1) for rw in reward_tensor_lst], dim=0).cpu()  # (batch_size,)
         # reward_tensor = torch.cat(reward_tensor_lst, dim=0).sum(-1).cpu()  # (batch_size,)
-        reward_tensor = torch.cat([rw.sum(-1) for rw in reward_tensor_lst], dim=0).cpu()
-        format_reward_tensor = torch.cat([rw.sum(-1) for rw in format_reward_tensor_lst], dim=0).cpu()
-        retrieval_reward_tensor = torch.cat([rw.sum(-1) for rw in retrieval_reward_tensor_lst], dim=0).cpu()
-    
+        reward_tensor = torch.cat([rw.sum(-1, keepdim=True) for rw in reward_tensor_lst], dim=0).cpu()
+        format_reward_tensor = torch.cat([rw.sum(-1, keepdim=True) for rw in format_reward_tensor_lst], dim=0).cpu()
+        retrieval_reward_tensor = torch.cat([rw.sum(-1, keepdim=True) for rw in retrieval_reward_tensor_lst], dim=0).cpu()
+
         data_sources = np.concatenate(data_source_lst, axis=0)
-        # evaluate test_score based on data source
-        data_source_reward = {}
-        data_source_format = {}
-        data_source_retrieval = {}
-        for i in range(reward_tensor.shape[0]):
-            source = data_sources[i]
-            if source not in data_source_reward:
-                data_source_reward[source] = []
-                data_source_format[source] = []
-                data_source_retrieval[source] = []
-            data_source_reward[source].append(reward_tensor[i].item())
-            data_source_format[source].append(format_reward_tensor[i].item())
-            data_source_retrieval[source].append(retrieval_reward_tensor[i].item())
 
         metric_dict = {}
-        for source in data_source_reward:
-            metric_dict[f'val/test_score/{source}'] = np.mean(data_source_reward[source])
-            metric_dict[f'val/format_score/{source}'] = np.mean(data_source_format[source])
-            metric_dict[f'val/retrieval_score/{source}'] = np.mean(data_source_retrieval[source])
+        metric_dict.update(self._track_reward_metrics(reward_tensor, data_sources, prefix="val/test_score"))
+        metric_dict.update(self._track_reward_metrics(format_reward_tensor, data_sources, prefix="val/format_score"))
+        metric_dict.update(self._track_reward_metrics(retrieval_reward_tensor, data_sources, prefix="val/retrieval_score"))
 
         return metric_dict
 
@@ -956,6 +942,9 @@ class RayPPOTrainer(object):
         return batch, metrics
 
     def _track_reward_metrics(self, reward_tensor: torch.Tensor, data_sources: List[str], prefix: str) -> Dict[str, float]:
+
+        if reward_tensor.dim() == 0:
+            reward_tensor = reward_tensor.unsqueeze(0)
 
         reward_tensor_sum = reward_tensor.sum(-1).cpu()
         data_source_reward_map = {}
