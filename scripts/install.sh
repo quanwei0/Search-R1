@@ -1,3 +1,5 @@
+eval "$(/mnt/home/siliang/miniconda3/bin/conda shell.bash hook)"
+
 conda create -n searchr1 python=3.9 -y
 conda activate searchr1
 # install torch [or you can skip this step and let vllm to install the correct version for you]

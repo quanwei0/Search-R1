@@ -22,7 +22,7 @@ from contextlib import contextmanager
 from dataclasses import dataclass, field
 from enum import Enum
 from pprint import pprint
-from typing import Type, Dict
+from typing import Type, Dict, List, Union, Optional
 
 import re
 import json
@@ -164,8 +164,28 @@ def compute_advantage(data: DataProto, adv_estimator, gamma=1.0, lam=1.0, num_re
                                                                                  values=values,
                                                                                  eos_mask=response_mask,
                                                                                  loss_mask=loss_mask,
+                                                                                 gamma=gamma,
+                                                                                 lam=lam,
                                                                                  turn_level_gamma=gamma,
                                                                                  turn_level_lam=lam)
+        data.batch['advantages'] = advantages
+        data.batch['returns'] = returns
+    elif adv_estimator == 'weighted_gae':
+        values = data.batch['values']
+        responses = data.batch['responses']
+        response_length = responses.size(-1)
+        attention_mask = data.batch['attention_mask']
+        response_mask = attention_mask[:, -response_length:]
+        loss_mask = data.batch['loss_mask']
+        token_level_rewards = data.batch['token_level_rewards']
+        advantages, returns = core_algos.compute_weighted_gae_advantage_return(token_level_rewards=token_level_rewards,
+                                                                               values=values,
+                                                                               eos_mask=response_mask,
+                                                                               loss_mask=loss_mask,
+                                                                               gamma=gamma,
+                                                                               lam=lam,                                                                                 
+                                                                               turn_level_gamma=gamma,
+                                                                               turn_level_lam=lam)
         data.batch['advantages'] = advantages
         data.batch['returns'] = returns
     elif adv_estimator == 'grpo':
@@ -471,6 +491,8 @@ class RayPPOTrainer(object):
         """
         import torch
         reward_tensor_lst = []
+        format_reward_tensor_lst = []
+        retrieval_reward_tensor_lst = []
         data_source_lst = []
 
         gen_config = GenerationConfig(
@@ -555,25 +577,25 @@ class RayPPOTrainer(object):
                     
                     # evaluate using reward_function
                     # for certain reward function (e.g. sandbox), the generation can overlap with reward
-                    reward_tensor = self.val_reward_fn(test_batch)
+                    reward_tensor, format_reward_tensor, retrieval_reward_tensor = self.val_reward_fn(test_batch)
 
                     reward_tensor_lst.append(reward_tensor)
+                    format_reward_tensor_lst.append(format_reward_tensor)
+                    retrieval_reward_tensor_lst.append(retrieval_reward_tensor)
                     data_source_lst.append(test_batch.non_tensor_batch.get('data_source', ['unknown'] * reward_tensor.shape[0]))
 
-        reward_tensor = torch.cat([rw.sum(-1) for rw in reward_tensor_lst], dim=0).cpu()  # (batch_size,)
+        # reward_tensor = torch.cat([rw.sum(-1) for rw in reward_tensor_lst], dim=0).cpu()  # (batch_size,)
         # reward_tensor = torch.cat(reward_tensor_lst, dim=0).sum(-1).cpu()  # (batch_size,)
+        reward_tensor = torch.cat([rw.sum(-1, keepdim=True) for rw in reward_tensor_lst], dim=0).cpu()
+        format_reward_tensor = torch.cat([rw.sum(-1, keepdim=True) for rw in format_reward_tensor_lst], dim=0).cpu()
+        retrieval_reward_tensor = torch.cat([rw.sum(-1, keepdim=True) for rw in retrieval_reward_tensor_lst], dim=0).cpu()
+
         data_sources = np.concatenate(data_source_lst, axis=0)
-        # evaluate test_score based on data source
-        data_source_reward = {}
-        for i in range(reward_tensor.shape[0]):
-            data_source = data_sources[i]
-            if data_source not in data_source_reward:
-                data_source_reward[data_source] = []
-            data_source_reward[data_source].append(reward_tensor[i].item())
 
         metric_dict = {}
-        for data_source, rewards in data_source_reward.items():
-            metric_dict[f'val/test_score/{data_source}'] = np.mean(rewards)
+        metric_dict.update(self._track_reward_metrics(reward_tensor, data_sources, prefix="val/test_score"))
+        metric_dict.update(self._track_reward_metrics(format_reward_tensor, data_sources, prefix="val/format_score"))
+        metric_dict.update(self._track_reward_metrics(retrieval_reward_tensor, data_sources, prefix="val/retrieval_score"))
 
         return metric_dict
 
@@ -596,7 +618,7 @@ class RayPPOTrainer(object):
 
         # create critic
         if self.config.algorithm.adv_estimator == 'gae' or self.config.algorithm.adv_estimator == 'masked_gae' or \
-                self.config.algorithm.adv_estimator == 'turn_level_gae':
+                self.config.algorithm.adv_estimator == 'turn_level_gae' or self.config.algorithm.adv_estimator == 'weighted_gae':
             resource_pool = self.resource_pool_manager.get_resource_pool(Role.Critic)
             critic_cls = RayClassWithInitArgs(cls=self.role_worker_mapping[Role.Critic], config=self.config.critic)
             self.resource_pool_to_cls[resource_pool]['critic'] = critic_cls
@@ -726,6 +748,12 @@ class RayPPOTrainer(object):
             config=gen_config,
         )
 
+        from datetime import datetime
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')  # 20250730_153045
+        save_dir = f"./outputs/log_train_traj/{self.config.trainer.experiment_name}_{timestamp}"
+        os.makedirs(save_dir, exist_ok=True)
+
+
         # start training loop
         for epoch in range(self.config.trainer.total_epochs):
             for batch_dict in self.train_dataloader:
@@ -812,6 +840,9 @@ class RayPPOTrainer(object):
 
                     if self.config.do_search and self.config.actor_rollout_ref.actor.state_masking:
                         batch, metrics = self._create_loss_mask(batch, metrics)
+                        batch = self._split_turn(batch)
+
+                    batch = self._save_trajectories(batch, save_dir)
                     
                     with _timer('adv', timing_raw):
                         # compute scores. Support both model and function-based.
@@ -823,25 +854,20 @@ class RayPPOTrainer(object):
                             batch = batch.union(reward_tensor)
 
                         # we combine with rule-based rm
-                        reward_tensor = self.reward_fn(batch)
+                        reward_tensor, format_reward_tensor, retrieval_reward_tensor = self.reward_fn(batch)
                         batch.batch['token_level_scores'] = reward_tensor
 
                         # compute training reward metrics by data source
-                        train_reward_tensor = batch.batch['token_level_scores'].sum(-1).cpu()
-                        train_data_sources = batch.non_tensor_batch.get('data_source', ['unknown'] * train_reward_tensor.shape[0])
-                        train_data_source_reward = {}
-                        for i in range(train_reward_tensor.shape[0]):
-                            data_source = train_data_sources[i]
-                            if data_source not in train_data_source_reward:
-                                train_data_source_reward[data_source] = []
-                            train_data_source_reward[data_source].append(train_reward_tensor[i].item())
+                        train_data_sources = batch.non_tensor_batch.get(
+                            'data_source', ['unknown'] * reward_tensor.shape[0]
+                        )
 
                         train_metric_dict = {}
-                        for data_source, rewards in train_data_source_reward.items():
-                            train_metric_dict[f'train/reward/{data_source}'] = np.mean(rewards)
-                            
-                        metrics.update(train_metric_dict)
+                        train_metric_dict.update(self._track_reward_metrics(reward_tensor, train_data_sources, prefix="train/reward"))
+                        train_metric_dict.update(self._track_reward_metrics(format_reward_tensor, train_data_sources, prefix="train/format_reward"))
+                        train_metric_dict.update(self._track_reward_metrics(retrieval_reward_tensor, train_data_sources, prefix="train/retrieval_reward"))
 
+                        metrics.update(train_metric_dict)
                         logger.log(data=train_metric_dict, step=self.global_steps)
 
                         # compute rewards. apply_kl_penalty if available
@@ -923,3 +949,136 @@ class RayPPOTrainer(object):
         })
         
         return batch, metrics
+
+    def _split_turn(self, batch: DataProto) -> DataProto:
+        loss_mask = batch.batch['loss_mask']
+        values = batch.batch['values']
+
+        turn_indices = []
+
+        for b in range(loss_mask.size(0)):
+            mask = loss_mask[b]
+            valid_response_length = values[b].nonzero(as_tuple=True)[0].shape[0] - 1
+
+            # Detect where a turn starts: when mask switches from 0 to 1
+            turn_end_pos = ((mask[1:] == 1) & (mask[:-1] == 0)).nonzero(as_tuple=True)[0]
+            turn_start_pos = turn_end_pos + 1
+
+            # Check if the very first token is part of a turn
+            if mask[0] == 1:
+                turn_start_pos = torch.cat([torch.tensor([0], device=mask.device), turn_start_pos])
+
+            # Append last token as final turn end if not already included
+
+            turn_end_pos = torch.cat([turn_end_pos, torch.tensor([valid_response_length - 1], device=mask.device)])
+
+            # Build list of (start, end) pairs
+            indices = list(zip(turn_start_pos.tolist(), turn_end_pos.tolist()))
+            turn_indices.append(indices)
+
+        # Save to batch meta_info for later use (e.g., in GAE)
+        batch.meta_info['turn_indices'] = turn_indices
+
+        return batch
+
+    def _track_reward_metrics(self, reward_tensor: torch.Tensor, data_sources: List[str], prefix: str) -> Dict[str, float]:
+
+        if reward_tensor.dim() == 0:
+            reward_tensor = reward_tensor.unsqueeze(0)
+
+        reward_tensor_sum = reward_tensor.sum(-1).cpu()
+        data_source_reward_map = {}
+
+        for i in range(reward_tensor_sum.shape[0]):
+            source = data_sources[i]
+            if source not in data_source_reward_map:
+                data_source_reward_map[source] = []
+            data_source_reward_map[source].append(reward_tensor_sum[i].item())
+
+        metric_dict = {}
+        for source, reward_list in data_source_reward_map.items():
+            metric_dict[f"{prefix}/{source}"] = np.mean(reward_list)
+
+        return metric_dict
+    
+    def _save_trajectories(self, batch, save_dir: Optional[str] = None) -> DataProto:
+        """
+        Decode full trajectories and per-turn sequences from the batch, and store them
+        into batch.meta_info for later use.
+
+        Optionally, save them to disk if `save_dir` is provided.
+        """
+        full_texts = []
+        prompt_texts = []
+        turn_texts = []
+        trajectories = []
+        
+        response_text_lengths = [] 
+        turn_text_lengths = []
+
+        turn_indices = batch.meta_info.get("turn_indices", [[] for _ in range(len(batch))])
+
+        for i in range(len(batch)):
+            data_item = batch[i]
+
+            prompt_ids = data_item.batch['prompts']
+            prompt_length = prompt_ids.shape[-1]
+
+            attention_mask = data_item.batch['attention_mask']
+            valid_prompt_length = attention_mask[:prompt_length].sum()
+            valid_prompt_ids = prompt_ids[-valid_prompt_length:]
+
+            prompt_text = self.tokenizer.decode(valid_prompt_ids, skip_special_tokens=True)
+            prompt_texts.append(prompt_text)
+            
+            response_ids = data_item.batch['responses']
+            valid_response_length = attention_mask[prompt_length:].sum()
+            valid_response_ids = response_ids[:valid_response_length]
+
+            full_ids = torch.cat((valid_prompt_ids, valid_response_ids))
+            full_text = self.tokenizer.decode(full_ids, skip_special_tokens=True)
+            full_texts.append(full_text)
+            response_text_lengths.append(valid_response_ids.shape[0])
+
+            # Turn-level decoding
+            turns = []
+            turn_lengths = []
+            for start, end in turn_indices[i]:
+                turn_ids = response_ids[start:end + 1]
+                turn_text = self.tokenizer.decode(turn_ids, skip_special_tokens=True)
+                turns.append(turn_text)
+                turn_lengths.append(turn_ids.shape[0])
+            turn_texts.append(turns)
+            turn_text_lengths.append(turn_lengths)
+
+            # Optional for logging/saving
+            ground_truth = data_item.non_tensor_batch.get('reward_model', {}).get('ground_truth', {}).get('target', '')
+            data_source = data_item.non_tensor_batch.get('data_source', 'unknown')
+            if isinstance(ground_truth, np.ndarray):
+                ground_truth = ground_truth.tolist()
+            if isinstance(data_source, np.ndarray):
+                data_source = data_source.tolist()
+
+            trajectories.append({
+                "data_source": data_source,
+                "ground_truth": ground_truth,
+                "full_text": full_text,
+                "prompt": prompt_text,
+                "turn_texts": turns,
+            })
+
+        # Inject into batch.meta_info
+        batch.meta_info["decoded_full_texts"] = full_texts
+        batch.meta_info["decoded_prompts"] = prompt_texts
+        batch.meta_info["decoded_turn_texts"] = turn_texts
+        batch.meta_info["response_text_lengths"] = response_text_lengths
+        batch.meta_info["turn_text_token_lengths"] = turn_text_lengths
+
+        # Optional: save to JSON
+        if save_dir:
+            os.makedirs(save_dir, exist_ok=True)
+            save_path = os.path.join(save_dir, f'trajectories_step_{self.global_steps}.json')
+            with open(save_path, 'w', encoding='utf-8') as f:
+                json.dump(trajectories, f, ensure_ascii=False, indent=2)
+
+        return batch

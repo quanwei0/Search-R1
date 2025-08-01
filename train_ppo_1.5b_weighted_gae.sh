@@ -1,11 +1,3 @@
-eval "$(/code/hongpaul-sandbox/search/miniconda/bin/conda shell.bash hook)"
-
-conda activate retriever
-bash retrieval_launch.sh
-sleep 60
-
-conda activate search
-
 export CUDA_VISIBLE_DEVICES=0,1,2,3
 export DATA_DIR='./data/nq_search'
 
@@ -15,10 +7,10 @@ export WANDB_ENTITY="rl_agent"
 WAND_PROJECT='Search-R1'
 
 
-# export BASE_MODEL='Qwen/Qwen2.5-1.5B'
-# export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-1.5b-em
-export BASE_MODEL='/code/hongpaul-sandbox/temp/Search-R1/qwen_models/qwen-1.5b-instruct'
-export EXPERIMENT_NAME=mhong-nq-search-r1-ppo-qwen2.5-1.5b-it-em-gae
+export BASE_MODEL='Qwen/Qwen2.5-1.5B'
+export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-1.5b-em-weighted-gae-weight0.1
+# export BASE_MODEL='Qwen/Qwen2.5-1.5B-Instruct'
+# export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-1.5b-it-em-gae
 # export BASE_MODEL='Qwen/Qwen2.5-3B'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-3b-em
 # export BASE_MODEL='Qwen/Qwen2.5-3B-Instruct'
@@ -45,7 +37,7 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     data.max_start_length=2048 \
     data.max_obs_length=500 \
     data.shuffle_train_dataloader=True \
-    algorithm.adv_estimator=gae \
+    algorithm.adv_estimator=weighted_gae \
     actor_rollout_ref.model.path=$BASE_MODEL \
     actor_rollout_ref.actor.optim.lr=1e-6 \
     actor_rollout_ref.model.enable_gradient_checkpointing=True \
@@ -65,6 +57,7 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     actor_rollout_ref.rollout.n_agent=1 \
     actor_rollout_ref.rollout.temperature=1 \
     actor_rollout_ref.actor.state_masking=True \
+    actor_rollout_ref.actor.use_kl_loss=False \
     critic.optim.lr=1e-5 \
     critic.model.use_remove_padding=True \
     critic.optim.lr_warmup_steps_ratio=0.015 \

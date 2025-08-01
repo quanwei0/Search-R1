@@ -1,4 +1,5 @@
-eval "$(/code/hongpaul-sandbox/search/miniconda/bin/conda shell.bash hook)"
+source /code/hongpaul-sandbox/search/miniconda/bin/activate
+conda init
 
 conda activate retriever
 bash retrieval_launch.sh
@@ -15,8 +16,8 @@ export WANDB_ENTITY="rl_agent"
 WAND_PROJECT='Search-R1'
 
 
-export BASE_MODEL='/code/hongpaul-sandbox/temp/Search-R1/qwen_models/qwen-1.5b'
-export EXPERIMENT_NAME=mhong-nq-search-r1-ppo-qwen2.5-1.5b-em-masked-gae-critic-masking
+export BASE_MODEL="/code/hongpaul-sandbox/temp/Search-R1/qwen_models/qwen-3b"
+export EXPERIMENT_NAME=mhong-nq-search-r1-ppo-qwen2.5-3b-em-weighted-gae-weight0.1
 # export BASE_MODEL='Qwen/Qwen2.5-1.5B-Instruct'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-1.5b-it-em
 # export BASE_MODEL='Qwen/Qwen2.5-3B'
@@ -45,7 +46,7 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     data.max_start_length=2048 \
     data.max_obs_length=500 \
     data.shuffle_train_dataloader=True \
-    algorithm.adv_estimator=masked_gae \
+    algorithm.adv_estimator=weighted_gae \
     actor_rollout_ref.model.path=$BASE_MODEL \
     actor_rollout_ref.actor.optim.lr=1e-6 \
     actor_rollout_ref.model.enable_gradient_checkpointing=True \
@@ -74,7 +75,7 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     critic.model.fsdp_config.param_offload=False \
     critic.model.fsdp_config.grad_offload=False \
     critic.model.fsdp_config.optimizer_offload=False \
-    +critic.is_critic_masking=True \
+    +critic.is_critic_masking=False \
     algorithm.kl_ctrl.kl_coef=0.001 \
     algorithm.no_think_rl=False \
     trainer.critic_warmup=0 \
