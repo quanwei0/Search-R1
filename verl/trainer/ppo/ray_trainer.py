@@ -841,7 +841,6 @@ class RayPPOTrainer(object):
                     if self.config.do_search and self.config.actor_rollout_ref.actor.state_masking:
                         batch, metrics = self._create_loss_mask(batch, metrics)
                         batch = self._split_turn(batch)
-
                     batch = self._save_trajectories(batch, save_dir)
                     
                     with _timer('adv', timing_raw):

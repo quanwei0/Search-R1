@@ -396,7 +396,11 @@ def compute_policy_loss(
         eos_mask: mask for valid tokens (completion_mask)
         cliprange: clipping range for PPO
         detach_ratio: detachment strategy ('soft', 'hard', or None)
-        importance_sampling_level: 'token' or 'sequence' level importance sampling
+        importance_sampling_level: importance sampling strategy
+            - 'token': each token uses its own importance weight
+            - 'sequence': traditional sequence-level where all tokens share the same weight (average over sequence)
+            - 'partial_sequence': partial-sequence-level GRPO where each token at position t uses 
+                                 cumulative average of log_ratio from position 1 to t
 
     Returns:
         pg_loss: scalar tensor
@@ -413,15 +417,45 @@ def compute_policy_loss(
         print("="*80)
     elif importance_sampling_level == "sequence":
         print("="*80)
-        print(f"[Debug] sequence-level importance sampling")
+        print(f"[Debug] traditional sequence-level importance sampling")
         print("="*80)
-        # Sequence-level importance sampling: average log_ratio over sequence
+        # Traditional sequence-level importance sampling: all tokens share same weight (average over sequence)
         log_importance_weights = (log_ratio * eos_mask).sum(-1) / eos_mask.sum(-1).clamp(min=1.0)
         log_importance_weights = log_importance_weights.unsqueeze(-1)
+    elif importance_sampling_level == "partial_sequence":
+        print("="*80)
+        print(f"[Debug] partial-sequence-level importance sampling")
+        print("="*80)
+        # Partial-Sequence-level importance sampling: 
+        # For each token at position t, use cumulative average of log_ratio from position 1 to t
+        # w_{i,t} = exp(1/t * Σ_{s=1}^t log_ratio_s)
+        
+        batch_size, seq_len = log_ratio.shape
+        log_importance_weights = torch.zeros_like(log_ratio)
+        
+        for b in range(batch_size):
+            mask = eos_mask[b]  # mask for this batch
+            valid_positions = mask.nonzero(as_tuple=True)[0]  # positions where mask=1
+            
+            if len(valid_positions) == 0:
+                continue
+                
+            # Extract log_ratios for valid positions only
+            valid_log_ratios = log_ratio[b, valid_positions]  # shape: [num_valid_tokens]
+            
+            # Compute cumulative sum and divide by position indices to get cumulative averages
+            cumsum = torch.cumsum(valid_log_ratios, dim=0)  # [num_valid_tokens]
+            position_indices = torch.arange(1, len(valid_positions) + 1, 
+                                          dtype=cumsum.dtype, device=cumsum.device)  # [1, 2, 3, ...]
+            cumulative_averages = cumsum / position_indices  # [num_valid_tokens]
+            
+            # Assign back to the original positions
+            log_importance_weights[b, valid_positions] = cumulative_averages
+
     else:
         raise ValueError(
-            f"Unknown importance sampling level: {importance_sampling_level}. Possible values are 'token' "
-            "and 'sequence'."
+            f"Unknown importance sampling level: {importance_sampling_level}. Possible values are 'token', "
+            "'sequence', and 'partial_sequence'."
         )
     
     negative_approx_kl = log_importance_weights
