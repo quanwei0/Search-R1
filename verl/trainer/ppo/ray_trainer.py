@@ -1046,7 +1046,6 @@ class RayPPOTrainer(object):
             turn_lengths = []
             for start, end in turn_indices[i]:
                 turn_ids = response_ids[start:end + 1]
-                breakpoint()
                 turn_text = self.tokenizer.decode(turn_ids, skip_special_tokens=True)
                 turns.append(turn_text)
                 turn_lengths.append(turn_ids.shape[0])
