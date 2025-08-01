@@ -843,7 +843,6 @@ class RayPPOTrainer(object):
                         batch = self._split_turn(batch)
 
                     batch = self._save_trajectories(batch, save_dir)
-                    breakpoint()
                     
                     with _timer('adv', timing_raw):
                         # compute scores. Support both model and function-based.
