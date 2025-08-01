@@ -821,9 +821,6 @@ class RayPPOTrainer(object):
                     # compute global_valid tokens
                     batch.meta_info['global_token_num'] = torch.sum(batch.batch['attention_mask'], dim=-1).tolist()
 
-                    decoded_sequences, ground_truths, data_sources = self._save_trajectories(batch, save_dir)
-
-
                     # batch.batch.apply(lambda x, key: x.long() if key != "old_log_probs" else x, inplace=True, key=True)
                     for key in batch.batch.keys():
                         if key != 'old_log_probs':
@@ -843,6 +840,10 @@ class RayPPOTrainer(object):
 
                     if self.config.do_search and self.config.actor_rollout_ref.actor.state_masking:
                         batch, metrics = self._create_loss_mask(batch, metrics)
+                        batch = self._split_turn(batch)
+
+                    batch = self._save_trajectories(batch, save_dir)
+                    breakpoint()
                     
                     with _timer('adv', timing_raw):
                         # compute scores. Support both model and function-based.
@@ -950,6 +951,37 @@ class RayPPOTrainer(object):
         
         return batch, metrics
 
+    def _split_turn(self, batch: DataProto) -> DataProto:
+        loss_mask = batch.batch['loss_mask']
+        values = batch.batch['values']
+
+        turn_indices = []
+
+        for b in range(loss_mask.size(0)):
+            mask = loss_mask[b]
+            valid_response_length = values[b].nonzero(as_tuple=True)[0].shape[0] - 1
+
+            # Detect where a turn starts: when mask switches from 0 to 1
+            turn_end_pos = ((mask[1:] == 1) & (mask[:-1] == 0)).nonzero(as_tuple=True)[0]
+            turn_start_pos = turn_end_pos + 1
+
+            # Check if the very first token is part of a turn
+            if mask[0] == 1:
+                turn_start_pos = torch.cat([torch.tensor([0], device=mask.device), turn_start_pos])
+
+            # Append last token as final turn end if not already included
+
+            turn_end_pos = torch.cat([turn_end_pos, torch.tensor([valid_response_length - 1], device=mask.device)])
+
+            # Build list of (start, end) pairs
+            indices = list(zip(turn_start_pos.tolist(), turn_end_pos.tolist()))
+            turn_indices.append(indices)
+
+        # Save to batch meta_info for later use (e.g., in GAE)
+        batch.meta_info['turn_indices'] = turn_indices
+
+        return batch
+
     def _track_reward_metrics(self, reward_tensor: torch.Tensor, data_sources: List[str], prefix: str) -> Dict[str, float]:
 
         if reward_tensor.dim() == 0:
@@ -970,15 +1002,25 @@ class RayPPOTrainer(object):
 
         return metric_dict
     
-    def _save_trajectories(self, data, dir):
+    def _save_trajectories(self, batch, save_dir: Optional[str] = None) -> DataProto:
+        """
+        Decode full trajectories and per-turn sequences from the batch, and store them
+        into batch.meta_info for later use.
 
-        decoded_sequences = []
-        ground_truths = []
-        data_sources = []
+        Optionally, save them to disk if `save_dir` is provided.
+        """
+        full_texts = []
+        prompt_texts = []
+        turn_texts = []
         trajectories = []
+        
+        response_text_lengths = [] 
+        turn_text_lengths = []
 
-        for i in range(len(data)):
-            data_item = data[i]
+        turn_indices = batch.meta_info.get("turn_indices", [[] for _ in range(len(batch))])
+
+        for i in range(len(batch)):
+            data_item = batch[i]
 
             prompt_ids = data_item.batch['prompts']
             prompt_length = prompt_ids.shape[-1]
@@ -987,31 +1029,58 @@ class RayPPOTrainer(object):
             valid_prompt_length = attention_mask[:prompt_length].sum()
             valid_prompt_ids = prompt_ids[-valid_prompt_length:]
 
+            prompt_text = self.tokenizer.decode(valid_prompt_ids, skip_special_tokens=True)
+            prompt_texts.append(prompt_text)
+            
             response_ids = data_item.batch['responses']
             valid_response_length = attention_mask[prompt_length:].sum()
             valid_response_ids = response_ids[:valid_response_length]
 
-            sequences = torch.cat((valid_prompt_ids, valid_response_ids))
-            sequences_str = self.tokenizer.decode(sequences, skip_special_tokens=True)
+            full_ids = torch.cat((valid_prompt_ids, valid_response_ids))
+            full_text = self.tokenizer.decode(full_ids, skip_special_tokens=True)
+            full_texts.append(full_text)
+            response_text_lengths.append(valid_response_ids.shape[0])
 
-            ground_truth = data_item.non_tensor_batch['reward_model']['ground_truth']['target']
-            data_source = data_item.non_tensor_batch['data_source']
-            ground_truth = ground_truth.tolist() if isinstance(ground_truth, np.ndarray) else ground_truth
-            data_source = data_source.tolist() if isinstance(data_source, np.ndarray) else data_source
+            # Turn-level decoding
+            turns = []
+            turn_lengths = []
+            for start, end in turn_indices[i]:
+                turn_ids = response_ids[start:end + 1]
+                breakpoint()
+                turn_text = self.tokenizer.decode(turn_ids, skip_special_tokens=True)
+                turns.append(turn_text)
+                turn_lengths.append(turn_ids.shape[0])
+            turn_texts.append(turns)
+            turn_text_lengths.append(turn_lengths)
 
-            decoded_sequences.append(sequences_str)
-            ground_truths.append(ground_truth)
-            data_sources.append(data_source)
+            # Optional for logging/saving
+            ground_truth = data_item.non_tensor_batch.get('reward_model', {}).get('ground_truth', {}).get('target', '')
+            data_source = data_item.non_tensor_batch.get('data_source', 'unknown')
+            if isinstance(ground_truth, np.ndarray):
+                ground_truth = ground_truth.tolist()
+            if isinstance(data_source, np.ndarray):
+                data_source = data_source.tolist()
 
-            trajectory = {
+            trajectories.append({
                 "data_source": data_source,
                 "ground_truth": ground_truth,
-                "text": sequences_str,
-            }
-            trajectories.append(trajectory)
+                "full_text": full_text,
+                "prompt": prompt_text,
+                "turn_texts": turns,
+            })
 
-        save_path = os.path.join(dir, f'trajectories_step_{self.global_steps}.json')
-        with open(save_path, 'w', encoding='utf-8') as f:
-            json.dump(trajectories, f, ensure_ascii=False, indent=2)
+        # Inject into batch.meta_info
+        batch.meta_info["decoded_full_texts"] = full_texts
+        batch.meta_info["decoded_prompts"] = prompt_texts
+        batch.meta_info["decoded_turn_texts"] = turn_texts
+        batch.meta_info["response_text_lengths"] = response_text_lengths
+        batch.meta_info["turn_text_token_lengths"] = turn_text_lengths
 
-        return decoded_sequences, ground_truths, data_sources
+        # Optional: save to JSON
+        if save_dir:
+            os.makedirs(save_dir, exist_ok=True)
+            save_path = os.path.join(save_dir, f'trajectories_step_{self.global_steps}.json')
+            with open(save_path, 'w', encoding='utf-8') as f:
+                json.dump(trajectories, f, ensure_ascii=False, indent=2)
+
+        return batch
