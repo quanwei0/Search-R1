@@ -55,7 +55,7 @@ class RewardManager():
         if 'rm_scores' in data.batch.keys():
             return data.batch['rm_scores']
 
-        reward_tensor = torch.zeros_like(data.batch['responses'], dtype=torch.float32)
+        answer_reward_tensor = torch.zeros_like(data.batch['responses'], dtype=torch.float32)
         format_reward_tensor = torch.zeros_like(data.batch['responses'], dtype=torch.float32)
         retrieval_reward_tensor = torch.zeros_like(data.batch['responses'], dtype=torch.float32)
         mixed_outcome_reward_tensor = torch.zeros_like(data.batch['responses'], dtype=torch.float32)
@@ -96,7 +96,7 @@ class RewardManager():
             retrieval_score = compute_retrieval_score(solution_str=sequences_str, ground_truth=ground_truth)
             mixed_outcome_score = comupte_mixed_outcome_score(solution_str=sequences_str, ground_truth=ground_truth)
 
-            reward_tensor[i, valid_response_length - 1] = answer_score
+            answer_reward_tensor[i, valid_response_length - 1] = answer_score
             format_reward_tensor[i, valid_response_length - 1] = format_score
             retrieval_reward_tensor[i, valid_response_length - 1] = retrieval_score
             mixed_outcome_reward_tensor[i, valid_response_length - 1] = mixed_outcome_score
@@ -117,8 +117,12 @@ class RewardManager():
         # print(f"[DEBUG] all_scores min: {np.min(all_scores)}")
         # print(f"[DEBUG] all_scores std: {np.std(all_scores)}")
 
-        return reward_tensor, format_reward_tensor, retrieval_reward_tensor, mixed_outcome_reward_tensor
-
+        return {
+            'answer_correctness': answer_reward_tensor,
+            'format_correctness': format_reward_tensor,
+            'retrieval_correctness': retrieval_reward_tensor,
+            'mixed_outcome_reward': mixed_outcome_reward_tensor,
+        }
 
 import ray
 import hydra

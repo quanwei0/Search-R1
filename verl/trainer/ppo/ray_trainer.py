@@ -491,6 +491,7 @@ class RayPPOTrainer(object):
         """
         import torch
         reward_tensor_lst = []
+        answer_reward_tensor_lst = []
         format_reward_tensor_lst = []
         retrieval_reward_tensor_lst = []
         mixed_reward_tensor_lst = []
@@ -578,17 +579,21 @@ class RayPPOTrainer(object):
                     
                     # evaluate using reward_function
                     # for certain reward function (e.g. sandbox), the generation can overlap with reward
-                    reward_tensor, format_reward_tensor, retrieval_reward_tensor, mixed_reward_tensor = self.val_reward_fn(test_batch)
-
-                    reward_tensor_lst.append(reward_tensor)
+                    reward_dict = self.val_reward_fn(test_batch)
+                    answer_reward_tensor = reward_dict['answer_correctness']
+                    format_reward_tensor = reward_dict['format_correctness']
+                    retrieval_reward_tensor = reward_dict['retrieval_correctness']
+                    mixed_reward_tensor = reward_dict['mixed_outcome_reward']
+                    
+                    answer_reward_tensor_lst.append(answer_reward_tensor)
                     format_reward_tensor_lst.append(format_reward_tensor)
                     retrieval_reward_tensor_lst.append(retrieval_reward_tensor)
                     mixed_reward_tensor_lst.append(mixed_reward_tensor)
-                    data_source_lst.append(test_batch.non_tensor_batch.get('data_source', ['unknown'] * reward_tensor.shape[0]))
+                    data_source_lst.append(test_batch.non_tensor_batch.get('data_source', ['unknown'] * answer_reward_tensor.shape[0]))
 
         # reward_tensor = torch.cat([rw.sum(-1) for rw in reward_tensor_lst], dim=0).cpu()  # (batch_size,)
         # reward_tensor = torch.cat(reward_tensor_lst, dim=0).sum(-1).cpu()  # (batch_size,)
-        reward_tensor = torch.cat([rw.sum(-1, keepdim=True) for rw in reward_tensor_lst], dim=0).cpu()
+        answer_reward_tensor = torch.cat([rw.sum(-1, keepdim=True) for rw in answer_reward_tensor_lst], dim=0).cpu()
         format_reward_tensor = torch.cat([rw.sum(-1, keepdim=True) for rw in format_reward_tensor_lst], dim=0).cpu()
         retrieval_reward_tensor = torch.cat([rw.sum(-1, keepdim=True) for rw in retrieval_reward_tensor_lst], dim=0).cpu()
         mixed_reward_tensor = torch.cat([rw.sum(-1, keepdim=True) for rw in mixed_reward_tensor_lst], dim=0).cpu()
@@ -596,7 +601,7 @@ class RayPPOTrainer(object):
         data_sources = np.concatenate(data_source_lst, axis=0)
 
         metric_dict = {}
-        metric_dict.update(self._track_reward_metrics(reward_tensor, data_sources, prefix="val/test_score"))
+        metric_dict.update(self._track_reward_metrics(answer_reward_tensor, data_sources, prefix="val/test_score"))
         metric_dict.update(self._track_reward_metrics(format_reward_tensor, data_sources, prefix="val/format_score"))
         metric_dict.update(self._track_reward_metrics(retrieval_reward_tensor, data_sources, prefix="val/retrieval_score"))
         metric_dict.update(self._track_reward_metrics(mixed_reward_tensor, data_sources, prefix="val/mixed_outcome_score"))
@@ -858,16 +863,24 @@ class RayPPOTrainer(object):
                             batch = batch.union(reward_tensor)
 
                         # we combine with rule-based rm
-                        reward_tensor, format_reward_tensor, retrieval_reward_tensor, mixed_reward_tensor = self.reward_fn(batch)
-                        batch.batch['token_level_scores'] = mixed_reward_tensor
+                        reward_dict = self.reward_fn(batch)
+                        answer_reward_tensor = reward_dict['answer_correctness']
+                        format_reward_tensor = reward_dict['format_correctness']
+                        retrieval_reward_tensor = reward_dict['retrieval_correctness']
+                        mixed_reward_tensor = reward_dict['mixed_outcome_reward']
+                        
+                        if self.config.algorithm.use_mixed_outcome_reward:
+                            batch.batch['token_level_scores'] = mixed_reward_tensor
+                        else:
+                            batch.batch['token_level_scores'] = answer_reward_tensor
 
                         # compute training reward metrics by data source
                         train_data_sources = batch.non_tensor_batch.get(
-                            'data_source', ['unknown'] * reward_tensor.shape[0]
+                            'data_source', ['unknown'] * answer_reward_tensor.shape[0]
                         )
 
                         train_metric_dict = {}
-                        train_metric_dict.update(self._track_reward_metrics(reward_tensor, train_data_sources, prefix="train/reward"))
+                        train_metric_dict.update(self._track_reward_metrics(answer_reward_tensor, train_data_sources, prefix="train/reward"))
                         train_metric_dict.update(self._track_reward_metrics(format_reward_tensor, train_data_sources, prefix="train/format_reward"))
                         train_metric_dict.update(self._track_reward_metrics(retrieval_reward_tensor, train_data_sources, prefix="train/retrieval_reward"))
                         train_metric_dict.update(self._track_reward_metrics(mixed_reward_tensor, train_data_sources, prefix="train/mixed_outcome_reward"))

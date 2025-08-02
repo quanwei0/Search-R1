@@ -1,3 +1,12 @@
+source /code/hongpaul-sandbox/search/miniconda/bin/activate
+conda init
+
+conda activate retriever
+bash retrieval_launch.sh
+sleep 60
+
+conda activate search
+
 export CUDA_VISIBLE_DEVICES=0,1,2,3
 export DATA_DIR='./data/nq_search'
 
@@ -7,16 +16,16 @@ export WANDB_ENTITY="rl_agent"
 WAND_PROJECT='Search-R1'
 
 
-# export BASE_MODEL='Qwen/Qwen2.5-1.5B'
-# export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-1.5b-em-gae
+export BASE_MODEL="/code/hongpaul-sandbox/temp/Search-R1/qwen_models/qwen-7b"
+export EXPERIMENT_NAME=mhong-nq-search-r1-ppo-qwen2.5-7b-format-em-gae
 # export BASE_MODEL='Qwen/Qwen2.5-1.5B-Instruct'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-1.5b-it-em
 # export BASE_MODEL='Qwen/Qwen2.5-3B'
-# export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-3b-em-gae
+# export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-3b-em
 # export BASE_MODEL='Qwen/Qwen2.5-3B-Instruct'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-3b-it-em
-export BASE_MODEL='Qwen/Qwen2.5-7B'
-export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-7b-em-gae
+# export BASE_MODEL='Qwen/Qwen2.5-7B'
+# export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-7b-em
 # export BASE_MODEL='Qwen/Qwen2.5-7B-Instruct'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-7b-it-em
 
@@ -40,7 +49,7 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     algorithm.adv_estimator=gae \
     algorithm.gamma=1 \
     algorithm.lam=1 \
-    +algorithm.use_use_mixed_outcome_reward=False \
+    +algorithm.use_use_mixed_outcome_reward=True \
     actor_rollout_ref.model.path=$BASE_MODEL \
     actor_rollout_ref.actor.optim.lr=1e-6 \
     actor_rollout_ref.model.enable_gradient_checkpointing=True \
