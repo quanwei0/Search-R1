@@ -235,9 +235,65 @@ def compute_score_format(solution_str):
     else:
         return 0.0
 
+
 def compute_score_retrieval(solution_str, ground_truth):
     retrieval_correct = is_retrieval_correct(solution_str, ground_truth['target'])
     if retrieval_correct:
         return 1.0
     else:
         return 0.0
+
+
+def compute_score_em_format_retrievel(
+    solution_str,
+    ground_truth,
+    method="strict",
+    structure_format_score=0.2,
+    final_format_score=0.1,
+    retrieval_score=0.1,
+    format_score=0,
+    score=1.0,
+):
+    """The scoring function for exact match (EM).
+
+    Args:
+        solution_str: the solution text
+        ground_truth: the ground truth
+        method: the method to extract the solution, choices are 'strict' and 'flexible'
+        format_score: the score for the format
+        score: the score for the correct answer
+    """
+    is_valid_format, _ = is_valid_sequence(solution_str)
+    retrieval_correct = False
+    if is_valid_format:
+        retrieval_correct = is_retrieval_correct(solution_str, ground_truth['target'])
+    answer = extract_solution(solution_str=solution_str)
+    do_print = random.randint(1, 64) == 1
+
+    if do_print:
+        print(f"--------------------------------")
+        print(f"Golden answers: {ground_truth['target']}")
+        print(f"Extracted answer: {answer}")
+        print(f"Solution string: {solution_str}")
+
+    if answer is None:
+        if is_valid_format:
+            if retrieval_correct:
+                return structure_format_score + retrieval_score # 0.3
+            else:
+                return structure_format_score # 0.2
+        else:
+            return 0
+    else:
+        if em_check(answer, ground_truth['target']):
+            if is_valid_format:
+                return score # 1
+            else:
+                return score - structure_format_score # 0.8
+        elif is_valid_format:
+            if retrieval_correct:
+                return structure_format_score + retrieval_score # 0.3
+            else:
+                return structure_format_score # 0.2
+        else:
+            return final_format_score # 0.1

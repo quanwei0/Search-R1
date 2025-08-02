@@ -30,6 +30,8 @@ def _select_rm_score_fn(data_source, reward_type='answer_correctness'):
             return qa_em_new.compute_score_format
         elif reward_type == 'retrieval_correctness':
             return qa_em_new.compute_score_retrieval
+        elif reward_type == 'mixed_outcome_reward':
+            return qa_em_new.compute_score_em_format_retrievel
         else:
             raise NotImplementedError(f"Unsupported reward type: {reward_type} for data source: {data_source}")
         
@@ -56,6 +58,7 @@ class RewardManager():
         reward_tensor = torch.zeros_like(data.batch['responses'], dtype=torch.float32)
         format_reward_tensor = torch.zeros_like(data.batch['responses'], dtype=torch.float32)
         retrieval_reward_tensor = torch.zeros_like(data.batch['responses'], dtype=torch.float32)
+        mixed_outcome_reward_tensor = torch.zeros_like(data.batch['responses'], dtype=torch.float32)
 
         # all_scores = []
 
@@ -86,14 +89,17 @@ class RewardManager():
             compute_answer_score = _select_rm_score_fn(data_source, reward_type='answer_correctness')
             compute_format_score = _select_rm_score_fn(data_source, reward_type='format_correctness')
             compute_retrieval_score = _select_rm_score_fn(data_source, reward_type='retrieval_correctness')
+            comupte_mixed_outcome_score = _select_rm_score_fn(data_source, reward_type='mixed_outcome_reward')
 
-            answer_score = compute_answer_score(solution_str=sequences_str, ground_truth=ground_truth, format_score=self.format_score)
+            answer_score = compute_answer_score(solution_str=sequences_str, ground_truth=ground_truth)
             format_score = compute_format_score(solution_str=sequences_str)
             retrieval_score = compute_retrieval_score(solution_str=sequences_str, ground_truth=ground_truth)
+            mixed_outcome_score = comupte_mixed_outcome_score(solution_str=sequences_str, ground_truth=ground_truth)
 
             reward_tensor[i, valid_response_length - 1] = answer_score
             format_reward_tensor[i, valid_response_length - 1] = format_score
             retrieval_reward_tensor[i, valid_response_length - 1] = retrieval_score
+            mixed_outcome_reward_tensor[i, valid_response_length - 1] = mixed_outcome_score
 
             # all_scores.append(score)
 
@@ -111,7 +117,7 @@ class RewardManager():
         # print(f"[DEBUG] all_scores min: {np.min(all_scores)}")
         # print(f"[DEBUG] all_scores std: {np.std(all_scores)}")
 
-        return reward_tensor, format_reward_tensor, retrieval_reward_tensor
+        return reward_tensor, format_reward_tensor, retrieval_reward_tensor, mixed_outcome_reward_tensor
 
 
 import ray
