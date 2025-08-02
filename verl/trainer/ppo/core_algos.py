@@ -384,6 +384,7 @@ def compute_policy_loss(
     cliprange,
     detach_ratio='soft',
     importance_sampling_level='token',
+    turn_indices=None,
 ):
     """
     Computes PPO policy loss with optional detached importance sampling ratio.
@@ -401,6 +402,9 @@ def compute_policy_loss(
             - 'sequence': traditional sequence-level where all tokens share the same weight (average over sequence)
             - 'partial_sequence': partial-sequence-level GRPO where each token at position t uses 
                                  cumulative average of log_ratio from position 1 to t
+            - 'turn': turn-level where all tokens within the same turn share the same importance weight
+        turn_indices: tensor of shape (batch_size, max_indices) containing turn indices,
+                     required when importance_sampling_level='turn'
 
     Returns:
         pg_loss: scalar tensor
@@ -451,11 +455,62 @@ def compute_policy_loss(
             
             # Assign back to the original positions
             log_importance_weights[b, valid_positions] = cumulative_averages
+    elif importance_sampling_level == "turn":
+        print("="*80)
+        print(f"[Debug] turn-level importance sampling")
+        print("="*80)
+        # Turn-level importance sampling: all tokens within the same turn share the same importance weight
+        # The weight for each turn is the average of log_ratios of all tokens within that turn
+        
+        if turn_indices is None:
+            raise ValueError("turn_indices must be provided when importance_sampling_level='turn'")
+        
+        batch_size, seq_len = log_ratio.shape
+        log_importance_weights = torch.zeros_like(log_ratio)
+        
+        for b in range(batch_size):
+            mask = eos_mask[b]  # mask for this batch
+            
+            # Get turn indices for this batch sample - stored as flattened [start1, end1, start2, end2, ...]
+            turn_indices_b = turn_indices[b]  # shape: (max_indices,)
+            
+            # Find valid turn indices (not equal to -1)
+            valid_indices = turn_indices_b[turn_indices_b != -1]
+            
+            if len(valid_indices) == 0 or len(valid_indices) % 2 != 0:
+                # If no valid indices or odd number of indices, fall back to token-level
+                log_importance_weights[b] = log_ratio[b]
+                continue
+            
+            # Parse pairs of (start, end) indices
+            num_turns = len(valid_indices) // 2
+            
+            for turn_idx in range(num_turns):
+                start_pos = valid_indices[turn_idx * 2].item()
+                end_pos = valid_indices[turn_idx * 2 + 1].item()
+                
+                # Ensure positions are within sequence bounds
+                start_pos = max(0, min(start_pos, seq_len - 1))
+                end_pos = max(0, min(end_pos, seq_len - 1))
+                
+                if start_pos > end_pos:
+                    continue
+                
+                # Get log_ratios for tokens in this turn that are valid (masked)
+                turn_mask = mask[start_pos:end_pos + 1]
+                turn_log_ratios = log_ratio[b, start_pos:end_pos + 1]
+                
+                if turn_mask.sum() > 0:
+                    # Compute average log_ratio for this turn (only for valid tokens)
+                    turn_avg_log_ratio = (turn_log_ratios * turn_mask).sum() / turn_mask.sum()
+                    
+                    # Assign this average to all tokens in the turn
+                    log_importance_weights[b, start_pos:end_pos + 1] = turn_avg_log_ratio
 
     else:
         raise ValueError(
             f"Unknown importance sampling level: {importance_sampling_level}. Possible values are 'token', "
-            "'sequence', and 'partial_sequence'."
+            "'sequence', 'partial_sequence', and 'turn'."
         )
     
     negative_approx_kl = log_importance_weights

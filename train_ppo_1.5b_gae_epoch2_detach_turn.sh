@@ -89,7 +89,6 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     trainer.total_training_steps=2000 \
     trainer.default_hdfs_dir=null \
     trainer.default_local_dir=verl_checkpoints/$EXPERIMENT_NAME \
-    do_search=True \
     max_turns=3 \
     retriever.url="http://127.0.0.1:8001/retrieve" \
     retriever.topk=3 \
@@ -98,7 +97,7 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
 echo "First experiment completed. Starting second experiment with turn-level importance sampling and soft detach ratio..."
 
 export BASE_MODEL='Qwen/Qwen2.5-1.5B'
-export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-1.5b-em-gae-2epochs-detach-soft-turn
+export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-1.5b-em-gae-2epochs-detach-soft-turn-run2
 
 PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     data.train_files=$DATA_DIR/train.parquet \
@@ -161,7 +160,6 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     trainer.total_training_steps=2000 \
     trainer.default_hdfs_dir=null \
     trainer.default_local_dir=verl_checkpoints/$EXPERIMENT_NAME \
-    do_search=True \
     max_turns=3 \
     retriever.url="http://127.0.0.1:8001/retrieve" \
     retriever.topk=3 \
