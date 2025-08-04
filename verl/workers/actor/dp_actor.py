@@ -220,11 +220,10 @@ class DataParallelPPOActor(BasePPOActor):
         dataloader = batch.split(self.config.ppo_mini_batch_size)
 
         metrics = {}
-        # Get ppo_epochs from config, default to 1 if not set
-        ppo_epochs = getattr(self.config, 'ppo_epochs', 2)
-        ppo_epochs = 2
-        
-        for _ in range(ppo_epochs):
+        # Get update_epochs from config, default to 1 if not set
+        update_epochs = getattr(self.config, 'update_epochs', 1)
+        print(f'update_epochs: {update_epochs}')
+        for _ in range(update_epochs):
             for batch_idx, data in enumerate(dataloader):
                 # split batch into micro_batches
                 mini_batch = data
