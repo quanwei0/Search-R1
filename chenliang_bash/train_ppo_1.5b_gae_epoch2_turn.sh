@@ -9,7 +9,7 @@ export WANDB_ENTITY="rl_agent"
 WAND_PROJECT='Search-R1'
 
 export BASE_MODEL='Qwen/Qwen2.5-1.5B'
-export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-1.5b-em-gae-2epochs-detach-soft-turn
+export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-1.5b-em-gae-2epochs-detach-normal-turn
 # export BASE_MODEL='Qwen/Qwen2.5-1.5B-Instruct'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-1.5b-it-em-turn
 # export BASE_MODEL='Qwen/Qwen2.5-3B'
@@ -26,7 +26,7 @@ export VLLM_ATTENTION_BACKEND=XFORMERS # vllm + qwen2-7b with flash_attn has som
 
 # max_prompt_length = (config['training']['max_start_length'] + config['training']['max_response_length'] * (config['training']['max_turns'] - 1) + config['training']['max_obs_length'] * config['training']['max_turns'])
 
-echo "Starting experiment with turn-level importance sampling and soft detach ratio..."
+echo "Starting experiment with turn-level importance sampling and normal detach ratio..."
 
 PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     data.train_files=$DATA_DIR/train.parquet \
@@ -60,7 +60,7 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     actor_rollout_ref.rollout.n_agent=1 \
     actor_rollout_ref.rollout.temperature=1 \
     actor_rollout_ref.actor.state_masking=True \
-    +actor_rollout_ref.actor.detach_ratio=soft \
+    +actor_rollout_ref.actor.detach_ratio=normal \
     +actor_rollout_ref.actor.importance_sampling_level=turn \
     critic.optim.lr=1e-5 \
     critic.model.use_remove_padding=True \
@@ -77,12 +77,12 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     trainer.critic_warmup=0 \
     trainer.logger=['console','wandb'] \
     +trainer.val_only=False \
-    +trainer.val_before_train=False \
+    +trainer.val_before_train=True \
     trainer.default_hdfs_dir=null \
     trainer.n_gpus_per_node=4 \
     trainer.nnodes=1 \
     trainer.save_freq=-1 \
-    trainer.test_freq=-1 \
+    trainer.test_freq=25 \
     trainer.project_name=$WAND_PROJECT \
     trainer.experiment_name=$EXPERIMENT_NAME \
     trainer.total_epochs=2 \
@@ -97,7 +97,7 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
 echo "First experiment completed. Starting second experiment with turn-level importance sampling and soft detach ratio..."
 
 export BASE_MODEL='Qwen/Qwen2.5-1.5B'
-export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-1.5b-em-gae-2epochs-detach-soft-turn-run2
+export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-1.5b-em-gae-2epochs-detach-normal-turn-run2
 
 PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     data.train_files=$DATA_DIR/train.parquet \
@@ -131,7 +131,7 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     actor_rollout_ref.rollout.n_agent=1 \
     actor_rollout_ref.rollout.temperature=1 \
     actor_rollout_ref.actor.state_masking=True \
-    +actor_rollout_ref.actor.detach_ratio=soft \
+    +actor_rollout_ref.actor.detach_ratio=normal \
     +actor_rollout_ref.actor.importance_sampling_level=turn \
     critic.optim.lr=1e-5 \
     critic.model.use_remove_padding=True \
@@ -148,12 +148,12 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     trainer.critic_warmup=0 \
     trainer.logger=['console','wandb'] \
     +trainer.val_only=False \
-    +trainer.val_before_train=False \
+    +trainer.val_before_train=True \
     trainer.default_hdfs_dir=null \
     trainer.n_gpus_per_node=4 \
     trainer.nnodes=1 \
     trainer.save_freq=-1 \
-    trainer.test_freq=-1 \
+    trainer.test_freq=25 \
     trainer.project_name=$WAND_PROJECT \
     trainer.experiment_name=$EXPERIMENT_NAME \
     trainer.total_epochs=2 \

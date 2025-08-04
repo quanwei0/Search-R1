@@ -540,7 +540,7 @@ def compute_policy_loss(
         lower = 1.0 - cliprange
         upper = 1.0 + cliprange
         lower_decay = 1.0 - 1.05 * cliprange 
-        upper_decay = 1.0 + 1.5 * cliprange
+        upper_decay = 1.0 + 1.3 * cliprange
 
         # Create smooth decay mask: multiplier ∈ [1, 0]
         decay_mask = torch.ones_like(ratio_detached)
