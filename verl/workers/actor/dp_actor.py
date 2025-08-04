@@ -207,12 +207,12 @@ class DataParallelPPOActor(BasePPOActor):
         assert self.config.ppo_mini_batch_size % self.config.ppo_micro_batch_size == 0
         self.gradient_accumulation = self.config.ppo_mini_batch_size // self.config.ppo_micro_batch_size
         temperature = data.meta_info['temperature']  # temperature must be in the data.meta_info to avoid slient error
-
-        select_keys = ['responses', 'input_ids', 'attention_mask', 'position_ids', 'old_log_probs', 'advantages']
+        select_keys = ['responses', 'input_ids', 'attention_mask', 'position_ids', 'old_log_probs', 'advantages', 'turn_indices']
         if self.config.state_masking:
             select_keys.append('loss_mask')
         if self.config.use_kl_loss:
             select_keys.append('ref_log_prob')
+
         batch = data.select(batch_keys=select_keys).batch
 
         # Split to make minibatch iterator for updating the actor
@@ -220,71 +220,86 @@ class DataParallelPPOActor(BasePPOActor):
         dataloader = batch.split(self.config.ppo_mini_batch_size)
 
         metrics = {}
-        for batch_idx, data in enumerate(dataloader):
-            # split batch into micro_batches
-            mini_batch = data
-            if self.config.use_dynamic_bsz:
-                max_token_len = self.config.ppo_max_token_len_per_gpu * self.ulysses_sequence_parallel_size
-                micro_batches, _ = rearrange_micro_batches(batch=mini_batch, max_token_len=max_token_len)
-            else:
+        # Get ppo_epochs from config, default to 1 if not set
+        ppo_epochs = getattr(self.config, 'ppo_epochs', 2)
+        ppo_epochs = 2
+        
+        for _ in range(ppo_epochs):
+            for batch_idx, data in enumerate(dataloader):
                 # split batch into micro_batches
-                micro_batches = mini_batch.split(self.config.ppo_micro_batch_size)
+                mini_batch = data
+                if self.config.use_dynamic_bsz:
+                    max_token_len = self.config.ppo_max_token_len_per_gpu * self.ulysses_sequence_parallel_size
+                    micro_batches, _ = rearrange_micro_batches(batch=mini_batch, max_token_len=max_token_len)
+                else:
+                    # split batch into micro_batches
+                    micro_batches = mini_batch.split(self.config.ppo_micro_batch_size)
 
-            self.actor_optimizer.zero_grad()
+                self.actor_optimizer.zero_grad()
+                # breakpoint()
+                for data in micro_batches:
+                    data = data.cuda()  # actor device is cpu when using offload
+                    responses = data['responses']
+                    response_length = responses.size(1)
+                    attention_mask = data['attention_mask']
+                    response_mask = attention_mask[:, -response_length:]
+                    if self.config.state_masking:
+                        response_mask = data['loss_mask']
+                    old_log_prob = data['old_log_probs']
+                    advantages = data['advantages']
 
-            for data in micro_batches:
-                data = data.cuda()  # actor device is cpu when using offload
-                responses = data['responses']
-                response_length = responses.size(1)
-                attention_mask = data['attention_mask']
-                response_mask = attention_mask[:, -response_length:]
-                if self.config.state_masking:
-                    response_mask = data['loss_mask']
-                old_log_prob = data['old_log_probs']
-                advantages = data['advantages']
+                    clip_ratio = self.config.clip_ratio
+                    entropy_coeff = self.config.entropy_coeff
+                    detach_ratio = self.config.get('detach_ratio', 'soft')  # default to 'soft' if not specified
+                    importance_sampling_level = self.config.get('importance_sampling_level', 'token')  # default to 'token' if not specified
 
-                clip_ratio = self.config.clip_ratio
-                entropy_coeff = self.config.entropy_coeff
+                    # all return: (bsz, response_length)
+                    entropy, log_prob = self._forward_micro_batch(micro_batch=data, temperature=temperature)
 
-                # all return: (bsz, response_length)
-                entropy, log_prob = self._forward_micro_batch(micro_batch=data, temperature=temperature)
+                    # Get turn_indices if using turn-level importance sampling
+                    turn_indices = None
+                    if importance_sampling_level == 'turn':
+                        turn_indices = data.get('turn_indices', None)
+                    
+                    pg_loss, pg_clipfrac, ppo_kl = core_algos.compute_policy_loss(old_log_prob=old_log_prob,
+                                                                                  log_prob=log_prob,
+                                                                                  advantages=advantages,
+                                                                                  eos_mask=response_mask,
+                                                                                  cliprange=clip_ratio,
+                                                                                  detach_ratio=detach_ratio,
+                                                                                  importance_sampling_level=importance_sampling_level,
+                                                                                  turn_indices=turn_indices)
+                    # compute entropy loss from entropy
+                    entropy_loss = verl_F.masked_mean(entropy, response_mask)
 
-                pg_loss, pg_clipfrac, ppo_kl = core_algos.compute_policy_loss(old_log_prob=old_log_prob,
-                                                                              log_prob=log_prob,
-                                                                              advantages=advantages,
-                                                                              eos_mask=response_mask,
-                                                                              cliprange=clip_ratio)
-                # compute entropy loss from entropy
-                entropy_loss = verl_F.masked_mean(entropy, response_mask)
+                    # compute policy loss
+                    policy_loss = pg_loss - entropy_loss * entropy_coeff
 
-                # compute policy loss
-                policy_loss = pg_loss - entropy_loss * entropy_coeff
+                    if self.config.use_kl_loss:
+                        ref_log_prob = data['ref_log_prob']
+                        # compute kl loss
+                        kld = core_algos.kl_penalty(logprob=log_prob,
+                                                    ref_logprob=ref_log_prob,
+                                                    kl_penalty=self.config.kl_loss_type)
+                        kl_loss = masked_mean(kld, response_mask)
 
-                if self.config.use_kl_loss:
-                    ref_log_prob = data['ref_log_prob']
-                    # compute kl loss
-                    kld = core_algos.kl_penalty(logprob=log_prob,
-                                                ref_logprob=ref_log_prob,
-                                                kl_penalty=self.config.kl_loss_type)
-                    kl_loss = masked_mean(kld, response_mask)
+                        policy_loss = policy_loss + kl_loss * self.config.kl_loss_coef
+                        metrics['actor/kl_loss'] = kl_loss.detach().item()
+                        metrics['actor/kl_coef'] = self.config.kl_loss_coef
 
-                    policy_loss = policy_loss + kl_loss * self.config.kl_loss_coef
-                    metrics['actor/kl_loss'] = kl_loss.detach().item()
-                    metrics['actor/kl_coef'] = self.config.kl_loss_coef
+                    loss = policy_loss / self.gradient_accumulation
+                    loss.backward()
 
-                loss = policy_loss / self.gradient_accumulation
-                loss.backward()
+                    data = {
+                        'actor/entropy_loss': entropy_loss.detach().item(),
+                        'actor/pg_loss': pg_loss.detach().item(),
+                        'actor/pg_clipfrac': pg_clipfrac.detach().item(),
+                        'actor/ppo_kl': ppo_kl.detach().item(),
+                    }
+                    append_to_dict(metrics, data)
 
-                data = {
-                    'actor/entropy_loss': entropy_loss.detach().item(),
-                    'actor/pg_loss': pg_loss.detach().item(),
-                    'actor/pg_clipfrac': pg_clipfrac.detach().item(),
-                    'actor/ppo_kl': ppo_kl.detach().item(),
-                }
+                grad_norm = self._optimizer_step()
+                data = {'actor/grad_norm': grad_norm.detach().item()}
                 append_to_dict(metrics, data)
-
-            grad_norm = self._optimizer_step()
-            data = {'actor/grad_norm': grad_norm.detach().item()}
-            append_to_dict(metrics, data)
         self.actor_optimizer.zero_grad()
         return metrics

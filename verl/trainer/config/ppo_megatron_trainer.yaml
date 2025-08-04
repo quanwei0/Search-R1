@@ -25,6 +25,7 @@ actor_rollout_ref:
     entropy_coeff: 0.001
     ppo_epochs: 1
     shuffle: True
+    detach_ratio: hard  # hard or soft detach ratio for policy loss
     optim:
       lr: 1e-6
       clip_grad: 1.0

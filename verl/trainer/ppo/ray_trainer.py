@@ -850,7 +850,6 @@ class RayPPOTrainer(object):
                     if self.config.do_search and self.config.actor_rollout_ref.actor.state_masking:
                         batch, metrics = self._create_loss_mask(batch, metrics)
                         batch = self._split_turn(batch)
-
                     batch = self._save_trajectories(batch, save_dir)
                     
                     with _timer('adv', timing_raw):
@@ -921,7 +920,7 @@ class RayPPOTrainer(object):
 
                     # validate
                     if self.val_reward_fn is not None and self.config.trainer.test_freq > 0 and \
-                        self.global_steps % self.config.trainer.test_freq == 0:
+                        self.global_steps % self.config.trainer.test_freq == 0 and self.global_steps != 0:
                         with _timer('testing', timing_raw):
                             val_metrics: dict = self._validate()
                         metrics.update(val_metrics)
@@ -994,8 +993,24 @@ class RayPPOTrainer(object):
             indices = list(zip(turn_start_pos.tolist(), turn_end_pos.tolist()))
             turn_indices.append(indices)
 
-        # Save to batch meta_info for later use (e.g., in GAE)
-        batch.meta_info['turn_indices'] = turn_indices
+        # Save to batch as tensor matrix for later use (e.g., in GAE)
+        # Create a batch_size x 20 matrix initialized with -1
+        batch_size = len(turn_indices)
+        max_indices = 20  # Should be enough for most cases (3 turns = max 6 indices, with buffer)
+        turn_indices_tensor = torch.full((batch_size, max_indices), -1, dtype=torch.long, device=loss_mask.device)
+        
+        # Fill in the actual turn indices for each sample
+        
+        for b, indices in enumerate(turn_indices):
+            flattened_indices = []
+            for start, end in indices:
+                flattened_indices.extend([start, end])
+            
+            # Fill the tensor with actual indices
+            num_indices = min(len(flattened_indices), max_indices)
+            turn_indices_tensor[b, :num_indices] = torch.tensor(flattened_indices[:num_indices], dtype=torch.long, device=loss_mask.device)
+        
+        batch.batch['turn_indices'] = turn_indices_tensor
 
         return batch
 
