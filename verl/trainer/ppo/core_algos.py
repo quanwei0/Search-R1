@@ -195,15 +195,30 @@ def compute_turn_level_gae_advantage_return(
             valid_positions = torch.cat([turn_start_pos, torch.tensor([valid_response_length - 1], device=loss_mask.device)])
             
             for i in range(len(valid_positions) - 1, -1, -1):
+                if i == 0:
+                    break
+                last_pos = valid_positions[i-1]
                 curr_pos = valid_positions[i]
+ 
+                curr_turn_reward = token_level_rewards[b, curr_pos-1]
+                curr_turn_value = values[b, curr_pos]
+                 
+                # curr_turn_reward = token_level_rewards[b, last_pos:curr_pos].sum()
+                # curr_turn_value = values[b, last_pos+1:curr_pos+1].sum()
+                
+                # curr_turn_reward = token_level_rewards[b, last_pos:curr_pos].mean()
+                # curr_turn_value = values[b, last_pos+1:curr_pos+1].mean()
+                
                 
                 if i < len(valid_positions) - 1:
                     next_pos = valid_positions[i+1]
                     nextvalues = values[b, next_pos]
+                    # nextvalues = values[b, curr_pos+1:next_pos+1].sum()
+                    # nextvalues = values[b, curr_pos+1:next_pos+1].mean()
                 else:
                     nextvalues = 0.0
-                
-                delta = token_level_rewards[b, curr_pos] + turn_level_gamma * nextvalues - values[b, curr_pos]
+                               
+                delta = curr_turn_reward + turn_level_gamma * nextvalues - curr_turn_value
                 lastgaelam = delta + turn_level_gamma * turn_level_lam * lastgaelam
                 turn_level_adv[b, curr_pos] = lastgaelam
 
@@ -264,15 +279,30 @@ def compute_weighted_gae_advantage_return(
             valid_positions = torch.cat([turn_start_pos, torch.tensor([valid_response_length - 1], device=loss_mask.device)])
             
             for i in range(len(valid_positions) - 1, -1, -1):
+                if i == 0:
+                    break
+                last_pos = valid_positions[i-1]
                 curr_pos = valid_positions[i]
+ 
+                curr_turn_reward = token_level_rewards[b, curr_pos-1]
+                curr_turn_value = values[b, curr_pos]
+                 
+                # curr_turn_reward = token_level_rewards[b, last_pos:curr_pos].sum()
+                # curr_turn_value = values[b, last_pos+1:curr_pos+1].sum()
+                
+                # curr_turn_reward = token_level_rewards[b, last_pos:curr_pos].mean()
+                # curr_turn_value = values[b, last_pos+1:curr_pos+1].mean()
+                
                 
                 if i < len(valid_positions) - 1:
                     next_pos = valid_positions[i+1]
                     nextvalues = values[b, next_pos]
+                    # nextvalues = values[b, curr_pos+1:next_pos+1].sum()
+                    # nextvalues = values[b, curr_pos+1:next_pos+1].mean()
                 else:
                     nextvalues = 0.0
-                
-                delta = token_level_rewards[b, curr_pos] + turn_level_gamma * nextvalues - values[b, curr_pos]
+                               
+                delta = curr_turn_reward + turn_level_gamma * nextvalues - curr_turn_value
                 lastgaelam = delta + turn_level_gamma * turn_level_lam * lastgaelam
                 turn_level_adv[b, curr_pos] = lastgaelam
 
