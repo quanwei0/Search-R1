@@ -249,7 +249,7 @@ class DataParallelPPOActor(BasePPOActor):
 
                     clip_ratio = self.config.clip_ratio
                     entropy_coeff = self.config.entropy_coeff
-                    detach_ratio = self.config.get('detach_ratio', 'soft')  # default to 'soft' if not specified
+                    detach_ratio = self.config.get('detach_ratio', 'normal')  # default to 'soft' if not specified
                     importance_sampling_level = self.config.get('importance_sampling_level', 'token')  # default to 'token' if not specified
 
                     # all return: (bsz, response_length)
