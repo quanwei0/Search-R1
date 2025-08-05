@@ -1046,7 +1046,7 @@ class RayPPOTrainer(object):
             valid_prompt_length = attention_mask[:prompt_length].sum()
             valid_prompt_ids = prompt_ids[-valid_prompt_length:]
 
-            prompt_text = self.tokenizer.decode(valid_prompt_ids, skip_special_tokens=True)
+            prompt_text = self.tokenizer.decode(valid_prompt_ids)
             prompt_texts.append(prompt_text)
             
             response_ids = data_item.batch['responses']
@@ -1054,7 +1054,7 @@ class RayPPOTrainer(object):
             valid_response_ids = response_ids[:valid_response_length]
 
             full_ids = torch.cat((valid_prompt_ids, valid_response_ids))
-            full_text = self.tokenizer.decode(full_ids, skip_special_tokens=True)
+            full_text = self.tokenizer.decode(full_ids)
             full_texts.append(full_text)
             response_text_lengths.append(valid_response_ids.shape[0])
 
@@ -1063,7 +1063,7 @@ class RayPPOTrainer(object):
             turn_lengths = []
             for start, end in turn_indices[i]:
                 turn_ids = response_ids[start:end + 1]
-                turn_text = self.tokenizer.decode(turn_ids, skip_special_tokens=True)
+                turn_text = self.tokenizer.decode(turn_ids)
                 turns.append(turn_text)
                 turn_lengths.append(turn_ids.shape[0])
             turn_texts.append(turns)
