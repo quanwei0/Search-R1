@@ -32,6 +32,10 @@ def _select_rm_score_fn(data_source, reward_type='answer_correctness'):
             return qa_em_new.compute_score_retrieval
         elif reward_type == 'mixed_outcome_reward':
             return qa_em_new.compute_score_em_format_retrievel
+        # elif reward_type == 'final_em_format':
+        #     return qa_em_new.compute_score_final_em_format
+        # elif reward_type == 'step_retrieval_format':
+        #     return qa_em_new.compute_score_step_retrieval_format
         else:
             raise NotImplementedError(f"Unsupported reward type: {reward_type} for data source: {data_source}")
         
@@ -59,6 +63,8 @@ class RewardManager():
         format_reward_tensor = torch.zeros_like(data.batch['responses'], dtype=torch.float32)
         retrieval_reward_tensor = torch.zeros_like(data.batch['responses'], dtype=torch.float32)
         mixed_outcome_reward_tensor = torch.zeros_like(data.batch['responses'], dtype=torch.float32)
+        # final_em_format_reward_tensor = torch.zeros_like(data.batch['responses'], dtype=torch.float32)
+        # step_retrieval_format_reward_tensor = torch.zeros_like(data.batch['responses'], dtype=torch.float32)
 
         # all_scores = []
 
@@ -90,16 +96,22 @@ class RewardManager():
             compute_format_score = _select_rm_score_fn(data_source, reward_type='format_correctness')
             compute_retrieval_score = _select_rm_score_fn(data_source, reward_type='retrieval_correctness')
             comupte_mixed_outcome_score = _select_rm_score_fn(data_source, reward_type='mixed_outcome_reward')
+            # compute_final_em_format_score = _select_rm_score_fn(data_source, reward_type='final_em_format')
+            # compute_step_retrieval_format_score = _select_rm_score_fn(data_source, reward_type='step_retrieval_format')
 
             answer_score = compute_answer_score(solution_str=sequences_str, ground_truth=ground_truth)
             format_score = compute_format_score(solution_str=sequences_str)
             retrieval_score = compute_retrieval_score(solution_str=sequences_str, ground_truth=ground_truth)
             mixed_outcome_score = comupte_mixed_outcome_score(solution_str=sequences_str, ground_truth=ground_truth)
+            # final_em_format_score = compute_final_em_format_score(solution_str=sequences_str, ground_truth=ground_truth)
+            # step_retrieval_format_score = compute_step_retrieval_format_score(solution_str=sequences_str, ground_truth=ground_truth)
 
             answer_reward_tensor[i, valid_response_length - 1] = answer_score
             format_reward_tensor[i, valid_response_length - 1] = format_score
             retrieval_reward_tensor[i, valid_response_length - 1] = retrieval_score
             mixed_outcome_reward_tensor[i, valid_response_length - 1] = mixed_outcome_score
+            # final_em_format_reward_tensor[i, valid_response_length - 1] = final_em_format_score
+            # step_retrieval_format_reward_tensor[i, valid_response_length - 1] = step_retrieval_format_score
 
             # all_scores.append(score)
 
@@ -122,6 +134,8 @@ class RewardManager():
             'format_correctness': format_reward_tensor,
             'retrieval_correctness': retrieval_reward_tensor,
             'mixed_outcome_reward': mixed_outcome_reward_tensor,
+            # 'final_em_format': final_em_format_reward_tensor,
+            # 'step_retrieval_format': step_retrieval_format_reward_tensor,
         }
 
 import ray

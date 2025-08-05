@@ -41,18 +41,19 @@ If you find no further external knowledge needed, you can directly provide the a
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
+    parser.add_argument('--data_source', type=str, default='nq')
     parser.add_argument('--local_dir', default='./data/nq_search')
     parser.add_argument('--hdfs_dir', default=None)
     parser.add_argument('--template_type', type=str, default='base')
 
     args = parser.parse_args()
 
-    data_source = 'nq'
+    data_source = args.data_source
 
-    dataset = datasets.load_dataset('RUC-NLPIR/FlashRAG_datasets', 'nq')
+    dataset = datasets.load_dataset('RUC-NLPIR/FlashRAG_datasets', data_source)
 
     train_dataset = dataset['train']
-    test_dataset = dataset['test']
+    test_dataset = dataset['dev']
 
     # add a row to each data item that represents a unique id
     def make_map_fn(split):
@@ -87,7 +88,7 @@ if __name__ == '__main__':
         return process_fn
 
     train_dataset = train_dataset.map(function=make_map_fn('train'), with_indices=True)
-    test_dataset = test_dataset.map(function=make_map_fn('test'), with_indices=True)
+    test_dataset = test_dataset.map(function=make_map_fn('dev'), with_indices=True)
 
     local_dir = args.local_dir
     hdfs_dir = args.hdfs_dir

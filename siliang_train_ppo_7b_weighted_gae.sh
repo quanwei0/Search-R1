@@ -1,5 +1,5 @@
 # export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
-export DATA_DIR='./data/nq_search'
+export DATA_DIR='./data/hotpotqa_search'
 
 export WANDB_API_KEY="810f91e58aa0fd1d03b11c60b0d1cffbb1d941f4"
 export WANDB_ENTITY="rl_agent"
@@ -16,7 +16,7 @@ WAND_PROJECT='Search-R1'
 # export BASE_MODEL='Qwen/Qwen2.5-3B-Instruct'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-3b-it-em
 export BASE_MODEL='Qwen/Qwen2.5-7B'
-export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-7b-em-weighted-gae-weight0.1
+export EXPERIMENT_NAME=hotpotqa-search-r1-ppo-qwen2.5-7b-em-weighted-gae-weight0.1
 # export BASE_MODEL='Qwen/Qwen2.5-7B-Instruct'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-7b-it-em
 

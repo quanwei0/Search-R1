@@ -16,7 +16,7 @@ WAND_PROJECT='Search-R1'
 # export BASE_MODEL='Qwen/Qwen2.5-3B-Instruct'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-3b-it-em
 export BASE_MODEL='Qwen/Qwen2.5-7B'
-export EXPERIMENT_NAME=hotpotqa-search-r1-ppo-qwen2.5-7b-em-gae
+export EXPERIMENT_NAME=hotpotqa-search-r1-ppo-qwen2.5-7b-em-turn-level-gae
 # export BASE_MODEL='Qwen/Qwen2.5-7B-Instruct'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-7b-it-em
 
@@ -37,7 +37,7 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     data.max_start_length=2048 \
     data.max_obs_length=500 \
     data.shuffle_train_dataloader=True \
-    algorithm.adv_estimator=gae \
+    algorithm.adv_estimator=turn_level_gae \
     algorithm.gamma=1 \
     algorithm.lam=1 \
     +algorithm.use_mixed_outcome_reward=False \

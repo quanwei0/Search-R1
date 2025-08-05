@@ -1,4 +1,4 @@
-export CUDA_VISIBLE_DEVICES=0,1,2,3
+# export CUDA_VISIBLE_DEVICES=0,1,2,3
 file_path=./data
 index_file=$file_path/e5_Flat.index
 corpus_file=$file_path/wiki-18.jsonl
