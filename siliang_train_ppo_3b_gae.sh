@@ -1,4 +1,17 @@
-# export CUDA_VISIBLE_DEVICES=0,1,2,3
+source /mnt/home/siliang/miniconda3/bin/activate
+conda init
+
+# Set shared configuration parameters
+export CUDA_VISIBLE_DEVICES=0,1,2,3
+export RETRIEVAL_PORT=8001
+
+conda activate retriever
+# Pass GPU devices and port to retrieval script
+bash retrieval_launch.sh "$CUDA_VISIBLE_DEVICES" "$RETRIEVAL_PORT"
+sleep 60
+
+conda activate search
+
 export DATA_DIR='./data/nq_search'
 
 export WANDB_API_KEY="810f91e58aa0fd1d03b11c60b0d1cffbb1d941f4"
@@ -89,6 +102,6 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     trainer.default_hdfs_dir=null \
     trainer.default_local_dir=verl_checkpoints/$EXPERIMENT_NAME \
     max_turns=3 \
-    retriever.url="http://127.0.0.1:8001/retrieve" \
+    retriever.url="http://127.0.0.1:$RETRIEVAL_PORT/retrieve" \
     retriever.topk=3 \
     2>&1 | tee $EXPERIMENT_NAME.log
