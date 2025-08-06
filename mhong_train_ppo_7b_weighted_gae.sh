@@ -21,7 +21,7 @@ WAND_PROJECT='Search-R1'
 
 
 export BASE_MODEL="/code/hongpaul-sandbox/temp/Search-R1/qwen_models/qwen-7b"
-export EXPERIMENT_NAME=mhong-nq-search-r1-ppo-qwen2.5-7b-em-weighted-gae-weight0.1
+export EXPERIMENT_NAME=mhong-nq-search-r1-ppo-qwen2.5-7b-em-weighted-gae-weight0.1-mixed-reward
 # export BASE_MODEL='Qwen/Qwen2.5-1.5B-Instruct'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-1.5b-it-em
 # export BASE_MODEL='Qwen/Qwen2.5-3B'
@@ -54,7 +54,7 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     algorithm.gamma=1 \
     algorithm.lam=1 \
     +algorithm.use_mixed_outcome_reward=False \
-    +algorithm.use_mixed_reward=False \
+    +algorithm.use_mixed_reward=True \
     actor_rollout_ref.model.path=$BASE_MODEL \
     actor_rollout_ref.actor.optim.lr=1e-6 \
     actor_rollout_ref.model.enable_gradient_checkpointing=True \
