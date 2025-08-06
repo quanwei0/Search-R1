@@ -298,173 +298,95 @@ def compute_score_em_format_retrievel(
         else:
             return final_format_score # 0.1
 
-def is_valid_sequence_outcome(text):
-    # Find the position of "<|im_start|>assistant" with potential whitespace
-    assistant_pattern = r"<\|im_start\|>assistant\s*"
-    assistant_match = re.search(assistant_pattern, text)
-    
-    if not assistant_match:
-        return False, "Missing assistant marker"
-    
-    # Extract the content after the assistant marker
-    start_pos = assistant_match.end()
-    content = text[start_pos:]
-    
-    # Check for balanced tags
-    tags_to_check = ["think", "answer"]
-    for tag in tags_to_check:
-        opening_count = len(re.findall(f"<{tag}>", content))
-        closing_count = len(re.findall(f"</{tag}>", content))
-        if opening_count != closing_count:
-            return False, f"Mismatch in {tag} tags: {opening_count} opening vs {closing_count} closing tags"
-    
-    # Now check for proper sequence pattern and no extraneous content
-    
-    # 1. First split the content by any tags we recognize
-    split_pattern = r"(</?(?:think|answer)>)"
-    parts = re.split(split_pattern, content)
-    
-    # 2. Keep track of the current position in the expected sequence
-    state = "start"  # start -> think -> search -> information -> think -> ... -> answer -> end
-    
-    # 3. Check each part
-    for i, part in enumerate(parts):
-        # Skip empty parts
-        if not part.strip():
-            continue
-            
-        # Check if this is a tag
-        if re.match(r"</?(?:think|search|information|answer)>", part):
-            # This is a tag, check if it's valid in the current state
-            if part == "<think>" and state in ["start", "information"]:
-                state = "in_think"
-            elif part == "</think>" and state == "in_think":
-                state = "after_think"
-            elif part == "<search>" and state == "after_think":
-                state = "in_search"
-            elif part == "</search>" and state == "in_search":
-                state = "after_search"
-            elif part == "<information>" and state == "after_search":
-                state = "in_information"
-            elif part == "</information>" and state == "in_information":
-                state = "information"
-            elif part == "<answer>" and state == "after_think":
-                state = "in_answer"
-            elif part == "</answer>" and state == "in_answer":
-                state = "end"
-            else:
-                return False, f"Unexpected tag {part} in state {state}"
+
+def compute_score_final_em_format(final_turn_str, ground_truth):
+    match_iter = re.finditer(r'<answer>(.*?)</answer>', final_turn_str, re.DOTALL)
+    matches = list(match_iter)
+
+    if len(matches) != 1:
+        answer = None
+    else:
+        answer = matches[0].group(1).strip()
+
+    if answer is None:
+        return 0.0
+    else:
+        if em_check(answer, ground_truth['target']):
+            return 1.0
         else:
-            # This is content, check if it's valid in the current state
-            if state in ["in_think", "in_search", "in_information", "in_answer"]:
-                # Content is allowed inside tags
-                pass
-            elif state in ["start", "after_think", "after_search", "information"]:
-                # Only whitespace is allowed between tags
-                if part.strip():
-                    return False, f"Unexpected content '{part.strip()}' between tags (state: {state})"
+            if final_format_check(final_turn_str):
+                return 0.2
             else:
-                return False, f"Unexpected content in state {state}"
-    
-    # Check final state
-    if state != "end":
-        return False, f"Incomplete sequence, ended in state {state}"
+                return 0.0
+
+
+def final_format_check(final_turn_str):
+    content = final_turn_str
+
+    for tag in ["think", "answer"]:
+        open_count = len(re.findall(fr"<{tag}>", content))
+        close_count = len(re.findall(fr"</{tag}>", content))
+        if open_count != 1 or close_count != 1:
+            return False
+
+    think_open = re.search(r"<think>", content)
+    answer_open = re.search(r"<answer>", content)
+
+    if not think_open or not answer_open:
+        return False
+    if think_open.start() > answer_open.start():
+        return False
+
+    return True
+
+
+def compute_score_step_retrieval_format(mid_turn_str, ground_truth):
+
+    num_turn_minus_1 = len(mid_turn_str)
+    step_rewards = []
+
+    for i in range(num_turn_minus_1):
+        turn_str = mid_turn_str[i]
+        match_iter = re.finditer(r'<information>(.*?)</information>', turn_str, re.DOTALL)
+        matches = list(match_iter)
+
+        if len(matches) != 1:
+            retrieval = None
+        else:
+            retrieval = matches[0].group(1).strip()
         
-    return True, "Valid sequence format"
-
-
-def compute_score_em_final_format(
-    solution_str,
-    ground_truth,
-    method="strict",
-    structure_format_score=0.2,
-    final_format_score=0.1,
-    retrieval_score=0.1,
-    format_score=0,
-    score=1.0,
-):
-    """The scoring function for exact match (EM).
-
-    Args:
-        solution_str: the solution text
-        ground_truth: the ground truth
-        method: the method to extract the solution, choices are 'strict' and 'flexible'
-        format_score: the score for the format
-        score: the score for the correct answer
-    """
-    is_valid_format, _ = is_valid_sequence(solution_str)
-    answer = extract_solution(solution_str=solution_str)
-    do_print = random.randint(1, 64) == 1
-
-    if do_print:
-        print(f"--------------------------------")
-        print(f"Golden answers: {ground_truth['target']}")
-        print(f"Extracted answer: {answer}")
-        print(f"Solution string: {solution_str}")
-
-    if answer is None:
-        if is_valid_format:
-            return structure_format_score # 0.2
-        else:
-            return 0
-    else:
-        if em_check(answer, ground_truth['target']):
-            if is_valid_format:
-                return score # 1
+        if retrieval is None:
+            if mid_format_check(turn_str):
+                step_rewards.append(0.2)
             else:
-                return score - structure_format_score # 0.8
-        elif is_valid_format:
-            return structure_format_score # 0.2
+                step_rewards.append(0.0)
         else:
-            return final_format_score # 0.1
-
-
-def compute_score_step_retrieval_format(
-    solution_str,
-    ground_truth,
-    method="strict",
-    structure_format_score=0.2,
-    final_format_score=0.1,
-    retrieval_score=0.1,
-    format_score=0,
-    score=1.0,
-):
-    """The scoring function for exact match (EM).
-
-    Args:
-        solution_str: the solution text
-        ground_truth: the ground truth
-        method: the method to extract the solution, choices are 'strict' and 'flexible'
-        format_score: the score for the format
-        score: the score for the correct answer
-    """
-    is_valid_format, _ = is_valid_sequence(solution_str)
-    retrieval_correct = False
-    if is_valid_format:
-        retrieval_correct = is_retrieval_correct(solution_str, ground_truth['target'])
-    answer = extract_solution(solution_str=solution_str)
-    do_print = random.randint(1, 64) == 1
-
-    if do_print:
-        print(f"--------------------------------")
-        print(f"Golden answers: {ground_truth['target']}")
-        print(f"Extracted answer: {answer}")
-        print(f"Solution string: {solution_str}")
-
-    if answer is None:
-        if is_valid_format:
-            return structure_format_score # 0.2
-        else:
-            return 0
-    else:
-        if em_check(answer, ground_truth['target']):
-            if is_valid_format:
-                return score # 1
+            if is_retrieval_correct(turn_str, ground_truth['target']):
+                step_rewards.append(0.5)
             else:
-                return score - structure_format_score # 0.8
-        elif is_valid_format:
-            return structure_format_score # 0.2
-        else:
-            return final_format_score # 0.1
+                if mid_format_check(turn_str):
+                    step_rewards.append(0.2)
+                else:
+                    step_rewards.append(0.0)
+    return step_rewards
 
+def mid_format_check(mid_turn_str):
+    content = mid_turn_str
 
+    for tag in ["think", "search", "information"]:
+        open_count = len(re.findall(fr"<{tag}>", content))
+        close_count = len(re.findall(fr"</{tag}>", content))
+        if open_count != 1 or close_count != 1:
+            return False
+
+    think_open = re.search(r"<think>", content)
+    search_open = re.search(r"<search>", content)
+    info_open = re.search(r"<information>", content)
+
+    if not (think_open and search_open and info_open):
+        return False
+
+    if not (think_open.start() < search_open.start() < info_open.start()):
+        return False
+
+    return True

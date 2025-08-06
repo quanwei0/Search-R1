@@ -867,10 +867,16 @@ class RayPPOTrainer(object):
                         answer_reward_tensor = reward_dict['answer_correctness']
                         format_reward_tensor = reward_dict['format_correctness']
                         retrieval_reward_tensor = reward_dict['retrieval_correctness']
-                        mixed_reward_tensor = reward_dict['mixed_outcome_reward']
+                        mixed_outcome_reward_tensor = reward_dict['mixed_outcome_reward']
+                        final_em_format_reward_tensor = reward_dict['final_em_format']
+                        step_retrieval_format_reward_tensor = reward_dict['step_retrieval_format']
+                        avg_step_retrieval_format_reward_tensor = reward_dict['avg_step_retrieval_format']
+                        mixed_reward_tensor = reward_dict['mixed_reward']
                         
-                        if self.config.algorithm.use_mixed_outcome_reward:
+                        if self.config.algorithm.use_mixed_reward:
                             batch.batch['token_level_scores'] = mixed_reward_tensor
+                        elif self.config.algorithm.use_mixed_outcome_reward:
+                            batch.batch['token_level_scores'] = mixed_outcome_reward_tensor
                         else:
                             batch.batch['token_level_scores'] = answer_reward_tensor
 
@@ -883,7 +889,9 @@ class RayPPOTrainer(object):
                         train_metric_dict.update(self._track_reward_metrics(answer_reward_tensor, train_data_sources, prefix="train/reward"))
                         train_metric_dict.update(self._track_reward_metrics(format_reward_tensor, train_data_sources, prefix="train/format_reward"))
                         train_metric_dict.update(self._track_reward_metrics(retrieval_reward_tensor, train_data_sources, prefix="train/retrieval_reward"))
-                        train_metric_dict.update(self._track_reward_metrics(mixed_reward_tensor, train_data_sources, prefix="train/mixed_outcome_reward"))
+                        train_metric_dict.update(self._track_reward_metrics(mixed_outcome_reward_tensor, train_data_sources, prefix="train/mixed_outcome_reward"))
+                        train_metric_dict.update(self._track_reward_metrics(final_em_format_reward_tensor, train_data_sources, prefix="train/final_em_format_reward"))
+                        train_metric_dict.update(self._track_reward_metrics(avg_step_retrieval_format_reward_tensor, train_data_sources, prefix="train/avg_step_retrieval_format_reward"))
 
                         metrics.update(train_metric_dict)
                         logger.log(data=train_metric_dict, step=self.global_steps)
@@ -1033,6 +1041,7 @@ class RayPPOTrainer(object):
         
         response_text_lengths = [] 
         turn_text_lengths = []
+        num_turns = []
 
         turn_indices = batch.meta_info.get("turn_indices", [[] for _ in range(len(batch))])
 
@@ -1068,6 +1077,7 @@ class RayPPOTrainer(object):
                 turn_lengths.append(turn_ids.shape[0])
             turn_texts.append(turns)
             turn_text_lengths.append(turn_lengths)
+            num_turns.append(len(turns))
 
             # Optional for logging/saving
             ground_truth = data_item.non_tensor_batch.get('reward_model', {}).get('ground_truth', {}).get('target', '')
@@ -1091,6 +1101,7 @@ class RayPPOTrainer(object):
         batch.meta_info["decoded_turn_texts"] = turn_texts
         batch.meta_info["response_text_lengths"] = response_text_lengths
         batch.meta_info["turn_text_token_lengths"] = turn_text_lengths
+        batch.meta_info["num_turns"] = num_turns
 
         # Optional: save to JSON
         if save_dir:
