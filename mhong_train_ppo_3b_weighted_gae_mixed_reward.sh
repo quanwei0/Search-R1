@@ -102,6 +102,6 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     trainer.default_hdfs_dir=null \
     trainer.default_local_dir=verl_checkpoints/$EXPERIMENT_NAME \
     max_turns=3 \
-    retriever.url="http://127.0.0.1:8001/retrieve" \
+    retriever.url="http://127.0.0.1:$RETRIEVAL_PORT/retrieve" \
     retriever.topk=3 \
     2>&1 | tee $EXPERIMENT_NAME.log
