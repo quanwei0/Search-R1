@@ -1,13 +1,15 @@
+export CUDA_VISIBLE_DEVICES=0,1,2,3
+
 source /code/hongpaul-sandbox/search/miniconda/bin/activate
 conda init
 
 conda activate retriever
-bash retrieval_launch.sh
+port=8001
+bash retrieval_launch.sh $port
 sleep 60
 
 conda activate search
 
-export CUDA_VISIBLE_DEVICES=0,1,2,3
 export DATA_DIR='./data/nq_search'
 
 export WANDB_API_KEY="810f91e58aa0fd1d03b11c60b0d1cffbb1d941f4"

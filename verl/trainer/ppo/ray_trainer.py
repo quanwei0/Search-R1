@@ -577,6 +577,8 @@ class RayPPOTrainer(object):
                     for key in test_batch.batch.keys():
                         test_batch.batch[key] = test_batch.batch[key].long()
                     
+                    test_batch = self._split_trajectories(test_batch)
+                    
                     # evaluate using reward_function
                     # for certain reward function (e.g. sandbox), the generation can overlap with reward
                     reward_dict = self.val_reward_fn(test_batch)
@@ -849,9 +851,9 @@ class RayPPOTrainer(object):
 
                     if self.config.do_search and self.config.actor_rollout_ref.actor.state_masking:
                         batch, metrics = self._create_loss_mask(batch, metrics)
-                        batch = self._split_turn(batch)
+                        batch = self._split_turn_idx(batch)
 
-                    batch = self._save_trajectories(batch, save_dir)
+                    batch = self._split_trajectories(batch, save_dir)
                     
                     with _timer('adv', timing_raw):
                         # compute scores. Support both model and function-based.
@@ -976,7 +978,7 @@ class RayPPOTrainer(object):
         
         return batch, metrics
 
-    def _split_turn(self, batch: DataProto) -> DataProto:
+    def _split_turn_idx(self, batch: DataProto) -> DataProto:
         loss_mask = batch.batch['loss_mask']
         values = batch.batch['values']
 
@@ -1027,7 +1029,7 @@ class RayPPOTrainer(object):
 
         return metric_dict
     
-    def _save_trajectories(self, batch, save_dir: Optional[str] = None) -> DataProto:
+    def _split_trajectories(self, batch, save_dir: Optional[str] = None) -> DataProto:
         """
         Decode full trajectories and per-turn sequences from the batch, and store them
         into batch.meta_info for later use.

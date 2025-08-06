@@ -91,7 +91,7 @@ class RewardManager():
             sequences_str = self.tokenizer.decode(sequences)
 
             ground_truth = data_item.non_tensor_batch['reward_model']['ground_truth']
-            decoded_full_texts = data_item.meta_info['decoded_full_texts'][i]
+            # decoded_full_texts = data_item.meta_info['decoded_full_texts'][i]
             decoded_turn_texts = data_item.meta_info['decoded_turn_texts'][i]
            
             # select rm_score
