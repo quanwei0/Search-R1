@@ -1,5 +1,5 @@
-source /code/hongpaul-sandbox/search/miniconda/bin/activate
-conda init
+# source /code/hongpaul-sandbox/search/miniconda/bin/activate
+# conda init
 
 # Set shared configuration parameters
 export CUDA_VISIBLE_DEVICES=0,1,2,3
