@@ -1,11 +1,13 @@
-export CUDA_VISIBLE_DEVICES=0,1,2,3
-
 source /code/hongpaul-sandbox/search/miniconda/bin/activate
 conda init
 
+# Set shared configuration parameters
+export CUDA_VISIBLE_DEVICES=0,1,2,3
+export RETRIEVAL_PORT=8001
+
 conda activate retriever
-port=8001
-bash retrieval_launch.sh $port
+# Pass GPU devices and port to retrieval script
+bash retrieval_launch.sh "$CUDA_VISIBLE_DEVICES" "$RETRIEVAL_PORT"
 sleep 60
 
 conda activate search
