@@ -10,9 +10,9 @@ conda activate retriever
 bash retrieval_launch.sh "$CUDA_VISIBLE_DEVICES" "$RETRIEVAL_PORT"
 sleep 60
 
-conda activate search
+conda activate searchr1
 
-export DATA_DIR='./data/hotpotqa_search'
+export DATA_DIR='./data/nq_search'
 
 export WANDB_API_KEY="810f91e58aa0fd1d03b11c60b0d1cffbb1d941f4"
 export WANDB_ENTITY="rl_agent"
@@ -29,7 +29,7 @@ WAND_PROJECT='Search-R1'
 # export BASE_MODEL='Qwen/Qwen2.5-3B-Instruct'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-3b-it-em
 export BASE_MODEL='Qwen/Qwen2.5-7B'
-export EXPERIMENT_NAME=hotpotqa-search-r1-ppo-qwen2.5-7b-em-turn-level-gae
+export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-7b-em-turn-level-gae-mixed-reward
 # export BASE_MODEL='Qwen/Qwen2.5-7B-Instruct'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-7b-it-em
 
@@ -54,7 +54,7 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     algorithm.gamma=1 \
     algorithm.lam=1 \
     +algorithm.use_mixed_outcome_reward=False \
-    +algorithm.use_mixed_reward=False \
+    +algorithm.use_mixed_reward=True \
     actor_rollout_ref.model.path=$BASE_MODEL \
     actor_rollout_ref.actor.optim.lr=1e-6 \
     actor_rollout_ref.model.enable_gradient_checkpointing=True \

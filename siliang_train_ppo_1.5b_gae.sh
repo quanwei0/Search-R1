@@ -10,7 +10,7 @@ conda activate retriever
 bash retrieval_launch.sh "$CUDA_VISIBLE_DEVICES" "$RETRIEVAL_PORT"
 sleep 60
 
-conda activate search
+conda activate searchr1
 
 export DATA_DIR='./data/nq_search'
 
