@@ -494,7 +494,9 @@ class RayPPOTrainer(object):
         answer_reward_tensor_lst = []
         format_reward_tensor_lst = []
         retrieval_reward_tensor_lst = []
-        mixed_reward_tensor_lst = []
+        mixed_outcome_reward_lst = []
+        final_em_format_reward_lst = []
+        avg_step_retrieval_format_reward_lst = []
         data_source_lst = []
 
         gen_config = GenerationConfig(
@@ -587,12 +589,16 @@ class RayPPOTrainer(object):
                     answer_reward_tensor = reward_dict['answer_correctness']
                     format_reward_tensor = reward_dict['format_correctness']
                     retrieval_reward_tensor = reward_dict['retrieval_correctness']
-                    mixed_reward_tensor = reward_dict['mixed_outcome_reward']
+                    mixed_outcome_reward = reward_dict['mixed_outcome_reward']
+                    final_em_format_reward = reward_dict['final_em_format_reward']
+                    avg_step_retrieval_format_reward = reward_dict['avg_step_retrieval_format_reward']
                     
                     answer_reward_tensor_lst.append(answer_reward_tensor)
                     format_reward_tensor_lst.append(format_reward_tensor)
                     retrieval_reward_tensor_lst.append(retrieval_reward_tensor)
-                    mixed_reward_tensor_lst.append(mixed_reward_tensor)
+                    mixed_outcome_reward_lst.append(mixed_outcome_reward)
+                    final_em_format_reward_lst.append(final_em_format_reward)
+                    avg_step_retrieval_format_reward_lst.append(avg_step_retrieval_format_reward)
                     data_source_lst.append(test_batch.non_tensor_batch.get('data_source', ['unknown'] * answer_reward_tensor.shape[0]))
 
         # reward_tensor = torch.cat([rw.sum(-1) for rw in reward_tensor_lst], dim=0).cpu()  # (batch_size,)
@@ -600,7 +606,9 @@ class RayPPOTrainer(object):
         answer_reward_tensor = torch.cat([rw.sum(-1, keepdim=True) for rw in answer_reward_tensor_lst], dim=0).cpu()
         format_reward_tensor = torch.cat([rw.sum(-1, keepdim=True) for rw in format_reward_tensor_lst], dim=0).cpu()
         retrieval_reward_tensor = torch.cat([rw.sum(-1, keepdim=True) for rw in retrieval_reward_tensor_lst], dim=0).cpu()
-        mixed_reward_tensor = torch.cat([rw.sum(-1, keepdim=True) for rw in mixed_reward_tensor_lst], dim=0).cpu()
+        mixed_outcome_reward = torch.cat([rw.sum(-1, keepdim=True) for rw in mixed_outcome_reward_lst], dim=0).cpu()
+        final_em_format_reward = torch.cat([rw.sum(-1, keepdim=True) for rw in final_em_format_reward_lst], dim=0).cpu()
+        avg_step_retrieval_format_reward = torch.cat([rw.sum(-1, keepdim=True) for rw in avg_step_retrieval_format_reward_lst], dim=0).cpu()
 
         data_sources = np.concatenate(data_source_lst, axis=0)
 
@@ -855,7 +863,7 @@ class RayPPOTrainer(object):
                         batch, metrics = self._create_loss_mask(batch, metrics)
                         batch = self._split_turn_idx(batch)
 
-                    batch = self._split_trajectories(batch, save_dir)
+                    batch = self._split_trajectories(batch)
                     
                     with _timer('adv', timing_raw):
                         # compute scores. Support both model and function-based.
