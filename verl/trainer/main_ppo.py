@@ -93,7 +93,8 @@ class RewardManager():
             ground_truth = data_item.non_tensor_batch['reward_model']['ground_truth']
             # decoded_full_texts = data_item.meta_info['decoded_full_texts'][i]
             decoded_turn_texts = data_item.meta_info['decoded_turn_texts'][i]
-           
+
+            
             # select rm_score
             data_source = data_item.non_tensor_batch['data_source']
             compute_answer_score = _select_rm_score_fn(data_source, reward_type='answer_correctness')

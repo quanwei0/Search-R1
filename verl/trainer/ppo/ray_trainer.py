@@ -577,6 +577,8 @@ class RayPPOTrainer(object):
                     for key in test_batch.batch.keys():
                         test_batch.batch[key] = test_batch.batch[key].long()
                     
+                    test_batch, _ = self._create_loss_mask(test_batch, {})
+                    test_batch = self._split_turn_idx(test_batch)
                     test_batch = self._split_trajectories(test_batch)
                     
                     # evaluate using reward_function
@@ -978,15 +980,18 @@ class RayPPOTrainer(object):
         
         return batch, metrics
 
+    ########################################################################################################
     def _split_turn_idx(self, batch: DataProto) -> DataProto:
-        loss_mask = batch.batch['loss_mask']
-        values = batch.batch['values']
+        loss_mask = batch.batch['loss_mask']        
+        # values = batch.batch['values']
 
         turn_indices = []
 
         for b in range(loss_mask.size(0)):
             mask = loss_mask[b]
-            valid_response_length = values[b].nonzero(as_tuple=True)[0].shape[0] - 1
+            # valid_response_length = values[b].nonzero(as_tuple=True)[0].shape[0] - 1
+            valid_response_length = mask.nonzero(as_tuple=True)[0][-1] + 1
+
 
             # Detect where a turn starts: when mask switches from 0 to 1
             turn_end_pos = ((mask[1:] == 1) & (mask[:-1] == 0)).nonzero(as_tuple=True)[0]
