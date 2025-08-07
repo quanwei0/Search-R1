@@ -1,9 +1,18 @@
+#!/bin/bash
+
+# Parse command line arguments
+CUDA_DEVICES=${1:-"0,1,2,3"}
+RETRIEVAL_PORT=${2:-8001}
+
+echo "Using CUDA devices: $CUDA_DEVICES"
+echo "Using retrieval port: $RETRIEVAL_PORT"
+
 source /code/hongpaul-sandbox/search/miniconda/bin/activate
 conda init
 
 # Set shared configuration parameters
-export CUDA_VISIBLE_DEVICES=0,1,2,3
-export RETRIEVAL_PORT=8001
+export CUDA_VISIBLE_DEVICES=$CUDA_DEVICES
+export RETRIEVAL_PORT=$RETRIEVAL_PORT
 
 conda activate retriever
 # Pass GPU devices and port to retrieval script
