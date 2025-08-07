@@ -234,6 +234,33 @@ def compute_turn_level_gae_advantage_return(
         advantages = verl_F.masked_whiten(turn_level_adv, loss_mask)
     return advantages, returns
 
+def compute_turn_level_gae_advantage_return_v2(
+    token_level_rewards: torch.Tensor,
+    values: torch.Tensor,
+    eos_mask: torch.Tensor,
+    loss_mask: torch.Tensor,
+    gamma: float,
+    lam: float,
+):
+    with torch.no_grad():
+        
+        lastgaelam = 0
+        advantages_reversed = []
+        gen_len = token_level_rewards.shape[-1]
+
+        for t in reversed(range(gen_len)):
+            nextvalues = values[:, t + 1] if t < gen_len - 1 else 0.0
+            delta = token_level_rewards[:, t] + gamma * nextvalues - values[:, t]
+            lastgaelam = delta + gamma * lam * lastgaelam
+            advantages_reversed.append(lastgaelam)
+        advantages = torch.stack(advantages_reversed[::-1], dim=1)
+
+        returns = advantages + values
+        
+        turn_level_adv = advantages.mean(dim=-1, keepdim=True).expand_as(advantages)
+        advantages = verl_F.masked_whiten(turn_level_adv, loss_mask)
+    return advantages, returns
+
 def compute_weighted_gae_advantage_return(
     token_level_rewards: torch.Tensor,
     values: torch.Tensor,
