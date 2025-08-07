@@ -430,37 +430,206 @@ def compute_rewards(token_level_scores, old_log_prob, ref_log_prob, kl_ratio):
     return token_level_scores - kl * kl_ratio
 
 
-def compute_policy_loss(old_log_prob, log_prob, advantages, eos_mask, cliprange):
-    """Adapted from https://github.com/huggingface/trl/blob/main/trl/trainer/ppo_trainer.py#L1122
+def compute_policy_loss( 
+    old_log_prob,
+    log_prob,
+    advantages,
+    eos_mask,
+    cliprange,
+    detach_ratio=None,
+    importance_sampling_level='token',
+    turn_indices=None,
+):
+    """
+    Computes PPO policy loss with optional detached importance sampling ratio.
+    If detach_ratio=True, ratio is linearly decayed to 0 outside the clipping range.
 
     Args:
-        old_log_prob: `(torch.Tensor)`
-            shape: (bs, response_length)
-        log_prob: `(torch.Tensor)`
-            shape: (bs, response_length)
-        advantages: `(torch.Tensor)`
-            shape: (bs, response_length)
-        eos_mask: `(torch.Tensor)`
-            shape: (bs, response_length)
-        cliprange: (float)
-            The clip range used in PPO. See https://arxiv.org/abs/1707.06347
+        old_log_prob: old log probabilities for each token
+        log_prob: new log probabilities for each token  
+        advantages: advantage values for each token
+        eos_mask: mask for valid tokens (completion_mask)
+        cliprange: clipping range for PPO
+        detach_ratio: detachment strategy ('soft', 'hard', or None)
+        importance_sampling_level: importance sampling strategy
+            - 'token': each token uses its own importance weight
+            - 'sequence': traditional sequence-level where all tokens share the same weight (average over sequence)
+            - 'partial_sequence': partial-sequence-level GRPO where each token at position t uses 
+                                 cumulative average of log_ratio from position 1 to t
+            - 'turn': turn-level where all tokens within the same turn share the same importance weight
+        turn_indices: tensor of shape (batch_size, max_indices) containing turn indices,
+                     required when importance_sampling_level='turn'
 
     Returns:
-        pg_loss: `a scalar torch.Tensor`
-            policy gradient loss computed via PPO
-        pg_clipfrac: (float)
-            a float number indicating the fraction of policy gradient loss being clipped
-
+        pg_loss: scalar tensor
+        pg_clipfrac: float tensor
+        ppo_kl: scalar tensor
     """
-    negative_approx_kl = log_prob - old_log_prob
+    log_ratio = log_prob - old_log_prob
+    
+    # Compute importance weights based on the specified level
+    if importance_sampling_level == "token":
+        print("="*80)
+        print(f"[Debug] (default) token-level importance sampling")
+        print("="*80)
+        log_importance_weights = log_ratio
+    elif importance_sampling_level == "sequence":
+        print("="*80)
+        print(f"[Debug] (GSPO) sequence-level importance sampling")
+        print("="*80)
+        # Traditional sequence-level importance sampling: all tokens share same weight (average over sequence)
+        log_importance_weights = (log_ratio * eos_mask).sum(-1) / eos_mask.sum(-1).clamp(min=1.0)
+        log_importance_weights = log_importance_weights.unsqueeze(-1)
+    elif importance_sampling_level == "partial_sequence":
+        print("="*80)
+        print(f"[Debug] partial-sequence-level importance sampling")
+        print("="*80)
+        # Partial-Sequence-level importance sampling: 
+        # For each token at position t, use cumulative average of log_ratio from position 1 to t
+        # w_{i,t} = exp(1/t * Σ_{s=1}^t log_ratio_s)
+        
+        batch_size, seq_len = log_ratio.shape
+        log_importance_weights = torch.zeros_like(log_ratio)
+        
+        for b in range(batch_size):
+            mask = eos_mask[b]  # mask for this batch
+            valid_positions = mask.nonzero(as_tuple=True)[0]  # positions where mask=1
+            
+            if len(valid_positions) == 0:
+                continue
+                
+            # Extract log_ratios for valid positions only
+            valid_log_ratios = log_ratio[b, valid_positions]  # shape: [num_valid_tokens]
+            
+            # Compute cumulative sum and divide by position indices to get cumulative averages
+            cumsum = torch.cumsum(valid_log_ratios, dim=0)  # [num_valid_tokens]
+            position_indices = torch.arange(1, len(valid_positions) + 1, 
+                                          dtype=cumsum.dtype, device=cumsum.device)  # [1, 2, 3, ...]
+            cumulative_averages = cumsum / position_indices  # [num_valid_tokens]
+            
+            # Assign back to the original positions
+            log_importance_weights[b, valid_positions] = cumulative_averages
+    elif importance_sampling_level == "turn":
+        print("="*80)
+        print(f"[Debug] turn-level importance sampling")
+        print("="*80)
+        # Turn-level importance sampling: all tokens within the same turn share the same importance weight
+        # The weight for each turn is the average of log_ratios of all tokens within that turn
+        
+        if turn_indices is None:
+            raise ValueError("turn_indices must be provided when importance_sampling_level='turn'")
+        
+        batch_size, seq_len = log_ratio.shape
+        log_importance_weights = torch.zeros_like(log_ratio)
+        
+        for b in range(batch_size):
+            mask = eos_mask[b]  # mask for this batch
+            
+            # Get turn indices for this batch sample - stored as flattened [start1, end1, start2, end2, ...]
+            turn_indices_b = turn_indices[b]  # shape: (max_indices,)
+            
+            # Find valid turn indices (not equal to -1)
+            valid_indices = turn_indices_b[turn_indices_b != -1]
+            
+            if len(valid_indices) == 0 or len(valid_indices) % 2 != 0:
+                # If no valid indices or odd number of indices, fall back to token-level
+                log_importance_weights[b] = log_ratio[b]
+                continue
+            
+            # Parse pairs of (start, end) indices
+            num_turns = len(valid_indices) // 2
+            
+            for turn_idx in range(num_turns):
+                start_pos = valid_indices[turn_idx * 2].item()
+                end_pos = valid_indices[turn_idx * 2 + 1].item()
+                
+                # Ensure positions are within sequence bounds
+                start_pos = max(0, min(start_pos, seq_len - 1))
+                end_pos = max(0, min(end_pos, seq_len - 1))
+                
+                if start_pos > end_pos:
+                    continue
+                
+                # Get log_ratios for tokens in this turn that are valid (masked)
+                turn_mask = mask[start_pos:end_pos + 1]
+                turn_log_ratios = log_ratio[b, start_pos:end_pos + 1]
+                
+                if turn_mask.sum() > 0:
+                    # Compute average log_ratio for this turn (only for valid tokens)
+                    turn_avg_log_ratio = (turn_log_ratios * turn_mask).sum() / turn_mask.sum()
+                    
+                    # Assign this average to all tokens in the turn
+                    log_importance_weights[b, start_pos:end_pos + 1] = turn_avg_log_ratio
+
+    else:
+        raise ValueError(
+            f"Unknown importance sampling level: {importance_sampling_level}. Possible values are 'token', "
+            "'sequence', 'partial_sequence', and 'turn'."
+        )
+    
+    negative_approx_kl = log_importance_weights
     ratio = torch.exp(negative_approx_kl)
     ppo_kl = verl_F.masked_mean(-negative_approx_kl, eos_mask)
+    
+    if detach_ratio=='hard':
+        print("="*80)
+        print(f"[Debug] hard detach ratio with {importance_sampling_level}-level importance sampling and the cliprange is",cliprange)
+        print("="*80)
+        # Detach ratio but still apply clipping
+        ratio_detached = ratio.detach()
+        clipped_ratio_detached = torch.clamp(ratio_detached, 1.0 - cliprange, 1.0 + cliprange)
 
-    pg_losses = -advantages * ratio
-    pg_losses2 = -advantages * torch.clamp(ratio, 1.0 - cliprange, 1.0 + cliprange)
+        pg_losses1 = -ratio_detached * advantages * log_prob
+        pg_losses2 = -clipped_ratio_detached * advantages * log_prob
 
-    pg_loss = verl_F.masked_mean(torch.max(pg_losses, pg_losses2), eos_mask)
-    pg_clipfrac = verl_F.masked_mean(torch.gt(pg_losses2, pg_losses).float(), eos_mask)
+        pg_loss = verl_F.masked_mean(torch.max(pg_losses1, pg_losses2), eos_mask)
+        pg_clipfrac = verl_F.masked_mean((pg_losses2 > pg_losses1).float(), eos_mask)
+    elif detach_ratio=='soft':
+        print("="*80)
+        print(f"[Debug] soft detach ratio with {importance_sampling_level}-level importance sampling and the cliprange is",cliprange)
+        print("="*80)
+        ratio_detached = ratio.detach()
+
+        # Define a smooth mask in the range [1 - 2ε, 1 - ε] ∪ [1 + ε, 1 + 2ε]
+        lower = 1.0 - cliprange
+        upper = 1.0 + cliprange
+        lower_decay = 1.0 - 1.05 * cliprange 
+        upper_decay = 1.0 + 1.3 * cliprange
+
+        # Create smooth decay mask: multiplier ∈ [1, 0]
+        decay_mask = torch.ones_like(ratio_detached)
+
+        # Left decay: [1 - 2ε, 1 - ε]
+        left_mask = (ratio_detached >= lower_decay) & (ratio_detached < lower)
+        decay_mask[left_mask] = (ratio_detached[left_mask] - lower_decay) / cliprange
+
+        # Right decay: [1 + ε, 1 + 2ε]
+        right_mask = (ratio_detached > upper) & (ratio_detached <= upper_decay)
+        decay_mask[right_mask] = (upper_decay - ratio_detached[right_mask]) / cliprange
+
+        # Outside full decay region: ratio < 1 - 2ε or > 1 + 2ε → mask = 0
+        decay_mask[ratio_detached < lower_decay] = 0.0
+        decay_mask[ratio_detached > upper_decay] = 0.0
+
+        # Apply soft decay mask
+        effective_ratio = ratio_detached * decay_mask
+
+        pg_losses = -advantages * log_prob * effective_ratio
+        pg_loss = verl_F.masked_mean(pg_losses, eos_mask)
+        pg_clipfrac = verl_F.masked_mean((decay_mask < 1.0).float(), eos_mask)
+
+    else:
+        # Standard PPO
+        print("="*80)
+        print(f"[Debug] normal detach ratio with {importance_sampling_level}-level importance sampling and the cliprange is",cliprange)
+        print("="*80)
+        
+        pg_losses = -advantages * ratio
+        pg_losses2 = -advantages * torch.clamp(ratio, 1.0 - cliprange, 1.0 + cliprange)
+
+        pg_loss = verl_F.masked_mean(torch.max(pg_losses, pg_losses2), eos_mask)
+        pg_clipfrac = verl_F.masked_mean(torch.gt(pg_losses2, pg_losses).float(), eos_mask)
+
     return pg_loss, pg_clipfrac, ppo_kl
 
 

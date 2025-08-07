@@ -1039,6 +1039,23 @@ class RayPPOTrainer(object):
         # Save to batch meta_info for later use (e.g., in GAE)
         batch.meta_info['turn_indices'] = turn_indices
 
+        batch_size = len(turn_indices)
+        max_indices = 20  # Should be enough for most cases (3 turns = max 6 indices, with buffer)
+        turn_indices_tensor = torch.full((batch_size, max_indices), -1, dtype=torch.long, device=loss_mask.device)
+        
+        # Fill in the actual turn indices for each sample
+        
+        for b, indices in enumerate(turn_indices):
+            flattened_indices = []
+            for start, end in indices:
+                flattened_indices.extend([start, end])
+            
+            # Fill the tensor with actual indices
+            num_indices = min(len(flattened_indices), max_indices)
+            turn_indices_tensor[b, :num_indices] = torch.tensor(flattened_indices[:num_indices], dtype=torch.long, device=loss_mask.device)
+        
+        batch.batch['turn_indices'] = turn_indices_tensor
+        
         return batch
 
     def _track_reward_metrics(self, reward_tensor: torch.Tensor, data_sources: List[str], prefix: str) -> Dict[str, float]:

@@ -208,7 +208,7 @@ class DataParallelPPOActor(BasePPOActor):
         self.gradient_accumulation = self.config.ppo_mini_batch_size // self.config.ppo_micro_batch_size
         temperature = data.meta_info['temperature']  # temperature must be in the data.meta_info to avoid slient error
 
-        select_keys = ['responses', 'input_ids', 'attention_mask', 'position_ids', 'old_log_probs', 'advantages']
+        select_keys = ['responses', 'input_ids', 'attention_mask', 'position_ids', 'old_log_probs', 'advantages', 'turn_indices']
         if self.config.state_masking:
             select_keys.append('loss_mask')
         if self.config.use_kl_loss:
@@ -246,14 +246,25 @@ class DataParallelPPOActor(BasePPOActor):
                 clip_ratio = self.config.clip_ratio
                 entropy_coeff = self.config.entropy_coeff
 
+                detach_ratio = self.config.get('detach_ratio', None)  # default to None if not specified
+                importance_sampling_level = self.config.get('importance_sampling_level', 'token')  # default to 'token' if not specified
+
                 # all return: (bsz, response_length)
                 entropy, log_prob = self._forward_micro_batch(micro_batch=data, temperature=temperature)
 
+                # Get turn_indices if using turn-level importance sampling
+                turn_indices = None
+                if importance_sampling_level == 'turn':
+                    turn_indices = data.get('turn_indices', None)
+                    
                 pg_loss, pg_clipfrac, ppo_kl = core_algos.compute_policy_loss(old_log_prob=old_log_prob,
                                                                               log_prob=log_prob,
                                                                               advantages=advantages,
                                                                               eos_mask=response_mask,
-                                                                              cliprange=clip_ratio)
+                                                                              cliprange=clip_ratio,
+                                                                              detach_ratio=detach_ratio,
+                                                                              importance_sampling_level=importance_sampling_level,
+                                                                              turn_indices=turn_indices)
                 # compute entropy loss from entropy
                 entropy_loss = verl_F.masked_mean(entropy, response_mask)
 
