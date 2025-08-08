@@ -469,21 +469,21 @@ def compute_policy_loss(
     
     # Compute importance weights based on the specified level
     if importance_sampling_level == "token":
-        print("="*80)
-        print(f"[Debug] (default) token-level importance sampling")
-        print("="*80)
+        # print("="*80)
+        # print(f"[Debug] (default) token-level importance sampling")
+        # print("="*80)
         log_importance_weights = log_ratio
     elif importance_sampling_level == "sequence":
-        print("="*80)
-        print(f"[Debug] (GSPO) sequence-level importance sampling")
-        print("="*80)
+        # print("="*80)
+        # print(f"[Debug] (GSPO) sequence-level importance sampling")
+        # print("="*80)
         # Traditional sequence-level importance sampling: all tokens share same weight (average over sequence)
         log_importance_weights = (log_ratio * eos_mask).sum(-1) / eos_mask.sum(-1).clamp(min=1.0)
         log_importance_weights = log_importance_weights.unsqueeze(-1)
     elif importance_sampling_level == "partial_sequence":
-        print("="*80)
-        print(f"[Debug] partial-sequence-level importance sampling")
-        print("="*80)
+        # print("="*80)
+        # print(f"[Debug] partial-sequence-level importance sampling")
+        # print("="*80)
         # Partial-Sequence-level importance sampling: 
         # For each token at position t, use cumulative average of log_ratio from position 1 to t
         # w_{i,t} = exp(1/t * Σ_{s=1}^t log_ratio_s)
@@ -510,9 +510,9 @@ def compute_policy_loss(
             # Assign back to the original positions
             log_importance_weights[b, valid_positions] = cumulative_averages
     elif importance_sampling_level == "turn":
-        print("="*80)
-        print(f"[Debug] turn-level importance sampling")
-        print("="*80)
+        # print("="*80)
+        # print(f"[Debug] turn-level importance sampling")
+        # print("="*80)
         # Turn-level importance sampling: all tokens within the same turn share the same importance weight
         # The weight for each turn is the average of log_ratios of all tokens within that turn
         
@@ -572,9 +572,9 @@ def compute_policy_loss(
     ppo_kl = verl_F.masked_mean(-negative_approx_kl, eos_mask)
     
     if detach_ratio=='hard':
-        print("="*80)
-        print(f"[Debug] hard detach ratio with {importance_sampling_level}-level importance sampling and the cliprange is",cliprange)
-        print("="*80)
+        # print("="*80)
+        # print(f"[Debug] hard detach ratio with {importance_sampling_level}-level importance sampling and the cliprange is",cliprange)
+        # print("="*80)
         # Detach ratio but still apply clipping
         ratio_detached = ratio.detach()
         clipped_ratio_detached = torch.clamp(ratio_detached, 1.0 - cliprange, 1.0 + cliprange)
@@ -585,9 +585,9 @@ def compute_policy_loss(
         pg_loss = verl_F.masked_mean(torch.max(pg_losses1, pg_losses2), eos_mask)
         pg_clipfrac = verl_F.masked_mean((pg_losses2 > pg_losses1).float(), eos_mask)
     elif detach_ratio=='soft':
-        print("="*80)
-        print(f"[Debug] soft detach ratio with {importance_sampling_level}-level importance sampling and the cliprange is",cliprange)
-        print("="*80)
+        # print("="*80)
+        # print(f"[Debug] soft detach ratio with {importance_sampling_level}-level importance sampling and the cliprange is",cliprange)
+        # print("="*80)
         ratio_detached = ratio.detach()
 
         # Define a smooth mask in the range [1 - 2ε, 1 - ε] ∪ [1 + ε, 1 + 2ε]
@@ -620,9 +620,9 @@ def compute_policy_loss(
 
     else:
         # Standard PPO
-        print("="*80)
-        print(f"[Debug] normal detach ratio with {importance_sampling_level}-level importance sampling and the cliprange is",cliprange)
-        print("="*80)
+        # print("="*80)
+        # print(f"[Debug] normal detach ratio with {importance_sampling_level}-level importance sampling and the cliprange is",cliprange)
+        # print("="*80)
         
         pg_losses = -advantages * ratio
         pg_losses2 = -advantages * torch.clamp(ratio, 1.0 - cliprange, 1.0 + cliprange)
