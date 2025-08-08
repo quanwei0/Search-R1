@@ -7,10 +7,10 @@ export WANDB_ENTITY="rl_agent"
 WAND_PROJECT='Search-R1'
 
 
-export BASE_MODEL='Qwen/Qwen2.5-1.5B'
-export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-1.5b-em-gae-2epochs
-# export BASE_MODEL='Qwen/Qwen2.5-1.5B-Instruct'
-# export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-1.5b-it-em
+# export BASE_MODEL='Qwen/Qwen2.5-1.5B'
+# export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-1.5b-em
+export BASE_MODEL='Qwen/Qwen2.5-1.5B-Instruct'
+export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-1.5b-it-em-turn-level-gae
 # export BASE_MODEL='Qwen/Qwen2.5-3B'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-3b-em
 # export BASE_MODEL='Qwen/Qwen2.5-3B-Instruct'
@@ -37,7 +37,7 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     data.max_start_length=2048 \
     data.max_obs_length=500 \
     data.shuffle_train_dataloader=True \
-    algorithm.adv_estimator=gae \
+    algorithm.adv_estimator=turn_level_gae \
     algorithm.gamma=1 \
     algorithm.lam=1 \
     +algorithm.use_mixed_outcome_reward=False \
@@ -60,6 +60,8 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     actor_rollout_ref.rollout.n_agent=1 \
     actor_rollout_ref.rollout.temperature=1 \
     actor_rollout_ref.actor.state_masking=True \
+    actor_rollout_ref.actor.use_kl_loss=False \
+    +actor_rollout_ref.actor.update_epochs=2 \
     critic.optim.lr=1e-5 \
     critic.model.use_remove_padding=True \
     critic.optim.lr_warmup_steps_ratio=0.015 \
@@ -80,10 +82,10 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     trainer.n_gpus_per_node=4 \
     trainer.nnodes=1 \
     trainer.save_freq=-1 \
-    trainer.test_freq=-1 \
+    trainer.test_freq=25 \
     trainer.project_name=$WAND_PROJECT \
     trainer.experiment_name=$EXPERIMENT_NAME \
-    trainer.total_epochs=2 \
+    trainer.total_epochs=4 \
     trainer.total_training_steps=2000 \
     trainer.default_hdfs_dir=null \
     trainer.default_local_dir=verl_checkpoints/$EXPERIMENT_NAME \
@@ -91,6 +93,3 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     retriever.url="http://127.0.0.1:8001/retrieve" \
     retriever.topk=3 \
     2>&1 | tee $EXPERIMENT_NAME.log
-
-
-    # actor_rollout_ref.actor.ppo_epochs=2 \

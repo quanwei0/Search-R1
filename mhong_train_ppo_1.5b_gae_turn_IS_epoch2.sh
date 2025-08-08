@@ -36,7 +36,7 @@ export VLLM_ATTENTION_BACKEND=XFORMERS # vllm + qwen2-7b with flash_attn has som
 # max_prompt_length = (config['training']['max_start_length'] + config['training']['max_response_length'] * (config['training']['max_turns'] - 1) + config['training']['max_obs_length'] * config['training']['max_turns'])
 
 export BASE_MODEL="/code/hongpaul-sandbox/temp/Search-R1/qwen_models/qwen-1.5b"
-export EXPERIMENT_NAME=mhong-nq-search-r1-ppo-qwen2.5-1.5b-em-gae-turn-IS-seed1
+export EXPERIMENT_NAME=mhong-nq-search-r1-ppo-qwen2.5-1.5b-em-gae-turn-IS-seed1-epoch2
 PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     data.train_files=$DATA_DIR/train.parquet \
     data.val_files=$DATA_DIR/test.parquet \
@@ -73,6 +73,7 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     actor_rollout_ref.rollout.temperature=1 \
     actor_rollout_ref.actor.state_masking=True \
     +actor_rollout_ref.actor.importance_sampling_level=turn \
+    +actor_rollout_ref.actor.update_epochs=2 \
     critic.optim.lr=1e-5 \
     critic.model.use_remove_padding=True \
     critic.optim.lr_warmup_steps_ratio=0.015 \

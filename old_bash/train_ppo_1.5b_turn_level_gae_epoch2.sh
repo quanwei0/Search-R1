@@ -1,17 +1,5 @@
-source /code/hongpaul-sandbox/search/miniconda/bin/activate
-conda init
-
-# Set shared configuration parameters
 export CUDA_VISIBLE_DEVICES=0,1,2,3
-export RETRIEVAL_PORT=8001
 export DATA_DIR='./data/nq_search'
-
-conda activate retriever
-# Pass GPU devices and port to retrieval script
-bash retrieval_launch.sh "$CUDA_VISIBLE_DEVICES" "$RETRIEVAL_PORT"
-sleep 60
-
-conda activate search
 
 export WANDB_API_KEY="810f91e58aa0fd1d03b11c60b0d1cffbb1d941f4"
 export WANDB_ENTITY="rl_agent"
@@ -19,8 +7,10 @@ export WANDB_ENTITY="rl_agent"
 WAND_PROJECT='Search-R1'
 
 
+export BASE_MODEL='Qwen/Qwen2.5-1.5B'
+export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-1.5b-em-turn-level-gae
 # export BASE_MODEL='Qwen/Qwen2.5-1.5B-Instruct'
-# export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-1.5b-it-em
+# export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-1.5b-it-em-gae
 # export BASE_MODEL='Qwen/Qwen2.5-3B'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-3b-em
 # export BASE_MODEL='Qwen/Qwen2.5-3B-Instruct'
@@ -35,8 +25,6 @@ export VLLM_ATTENTION_BACKEND=XFORMERS # vllm + qwen2-7b with flash_attn has som
 
 # max_prompt_length = (config['training']['max_start_length'] + config['training']['max_response_length'] * (config['training']['max_turns'] - 1) + config['training']['max_obs_length'] * config['training']['max_turns'])
 
-export BASE_MODEL="/code/hongpaul-sandbox/temp/Search-R1/qwen_models/qwen-1.5b"
-export EXPERIMENT_NAME=mhong-nq-search-r1-ppo-qwen2.5-1.5b-em-gae-turn-IS-seed1
 PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     data.train_files=$DATA_DIR/train.parquet \
     data.val_files=$DATA_DIR/test.parquet \
@@ -49,7 +37,7 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     data.max_start_length=2048 \
     data.max_obs_length=500 \
     data.shuffle_train_dataloader=True \
-    algorithm.adv_estimator=gae \
+    algorithm.adv_estimator=turn_level_gae \
     algorithm.gamma=1 \
     algorithm.lam=1 \
     +algorithm.use_mixed_outcome_reward=False \
@@ -72,7 +60,7 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     actor_rollout_ref.rollout.n_agent=1 \
     actor_rollout_ref.rollout.temperature=1 \
     actor_rollout_ref.actor.state_masking=True \
-    +actor_rollout_ref.actor.importance_sampling_level=turn \
+    actor_rollout_ref.actor.use_kl_loss=False \
     critic.optim.lr=1e-5 \
     critic.model.use_remove_padding=True \
     critic.optim.lr_warmup_steps_ratio=0.015 \
@@ -96,12 +84,11 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     trainer.test_freq=25 \
     trainer.project_name=$WAND_PROJECT \
     trainer.experiment_name=$EXPERIMENT_NAME \
-    trainer.total_epochs=2 \
+    trainer.total_epochs=4 \
     trainer.total_training_steps=2000 \
     trainer.default_hdfs_dir=null \
     trainer.default_local_dir=verl_checkpoints/$EXPERIMENT_NAME \
     max_turns=3 \
-    retriever.url="http://127.0.0.1:$RETRIEVAL_PORT/retrieve" \
+    retriever.url="http://127.0.0.1:8001/retrieve" \
     retriever.topk=3 \
     2>&1 | tee $EXPERIMENT_NAME.log
-
