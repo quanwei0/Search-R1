@@ -30,7 +30,7 @@ WAND_PROJECT='Search-R1'
 
 
 export BASE_MODEL="/code/hongpaul-sandbox/temp/Search-R1/qwen_models/qwen-7b"
-export EXPERIMENT_NAME=mhong-nq-search-r1-ppo-qwen2.5-7b-em-turn-level-gae-mixed-reward
+export EXPERIMENT_NAME=mhong-nq-search-r1-ppo-qwen2.5-7b-em-turn-level-gae
 # export BASE_MODEL='Qwen/Qwen2.5-1.5B-Instruct'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-1.5b-it-em
 # export BASE_MODEL='Qwen/Qwen2.5-3B'
@@ -62,8 +62,6 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     algorithm.adv_estimator=turn_level_gae \
     algorithm.gamma=1 \
     algorithm.lam=1 \
-    +algorithm.use_mixed_outcome_reward=False \
-    +algorithm.use_mixed_reward=True \
     actor_rollout_ref.model.path=$BASE_MODEL \
     actor_rollout_ref.actor.optim.lr=1e-6 \
     actor_rollout_ref.model.enable_gradient_checkpointing=True \
@@ -92,7 +90,6 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     critic.model.fsdp_config.param_offload=True \
     critic.model.fsdp_config.grad_offload=True \
     critic.model.fsdp_config.optimizer_offload=True \
-    +critic.is_critic_masking=False \
     algorithm.kl_ctrl.kl_coef=0.001 \
     algorithm.no_think_rl=False \
     trainer.critic_warmup=0 \

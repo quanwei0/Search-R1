@@ -148,8 +148,10 @@ class DataParallelPPOCritic(BasePPOCritic):
         self.critic_module.train()
         metrics = {}
 
+        is_critic_masking = self.config.get('is_critic_masking', False)
+        
         select_keys = ['input_ids', 'responses', 'attention_mask', 'position_ids', 'values', 'returns']
-        if self.config.is_critic_masking:
+        if is_critic_masking:
             select_keys.append('loss_mask')
         batch = data.select(batch_keys=select_keys).batch
         # Split to make minibatch iterator for updating the actor
@@ -179,7 +181,7 @@ class DataParallelPPOCritic(BasePPOCritic):
 
                 eos_mask = attention_mask[:, -response_length - 1:-1]
 
-                if self.config.is_critic_masking:
+                if is_critic_masking:
                     response_mask = data['loss_mask']
                 else:
                     response_mask = eos_mask

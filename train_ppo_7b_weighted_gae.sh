@@ -70,7 +70,6 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     critic.model.fsdp_config.param_offload=True \
     critic.model.fsdp_config.grad_offload=True \
     critic.model.fsdp_config.optimizer_offload=True \
-    +critic.is_critic_masking=False \
     algorithm.kl_ctrl.kl_coef=0.001 \
     algorithm.no_think_rl=False \
     trainer.critic_warmup=0 \

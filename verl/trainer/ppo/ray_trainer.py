@@ -904,11 +904,13 @@ class RayPPOTrainer(object):
                         avg_step_retrieval_format_reward_tensor = reward_dict['avg_step_retrieval_format']
                         mixed_reward_tensor = reward_dict['mixed_reward']
                         
-                        if self.config.algorithm.use_mixed_reward:
+                        reward_type = self.config.algorithm.get('reward_type', 'answer_correctness')
+                        
+                        if reward_type == 'mixed_reward':
                             batch.batch['token_level_scores'] = mixed_reward_tensor
-                        elif self.config.algorithm.use_mixed_outcome_reward:
+                        elif reward_type == 'mixed_outcome_reward':
                             batch.batch['token_level_scores'] = mixed_outcome_reward_tensor
-                        else:
+                        elif reward_type == 'answer_correctness':
                             batch.batch['token_level_scores'] = answer_reward_tensor
 
                         # compute training reward metrics by data source
