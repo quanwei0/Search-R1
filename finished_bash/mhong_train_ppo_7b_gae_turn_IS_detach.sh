@@ -1,14 +1,17 @@
 source /code/hongpaul-sandbox/search/miniconda/bin/activate
 conda init
 
+# Set shared configuration parameters
+export CUDA_VISIBLE_DEVICES=0,1,2,3
+export RETRIEVAL_PORT=8001
+export DATA_DIR='./data/nq_search'
+
 conda activate retriever
-bash retrieval_launch.sh
+# Pass GPU devices and port to retrieval script
+bash retrieval_launch.sh "$CUDA_VISIBLE_DEVICES" "$RETRIEVAL_PORT"
 sleep 60
 
 conda activate search
-
-export CUDA_VISIBLE_DEVICES=0,1,2,3
-export DATA_DIR='./data/nq_search'
 
 export WANDB_API_KEY="810f91e58aa0fd1d03b11c60b0d1cffbb1d941f4"
 export WANDB_ENTITY="rl_agent"
@@ -17,7 +20,7 @@ WAND_PROJECT='Search-R1'
 
 
 export BASE_MODEL="/code/hongpaul-sandbox/temp/Search-R1/qwen_models/qwen-7b"
-export EXPERIMENT_NAME=mhong-nq-search-r1-ppo-qwen2.5-7b-em-gae-turn-IS-epoch2
+export EXPERIMENT_NAME=mhong-nq-search-r1-ppo-qwen2.5-7b-em-gae-turn-IS-detach
 # export BASE_MODEL='Qwen/Qwen2.5-1.5B-Instruct'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-1.5b-it-em
 # export BASE_MODEL='Qwen/Qwen2.5-3B'
@@ -70,7 +73,7 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     actor_rollout_ref.rollout.temperature=1 \
     actor_rollout_ref.actor.state_masking=True \
     +actor_rollout_ref.actor.importance_sampling_level=turn \
-    +actor_rollout_ref.actor.update_epochs=2 \
+    +actor_rollout_ref.actor.detach_ratio=hard \
     critic.optim.lr=1e-5 \
     critic.model.use_remove_padding=True \
     critic.optim.lr_warmup_steps_ratio=0.015 \
@@ -99,6 +102,6 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     trainer.default_hdfs_dir=null \
     trainer.default_local_dir=verl_checkpoints/$EXPERIMENT_NAME \
     max_turns=3 \
-    retriever.url="http://127.0.0.1:8001/retrieve" \
+    retriever.url="http://127.0.0.1:$RETRIEVAL_PORT/retrieve" \
     retriever.topk=3 \
     2>&1 | tee $EXPERIMENT_NAME.log
