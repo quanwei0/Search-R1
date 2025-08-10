@@ -36,7 +36,7 @@ export VLLM_ATTENTION_BACKEND=XFORMERS # vllm + qwen2-7b with flash_attn has som
 # max_prompt_length = (config['training']['max_start_length'] + config['training']['max_response_length'] * (config['training']['max_turns'] - 1) + config['training']['max_obs_length'] * config['training']['max_turns'])
 
 export BASE_MODEL="/code/hongpaul-sandbox/temp/Search-R1/qwen_models/qwen-1.5b"
-export EXPERIMENT_NAME=mhong-nq-search-r1-ppo-qwen2.5-1.5b-em-gae-token-IS-seed1-detach
+export EXPERIMENT_NAME=mhong-nq-search-r1-ppo-qwen2.5-1.5b-em-gae-token-IS-detach-total-epochs-2
 PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     data.train_files=$DATA_DIR/train.parquet \
     data.val_files=$DATA_DIR/test.parquet \
@@ -97,7 +97,7 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     trainer.test_freq=25 \
     trainer.project_name=$WAND_PROJECT \
     trainer.experiment_name=$EXPERIMENT_NAME \
-    trainer.total_epochs=4 \
+    trainer.total_epochs=2 \
     trainer.total_training_steps=2000 \
     trainer.default_hdfs_dir=null \
     trainer.default_local_dir=verl_checkpoints/$EXPERIMENT_NAME \
