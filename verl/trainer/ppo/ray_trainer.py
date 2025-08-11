@@ -788,10 +788,12 @@ class RayPPOTrainer(object):
             config=gen_config,
         )
 
-        from datetime import datetime
-        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')  # 20250730_153045
-        save_dir = f"./outputs/log_train_traj/{self.config.trainer.experiment_name}_{timestamp}"
-        os.makedirs(save_dir, exist_ok=True)
+        if self.config.trainer.get('is_save_train_traj', False):
+            from datetime import datetime
+            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')  # 20250730_153045
+            train_traj_dir = self.config.trainer.get('train_traj_dir', './outputs/log_train_traj')
+            save_dir = os.path.join(train_traj_dir, f"{self.config.trainer.experiment_name}_{timestamp}")
+            os.makedirs(save_dir, exist_ok=True)
 
 
         # start training loop
@@ -882,7 +884,10 @@ class RayPPOTrainer(object):
                         batch, metrics = self._create_loss_mask(batch, metrics)
                         batch = self._split_turn_idx(batch)
 
-                    batch = self._split_trajectories(batch)
+                    if self.config.trainer.get('is_save_train_traj', False):
+                        batch = self._split_trajectories(batch, save_dir)
+                    else:
+                        batch = self._split_trajectories(batch)
                     
                     with _timer('adv', timing_raw):
                         # compute scores. Support both model and function-based.

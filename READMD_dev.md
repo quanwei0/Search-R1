@@ -43,3 +43,8 @@ Process the NQ dataset
 ```bash
 python scripts/data_process/nq_search.py --local_dir ./data/nq_search
 ```
+
+Download the dataset in the paper
+```bash
+huggingface-cli download --repo-type dataset --local-dir ./data/nq_hotpotqa_train  PeterJinGo/nq_hotpotqa_train
+```
