@@ -269,7 +269,7 @@ class MegatronPPOActor(BasePPOActor):
             logits = output.logits
             logits = logits[:, -response_length - 1:-1]
             log_prob = vocab_parallel_log_probs_from_logits(logits, responses)
-            pg_loss, pg_clipfrac, ppo_kl = core_algos.compute_policy_loss(old_log_prob=old_log_prob,
+            pg_loss, pg_clipfrac, ppo_kl, clip_grad_norm = core_algos.compute_policy_loss(old_log_prob=old_log_prob,
                                                                           log_prob=log_prob,
                                                                           advantages=advantages,
                                                                           eos_mask=response_mask,
@@ -283,7 +283,8 @@ class MegatronPPOActor(BasePPOActor):
                 'actor/entropy_loss': entropy_loss.detach().item(),
                 'actor/pg_loss': pg_loss.detach().item(),
                 'actor/pg_clipfrac': pg_clipfrac.detach().item(),
-                'actor/ppo_kl': ppo_kl.detach().item()
+                'actor/ppo_kl': ppo_kl.detach().item(),
+                'actor/clip_grad_norm': clip_grad_norm.detach().item()
             }
             return policy_loss, stats
 

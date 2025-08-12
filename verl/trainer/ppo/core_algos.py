@@ -408,9 +408,10 @@ def compute_policy_loss(
         pg_loss: scalar tensor
         pg_clipfrac: float tensor
         ppo_kl: scalar tensor
+        clip_grad_norm: scalar tensor (squared norm of clipped gradients, without sqrt)
     """
     log_ratio = log_prob - old_log_prob
-    
+    log_ratio = torch.clamp(log_ratio, min=-20.0, max=20.0)
     # Compute importance weights based on the specified level
     if importance_sampling_level == "token":
         log_importance_weights = log_ratio
@@ -528,6 +529,12 @@ def compute_policy_loss(
 
         pg_loss = verl_F.masked_mean(torch.max(pg_losses1, pg_losses2), eos_mask)
         pg_clipfrac = verl_F.masked_mean((pg_losses2 > pg_losses1).float(), eos_mask)
+        
+        # Compute clip gradient norm for hard detach
+        # For tokens that are clipped, compute the gradient norm (without sqrt)
+        clipped_mask = (pg_losses2 > pg_losses1) * eos_mask  # tokens that are actually clipped
+        clipped_grad = (ratio_detached * advantages).abs() * clipped_mask  # |importance_sampling * advantage|
+        clip_grad_norm = verl_F.masked_mean(clipped_grad ** 2, eos_mask)
     elif detach_ratio=='soft':
         print("="*80)
         print(f"[Debug] soft detach ratio with {importance_sampling_level}-level importance sampling and the cliprange is",cliprange)
@@ -561,6 +568,12 @@ def compute_policy_loss(
         pg_losses = -advantages * log_prob * effective_ratio
         pg_loss = verl_F.masked_mean(pg_losses, eos_mask)
         pg_clipfrac = verl_F.masked_mean((decay_mask < 1.0).float(), eos_mask)
+        
+        # Compute clip gradient norm for soft detach
+        # For tokens that have decay applied (decay_mask < 1.0), compute the gradient norm (without sqrt)
+        clipped_mask = (decay_mask < 1.0) * eos_mask  # tokens that are affected by decay
+        clipped_grad = (ratio_detached * advantages).abs() * clipped_mask  # |importance_sampling * advantage|
+        clip_grad_norm = verl_F.masked_mean(clipped_grad ** 2, eos_mask)
 
     else:
         # Standard PPO
@@ -573,8 +586,14 @@ def compute_policy_loss(
 
         pg_loss = verl_F.masked_mean(torch.max(pg_losses1, pg_losses2), eos_mask)
         pg_clipfrac = verl_F.masked_mean((pg_losses2 > pg_losses1).float(), eos_mask)
-
-    return pg_loss, pg_clipfrac, ppo_kl
+        
+        # Compute clip gradient norm for standard PPO
+        # For tokens that are clipped, compute the gradient norm (without sqrt)
+        clipped_mask = (pg_losses2 > pg_losses1) * eos_mask  # tokens that are actually clipped
+        clipped_grad = (ratio * advantages).abs() * clipped_mask  # |importance_sampling * advantage|
+        clip_grad_norm = verl_F.masked_mean(clipped_grad ** 2, eos_mask)
+        
+    return pg_loss, pg_clipfrac, ppo_kl, clip_grad_norm
 
 
 def compute_entropy_loss(logits, eos_mask):

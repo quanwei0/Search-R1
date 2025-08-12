@@ -260,7 +260,7 @@ class DataParallelPPOActor(BasePPOActor):
                     if importance_sampling_level == 'turn':
                         turn_indices = data.get('turn_indices', None)
                     
-                    pg_loss, pg_clipfrac, ppo_kl = core_algos.compute_policy_loss(old_log_prob=old_log_prob,
+                    pg_loss, pg_clipfrac, ppo_kl, clip_grad_norm = core_algos.compute_policy_loss(old_log_prob=old_log_prob,
                                                                                   log_prob=log_prob,
                                                                                   advantages=advantages,
                                                                                   eos_mask=response_mask,
@@ -294,6 +294,7 @@ class DataParallelPPOActor(BasePPOActor):
                         'actor/pg_loss': pg_loss.detach().item(),
                         'actor/pg_clipfrac': pg_clipfrac.detach().item(),
                         'actor/ppo_kl': ppo_kl.detach().item(),
+                        'actor/clip_grad_norm': clip_grad_norm.detach().item(),
                     }
                     append_to_dict(metrics, data)
 
