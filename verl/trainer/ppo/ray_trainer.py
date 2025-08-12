@@ -911,11 +911,15 @@ class RayPPOTrainer(object):
                         
                         reward_type = self.config.algorithm.get('reward_type', 'answer_correctness')
                         
+                        print(f"[INFO] reward_type: {reward_type}")
                         if reward_type == 'mixed_reward':
+                            print("[INFO] Using mixed_reward_tensor for token_level_scores")
                             batch.batch['token_level_scores'] = mixed_reward_tensor
                         elif reward_type == 'mixed_outcome_reward':
+                            print("[INFO] Using mixed_outcome_reward_tensor for token_level_scores")
                             batch.batch['token_level_scores'] = mixed_outcome_reward_tensor
                         elif reward_type == 'answer_correctness':
+                            print("[INFO] Using answer_reward_tensor for token_level_scores")
                             batch.batch['token_level_scores'] = answer_reward_tensor
 
                         # compute training reward metrics by data source
