@@ -1,17 +1,26 @@
+source /code/hongpaul-sandbox/search/miniconda/bin/activate
+conda init
+
 # Set shared configuration parameters
 export CUDA_VISIBLE_DEVICES=0,1,2,3
 export RETRIEVAL_PORT=8001
 export DATA_DIR='./data/nq_search'
 
-# conda activate searchr1
+conda activate retriever
+# Pass GPU devices and port to retrieval script
+bash retrieval_launch.sh "$CUDA_VISIBLE_DEVICES" "$RETRIEVAL_PORT"
+sleep 60
+
+conda activate search
 
 export WANDB_API_KEY="810f91e58aa0fd1d03b11c60b0d1cffbb1d941f4"
 export WANDB_ENTITY="rl_agent"
 
 WAND_PROJECT='Search-R1'
 
-export BASE_MODEL='Qwen/Qwen2.5-7B'
-export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-7b-em-gae-turn-IS-total-epoch-4
+
+export BASE_MODEL="/code/hongpaul-sandbox/temp/Search-R1/qwen_models/qwen-7b"
+export EXPERIMENT_NAME=mhong-nq-search-r1-ppo-qwen2.5-7b-em-gae-turn-IS-total-epoch-4-clipped-normlized-seed2
 # export BASE_MODEL='Qwen/Qwen2.5-1.5B-Instruct'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-1.5b-it-em
 # export BASE_MODEL='Qwen/Qwen2.5-3B'
@@ -80,12 +89,12 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     trainer.critic_warmup=0 \
     trainer.logger=['console','wandb'] \
     +trainer.val_only=False \
-    +trainer.val_before_train=False \
+    +trainer.val_before_train=True \
     trainer.default_hdfs_dir=null \
     trainer.n_gpus_per_node=4 \
     trainer.nnodes=1 \
     trainer.save_freq=-1 \
-    trainer.test_freq=-1 \
+    trainer.test_freq=25 \
     trainer.project_name=$WAND_PROJECT \
     trainer.experiment_name=$EXPERIMENT_NAME \
     trainer.total_epochs=4 \
