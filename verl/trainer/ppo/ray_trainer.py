@@ -489,7 +489,7 @@ class RayPPOTrainer(object):
         # inject total_training_steps to actor/critic optim_config. This is hacky.
         total_training_steps = len(self.train_dataloader) * self.config.trainer.total_epochs
 
-        if self.config.trainer.total_training_steps < total_training_steps:
+        if self.config.trainer.total_training_steps is not None:
             total_training_steps = self.config.trainer.total_training_steps
 
         self.total_training_steps = total_training_steps
@@ -597,7 +597,16 @@ class RayPPOTrainer(object):
                     
                     test_batch, _ = self._create_loss_mask(test_batch, {})
                     test_batch = self._split_turn_idx(test_batch)
-                    test_batch = self._split_trajectories(test_batch)
+                    
+                    if self.config.trainer.get('is_save_val_traj', False):
+                        from datetime import datetime
+                        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')  # 20250730_153045
+                        val_traj_dir = self.config.trainer.get('val_traj_dir', './outputs/log_val_traj')
+                        save_dir = os.path.join(val_traj_dir, f"{self.config.trainer.experiment_name}_{timestamp}")
+                        os.makedirs(save_dir, exist_ok=True)
+                        test_batch = self._split_trajectories(test_batch, save_dir)
+                    else:
+                        test_batch = self._split_trajectories(test_batch)
                     
                     # evaluate using reward_function
                     # for certain reward function (e.g. sandbox), the generation can overlap with reward
