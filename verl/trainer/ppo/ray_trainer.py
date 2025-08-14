@@ -568,7 +568,16 @@ class RayPPOTrainer(object):
                 reward_tensor_lst.append(reward_tensor)
                 data_source_lst.append(test_batch.non_tensor_batch.get('data_source', ['unknown'] * reward_tensor.shape[0]))
         else:
-            for batch_dict in self.val_dataloader:
+            # Prepare save directory once outside the loop
+            save_dir = None
+            if self.config.trainer.get('is_save_val_traj', False):
+                from datetime import datetime
+                timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')  # 20250730_153045
+                val_traj_dir = self.config.trainer.get('val_traj_dir', './outputs/log_val_traj')
+                save_dir = os.path.join(val_traj_dir, f"{self.config.trainer.experiment_name}_{timestamp}")
+                os.makedirs(save_dir, exist_ok=True)
+            
+            for i, batch_dict in enumerate(self.val_dataloader):
                 timing_raw = {}
                 test_batch: DataProto = DataProto.from_single_dict(batch_dict)
                 # test_batch = test_batch.repeat(repeat_times=self.config.actor_rollout_ref.rollout.n_agent, interleave=True)
@@ -598,15 +607,7 @@ class RayPPOTrainer(object):
                     test_batch, _ = self._create_loss_mask(test_batch, {})
                     test_batch = self._split_turn_idx(test_batch)
                     
-                    if self.config.trainer.get('is_save_val_traj', False):
-                        from datetime import datetime
-                        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')  # 20250730_153045
-                        val_traj_dir = self.config.trainer.get('val_traj_dir', './outputs/log_val_traj')
-                        save_dir = os.path.join(val_traj_dir, f"{self.config.trainer.experiment_name}_{timestamp}")
-                        os.makedirs(save_dir, exist_ok=True)
-                        test_batch = self._split_trajectories(test_batch, save_dir)
-                    else:
-                        test_batch = self._split_trajectories(test_batch)
+                    test_batch = self._split_trajectories(test_batch, save_dir, val_batch_idx=i)
                     
                     # evaluate using reward_function
                     # for certain reward function (e.g. sandbox), the generation can overlap with reward
@@ -797,6 +798,7 @@ class RayPPOTrainer(object):
             config=gen_config,
         )
 
+        save_dir = None
         if self.config.trainer.get('is_save_train_traj', False):
             from datetime import datetime
             timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')  # 20250730_153045
@@ -893,10 +895,9 @@ class RayPPOTrainer(object):
                         batch, metrics = self._create_loss_mask(batch, metrics)
                         batch = self._split_turn_idx(batch)
 
-                    if self.config.trainer.get('is_save_train_traj', False):
-                        batch = self._split_trajectories(batch, save_dir)
-                    else:
-                        batch = self._split_trajectories(batch)
+
+                    batch = self._split_trajectories(batch, save_dir)
+
                     
                     with _timer('adv', timing_raw):
                         # compute scores. Support both model and function-based.
@@ -1098,7 +1099,7 @@ class RayPPOTrainer(object):
 
         return metric_dict
     
-    def _split_trajectories(self, batch, save_dir: Optional[str] = None) -> DataProto:
+    def _split_trajectories(self, batch, save_dir: Optional[str] = None, val_batch_idx: Optional[int] = None) -> DataProto:
         """
         Decode full trajectories and per-turn sequences from the batch, and store them
         into batch.meta_info for later use.
@@ -1177,7 +1178,10 @@ class RayPPOTrainer(object):
         # Optional: save to JSON
         if save_dir:
             os.makedirs(save_dir, exist_ok=True)
-            save_path = os.path.join(save_dir, f'trajectories_step_{self.global_steps}.json')
+            if val_batch_idx is not None:
+                save_path = os.path.join(save_dir, f'trajectories_val_batch_{val_batch_idx}.json')
+            else:
+                save_path = os.path.join(save_dir, f'trajectories_step_{self.global_steps}.json')
             with open(save_path, 'w', encoding='utf-8') as f:
                 json.dump(trajectories, f, ensure_ascii=False, indent=2)
 
