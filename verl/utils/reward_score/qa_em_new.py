@@ -298,77 +298,69 @@ def compute_score_em_format_retrievel(
         else:
             return final_format_score # 0.1
 
-
+###################################################################################################
 def compute_score_final_em_format(final_turn_str, ground_truth):
-    match_iter = re.finditer(r'<answer>(.*?)</answer>', final_turn_str, re.DOTALL)
-    matches = list(match_iter)
 
-    if len(matches) != 1:
-        answer = None
+    if not final_format_check(final_turn_str):
+        return -1.0
+
+    matches = list(re.finditer(r'<answer>(.*?)</answer>', final_turn_str, re.DOTALL))
+    answer = matches[0].group(1).strip()
+    if em_check(answer, ground_truth['target']):
+        return 1.0
     else:
-        answer = matches[0].group(1).strip()
-
-    if answer is None:
-        return 0.0
-    else:
-        if em_check(answer, ground_truth['target']):
-            return 1.0
-        else:
-            if final_format_check(final_turn_str):
-                return 0.2
-            else:
-                return 0.0
+        return 0.2
 
 
-def final_format_check(final_turn_str):
+def final_format_check(final_turn_str: str) -> bool:
     content = final_turn_str
 
-    for tag in ["think", "answer"]:
-        open_count = len(re.findall(fr"<{tag}>", content))
-        close_count = len(re.findall(fr"</{tag}>", content))
-        if open_count != 1 or close_count != 1:
-            return False
-
-    think_open = re.search(r"<think>", content)
-    answer_open = re.search(r"<answer>", content)
-
-    if not think_open or not answer_open:
+    if any(tag in content for tag in ["<search>", "</search>", "<information>", "</information>"]):
         return False
-    if think_open.start() > answer_open.start():
+
+    if (len(re.findall(r"<think>", content))  != 1 or
+        len(re.findall(r"</think>", content)) != 1 or
+        len(re.findall(r"<answer>", content)) != 1 or
+        len(re.findall(r"</answer>", content))!= 1):
+        return False
+
+    m_think_open  = re.search(r"<think>", content)
+    m_think_close = re.search(r"</think>", content)
+    m_ans_open    = re.search(r"<answer>", content)
+    m_ans_close   = re.search(r"</answer>", content)
+
+    if not (m_think_open.start()  < m_think_close.start() <
+            m_ans_open.start()    < m_ans_close.start()):
         return False
 
     return True
 
 
-def compute_score_step_retrieval_format(mid_turn_str, ground_truth):
+def compute_score_step_retrieval_format(mid_turn_str, ground_truth, max_turn=3):
 
     num_turn_minus_1 = len(mid_turn_str)
     step_rewards = []
-
+    search_count = 0
+    
     for i in range(num_turn_minus_1):
         turn_str = mid_turn_str[i]
-        match_iter = re.finditer(r'<information>(.*?)</information>', turn_str, re.DOTALL)
-        matches = list(match_iter)
 
-        if len(matches) != 1:
-            retrieval = None
+        hit = is_retrieval_correct(turn_str, ground_truth['target'])
+        retrieval_score = 0.3 if hit else 0.0
+
+        format_score = 0.1 if mid_format_check(turn_str) else -0.2
+
+        if "<search>" in turn_str:
+            search_count += 1
+            search_penalty = -0.1 * search_count
         else:
-            retrieval = matches[0].group(1).strip()
+            search_penalty = 0.0
         
-        if retrieval is None:
-            if mid_format_check(turn_str):
-                step_rewards.append(0.2)
-            else:
-                step_rewards.append(0.0)
-        else:
-            if is_retrieval_correct(turn_str, ground_truth['target']):
-                step_rewards.append(0.5)
-            else:
-                if mid_format_check(turn_str):
-                    step_rewards.append(0.2)
-                else:
-                    step_rewards.append(0.0)
+        r = retrieval_score + format_score + search_penalty
+        step_rewards.append(r)
+        
     return step_rewards
+
 
 def mid_format_check(mid_turn_str):
     content = mid_turn_str
