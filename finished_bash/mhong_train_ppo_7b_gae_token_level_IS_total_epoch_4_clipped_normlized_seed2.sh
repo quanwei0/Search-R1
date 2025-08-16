@@ -4,7 +4,7 @@ conda init
 # Set shared configuration parameters
 export CUDA_VISIBLE_DEVICES=0,1,2,3
 export RETRIEVAL_PORT=8001
-export DATA_DIR='./data/nq_search'
+export DATA_DIR='./data/nq_hotpotqa_train'
 
 conda activate retriever
 # Pass GPU devices and port to retrieval script
@@ -20,7 +20,7 @@ WAND_PROJECT='Search-R1'
 
 
 export BASE_MODEL="/code/hongpaul-sandbox/temp/Search-R1/qwen_models/qwen-7b"
-export EXPERIMENT_NAME=mhong-nq-search-r1-ppo-qwen2.5-7b-em-gae-token-IS-total-epoch-4-clipped-normlized-seed1
+export EXPERIMENT_NAME=mhong-hotpotqa-search-r1-ppo-qwen2.5-7b-em-gae-token-IS-total-epoch-4-clipped-normlized-seed2
 # export BASE_MODEL='Qwen/Qwen2.5-1.5B-Instruct'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-1.5b-it-em
 # export BASE_MODEL='Qwen/Qwen2.5-3B'
@@ -89,12 +89,12 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     trainer.critic_warmup=0 \
     trainer.logger=['console','wandb'] \
     +trainer.val_only=False \
-    +trainer.val_before_train=True \
+    +trainer.val_before_train=False \
     trainer.default_hdfs_dir=null \
     trainer.n_gpus_per_node=4 \
     trainer.nnodes=1 \
     trainer.save_freq=-1 \
-    trainer.test_freq=25 \
+    trainer.test_freq=-1 \
     trainer.project_name=$WAND_PROJECT \
     trainer.experiment_name=$EXPERIMENT_NAME \
     trainer.total_epochs=4 \

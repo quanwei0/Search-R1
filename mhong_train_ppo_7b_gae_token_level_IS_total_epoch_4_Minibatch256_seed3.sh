@@ -20,7 +20,7 @@ WAND_PROJECT='Search-R1'
 
 
 export BASE_MODEL="/code/hongpaul-sandbox/temp/Search-R1/qwen_models/qwen-7b"
-export EXPERIMENT_NAME=mhong-hotpotqa-search-r1-ppo-qwen2.5-7b-em-gae-token-IS-total-epoch-4-seed1
+export EXPERIMENT_NAME=mhong-hotpotqa-search-r1-ppo-qwen2.5-7b-em-gae-token-IS-total-epoch-4-Minibatch256-seed3
 # export BASE_MODEL='Qwen/Qwen2.5-1.5B-Instruct'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-1.5b-it-em
 # export BASE_MODEL='Qwen/Qwen2.5-3B'
