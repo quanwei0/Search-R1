@@ -620,6 +620,120 @@ def compute_policy_loss(
             'clipped_l2_norm': clipped_l2_norm.detach(),
             'non_clipped_l2_norm': non_clipped_l2_norm.detach()
         }
+    elif detach_ratio=='turn_level_variance_reduction':
+        print("="*80)
+        print(f"[Debug] turn-level variance reduction detach ratio with {importance_sampling_level}-level importance sampling and the cliprange is",cliprange)
+        print("="*80)
+        
+        if turn_indices is None:
+            raise ValueError("turn_indices must be provided when detach_ratio='turn_level_variance_reduction'")
+        
+        # Standard PPO losses
+        pg_losses1 = -advantages * ratio
+        pg_losses2 = -advantages * torch.clamp(ratio, 1.0 - cliprange, 1.0 + cliprange)
+        
+        # Use token level ratio to identify clipped and non-clipped tokens
+        clipped_mask = ((token_level_ratio < (1.0 - cliprange)) | (token_level_ratio > (1.0 + cliprange))) & (eos_mask > 0)
+        non_clipped_mask = ((token_level_ratio >= (1.0 - cliprange)) & (token_level_ratio <= (1.0 + cliprange))) & (eos_mask > 0)
+        
+        batch_size, seq_len = ratio.shape
+        stabilization_factor_per_token = torch.ones_like(ratio)
+        
+        # Aggregate metrics for logging
+        total_clipped_l2_norm = 0.0
+        total_non_clipped_l2_norm = 0.0
+        total_stabilization_ratio = 0.0
+        num_turns_processed = 0
+        
+        for b in range(batch_size):
+            # Get turn indices for this batch sample - stored as flattened [start1, end1, start2, end2, ...]
+            turn_indices_b = turn_indices[b]  # shape: (max_indices,)
+            
+            # Find valid turn indices (not equal to -1)
+            valid_indices = turn_indices_b[turn_indices_b != -1]
+            
+            if len(valid_indices) == 0 or len(valid_indices) % 2 != 0:
+                # If no valid indices or odd number of indices, use global stabilization factor
+                print(f"[Debug] Batch {b}: No valid turn indices, using global stabilization")
+                continue
+            
+            # Parse pairs of (start, end) indices
+            num_turns = len(valid_indices) // 2
+            
+            for turn_idx in range(num_turns):
+                start_pos = valid_indices[turn_idx * 2].item()
+                end_pos = valid_indices[turn_idx * 2 + 1].item()
+                
+                # Ensure positions are within sequence bounds
+                start_pos = max(0, min(start_pos, seq_len - 1))
+                end_pos = max(0, min(end_pos, seq_len - 1))
+                
+                if start_pos > end_pos:
+                    continue
+                
+                # Get masks for this turn
+                turn_clipped_mask = clipped_mask[b, start_pos:end_pos + 1]
+                turn_non_clipped_mask = non_clipped_mask[b, start_pos:end_pos + 1]
+                
+                # Skip if no tokens in this turn
+                if turn_clipped_mask.sum() == 0 and turn_non_clipped_mask.sum() == 0:
+                    continue
+                
+                # Compute turn-level importance sampling * advantage for clipped tokens
+                turn_clipped_is_adv = token_level_ratio[b, start_pos:end_pos + 1] * advantages[b, start_pos:end_pos + 1] * turn_clipped_mask
+                turn_clipped_l2_norm = torch.sqrt((turn_clipped_is_adv ** 2).sum() / turn_clipped_mask.sum().clamp(min=1e-8))
+                
+                # Compute turn-level importance sampling * advantage for non-clipped tokens  
+                turn_non_clipped_is_adv = token_level_ratio[b, start_pos:end_pos + 1] * advantages[b, start_pos:end_pos + 1] * turn_non_clipped_mask
+                turn_non_clipped_l2_norm = torch.sqrt((turn_non_clipped_is_adv ** 2).sum() / turn_non_clipped_mask.sum().clamp(min=1e-8))
+                
+                # Compute turn-level stabilization ratio and detach gradient
+                turn_stabilization_ratio = turn_clipped_l2_norm / (turn_non_clipped_l2_norm + 1e-8)
+                turn_stabilization_ratio = turn_stabilization_ratio.detach()
+                
+                print(f"[Debug] Batch {b}, Turn {turn_idx} (pos {start_pos}-{end_pos}): Clipped L2 norm: {turn_clipped_l2_norm.item():.6f}, Non-clipped L2 norm: {turn_non_clipped_l2_norm.item():.6f}")
+                print(f"[Debug] Batch {b}, Turn {turn_idx}: Stabilization ratio: {turn_stabilization_ratio.item():.6f}")
+                
+                # Apply turn-level stabilization if ratio > 5
+                turn_stabilization_factor = 1.0
+                if turn_stabilization_ratio > 5.0:
+                    turn_stabilization_factor = 1.0 / turn_stabilization_ratio
+                    print(f"[Debug] Batch {b}, Turn {turn_idx}: Applying gradient stabilization with factor: {turn_stabilization_factor:.6f}")
+                
+                # Apply stabilization factor to all tokens in this turn
+                stabilization_factor_per_token[b, start_pos:end_pos + 1] = turn_stabilization_factor
+                
+                # Accumulate metrics for logging
+                total_clipped_l2_norm += turn_clipped_l2_norm.item()
+                total_non_clipped_l2_norm += turn_non_clipped_l2_norm.item()
+                total_stabilization_ratio += turn_stabilization_ratio.item()
+                num_turns_processed += 1
+        
+        # Compute standard PPO loss
+        pg_loss = verl_F.masked_mean(torch.max(pg_losses1, pg_losses2), eos_mask)
+        
+        # Apply per-token stabilization factors to the final loss
+        pg_loss = pg_loss * verl_F.masked_mean(stabilization_factor_per_token, eos_mask)
+        
+        pg_clipfrac = verl_F.masked_mean((pg_losses2 > pg_losses1).float(), eos_mask)
+        
+        # Compute clip gradient norm
+        clipped_grad = (ratio * advantages).abs() * clipped_mask  # |importance_sampling * advantage|
+        clip_grad_norm = verl_F.masked_mean(clipped_grad ** 2, eos_mask)
+        
+        # Store aggregated stabilization metrics for logging
+        avg_clipped_l2_norm = total_clipped_l2_norm / max(num_turns_processed, 1)
+        avg_non_clipped_l2_norm = total_non_clipped_l2_norm / max(num_turns_processed, 1)
+        avg_stabilization_ratio = total_stabilization_ratio / max(num_turns_processed, 1)
+        avg_stabilization_factor = verl_F.masked_mean(stabilization_factor_per_token, eos_mask)
+        
+        stabilization_metrics = {
+            'stabilization_factor': avg_stabilization_factor.detach(),
+            'stabilization_ratio': torch.tensor(avg_stabilization_ratio, device=ratio.device),
+            'clipped_l2_norm': torch.tensor(avg_clipped_l2_norm, device=ratio.device),
+            'non_clipped_l2_norm': torch.tensor(avg_non_clipped_l2_norm, device=ratio.device),
+            'num_turns_processed': torch.tensor(num_turns_processed, device=ratio.device)
+        }
     else:
         # Standard PPO
         print("="*80)
