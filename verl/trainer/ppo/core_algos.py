@@ -595,9 +595,9 @@ def compute_policy_loss(
         print(f"[Debug] Clipped L2 norm: {clipped_l2_norm.item():.6f}, Non-clipped L2 norm: {non_clipped_l2_norm.item():.6f}")
         print(f"[Debug] Stabilization ratio: {stabilization_ratio.item():.6f}")
         
-        # Apply stabilization if ratio > 5
+        # Apply stabilization if ratio > 3
         stabilization_factor = torch.tensor(1.0, device=stabilization_ratio.device)
-        if stabilization_ratio > 5.0:
+        if stabilization_ratio > 3.0:
             stabilization_factor = 1.0 / stabilization_ratio
             print(f"[Debug] Applying gradient stabilization with factor: {stabilization_factor.item():.6f}")
         
