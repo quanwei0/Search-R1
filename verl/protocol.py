@@ -361,7 +361,47 @@ class DataProto:
             sub_meta_info = copy.deepcopy(sub_meta_info)
 
         return DataProto(batch=sub_batch, non_tensor_batch=non_tensor_batch, meta_info=sub_meta_info)
+    
+    def select_idxs(self, idxs):
+        """
+        Select specific indices from the DataProto.
 
+        Args:
+            idxs (torch.Tensor or numpy.ndarray or list): Indices to select
+
+        Returns:
+            DataProto: A new DataProto containing only the selected indices
+        """
+        if isinstance(idxs, list):
+            idxs = torch.tensor(idxs)
+            if idxs.dtype != torch.bool:
+                idxs = idxs.type(torch.int32)
+
+        if isinstance(idxs, np.ndarray):
+            idxs_np = idxs
+            idxs_torch = torch.from_numpy(idxs)
+        else:  # torch.Tensor
+            idxs_torch = idxs
+            idxs_np = idxs.detach().cpu().numpy()
+
+        batch_size = int(idxs_np.sum()) if idxs_np.dtype == bool else idxs_np.shape[0]
+
+        if self.batch is not None:
+            # Use TensorDict's built-in indexing capabilities
+            selected_batch = TensorDict(
+                source={key: tensor[idxs_torch] for key, tensor in self.batch.items()},
+                batch_size=(batch_size,),
+                device=self.batch.device,
+            )
+        else:
+            selected_batch = None
+
+        selected_non_tensor = {}
+        for key, val in self.non_tensor_batch.items():
+            selected_non_tensor[key] = val[idxs_np]
+
+        return type(self)(batch=selected_batch, non_tensor_batch=selected_non_tensor, meta_info=self.meta_info)
+    
     def pop(self, batch_keys=None, non_tensor_batch_keys=None, meta_info_keys=None) -> 'DataProto':
         """Pop a subset of the DataProto via `batch_keys` and `meta_info_keys`
 

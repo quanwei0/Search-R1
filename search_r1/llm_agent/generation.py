@@ -21,6 +21,10 @@ class GenerationConfig:
     no_think_rl: bool=False
     search_url: str = None
     topk: int = 3
+    # Inference scaling configuration
+    use_inference_scaling: bool = False
+    scaling_algorithm: str = "best_of_n"  # "best_of_n", "beam_search", etc.
+    scaling_config: dict = None
 
 class LLMGenerationManager:
     def __init__(
@@ -41,7 +45,29 @@ class LLMGenerationManager:
             max_obs_length=config.max_obs_length,
             max_start_length=config.max_start_length
         ))
-
+        
+        # Initialize inference scaling if enabled
+        self.inference_scaler = None
+        if config.use_inference_scaling:
+            self._init_inference_scaler()
+    
+    def _init_inference_scaler(self):
+        """Initialize the appropriate inference scaling algorithm."""
+        scaling_config = self.config.scaling_config or {}
+        if self.config.scaling_algorithm == "best_of_n":
+            from ..inference_scaling import BestOfNScaler
+            self.inference_scaler = BestOfNScaler(scaling_config)
+        elif self.config.scaling_algorithm == "stepwise_bon":
+            from ..inference_scaling import StepwiseBestOfNScaler
+            self.inference_scaler = StepwiseBestOfNScaler(scaling_config)
+        elif self.config.scaling_algorithm == "beam_search":
+            from ..inference_scaling import BeamSearchScaler  
+            self.inference_scaler = BeamSearchScaler(scaling_config)
+        else:
+            raise ValueError(f"Unknown scaling algorithm: {self.config.scaling_algorithm}")
+            
+        print(f"[Generation] Initialized {self.config.scaling_algorithm} with config: {scaling_config}")
+        
     def _batch_tokenize(self, responses: List[str]) -> torch.Tensor:
         """Tokenize a batch of responses."""
         return self.tokenizer(
@@ -217,8 +243,50 @@ class LLMGenerationManager:
         padded_output.batch = trimmed_batch
         return padded_output
 
-    def run_llm_loop(self, gen_batch, initial_input_ids: torch.Tensor) -> Tuple[Dict, Dict]:
-        """Run main LLM generation loop."""
+    def run_llm_loop(self, gen_batch, initial_input_ids: torch.Tensor, reward_fn=None) -> Tuple[Dict, Dict]:
+        """
+        Run main LLM generation loop with optional inference scaling.
+        
+        Args:
+            gen_batch: Generation batch
+            initial_input_ids: Initial input token IDs
+            reward_fn: Optional reward function for candidate selection
+            
+        Returns:
+            Generation output (single best candidate if scaling is used)
+        """
+        # Use inference scaling if enabled
+        if self.config.use_inference_scaling and self.inference_scaler is not None:
+            return self.run_scaled_generation(gen_batch, initial_input_ids, reward_fn)
+        
+        # Original generation logic
+        return self._run_single_generation(gen_batch, initial_input_ids)
+    
+    def run_scaled_generation(self, gen_batch, initial_input_ids: torch.Tensor, reward_fn=None):
+        """
+        Run inference-time scaled generation.
+        
+        Args:
+            gen_batch: Generation batch
+            initial_input_ids: Initial input token IDs
+            reward_fn: Reward function for candidate selection
+            
+        Returns:
+            Best generation output selected from multiple candidates
+        """
+        print(f"[Generation] Using {self.config.scaling_algorithm} inference scaling...")
+        # Generate multiple candidates
+        candidates = self.inference_scaler.scale_inference(
+            generation_manager=self,
+            gen_batch=gen_batch,
+            initial_input_ids=initial_input_ids,
+            reward_fn=reward_fn,
+        )
+        
+        return candidates
+    
+    def _run_single_generation(self, gen_batch, initial_input_ids: torch.Tensor):
+        """Run single generation (original logic)."""
 
         original_left_side = {'input_ids': initial_input_ids[:, -self.config.max_start_length:]}
         original_right_side = {'responses': initial_input_ids[:, []], 'responses_with_info_mask': initial_input_ids[:, []]}

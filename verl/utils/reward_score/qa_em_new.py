@@ -94,7 +94,6 @@ def compute_score_em(solution_str, ground_truth, method='strict', format_score=0
     """
     answer = extract_solution(solution_str=solution_str)
     do_print = random.randint(1, 64) == 1
-    
     if do_print:
         print(f"--------------------------------")
         print(f"Golden answers: {ground_truth['target']}")
@@ -102,12 +101,12 @@ def compute_score_em(solution_str, ground_truth, method='strict', format_score=0
         print(f"Solution string: {solution_str}")
     
     if answer is None:
-        return 0
+        return 0, answer
     else:
         if em_check(answer, ground_truth['target']):
-            return score
+            return score, answer
         else:
-            return format_score
+            return format_score, answer
 
 
 def compute_score_subem(solution_str, ground_truth, method='strict', format_score=0., score=1.):

@@ -525,6 +525,8 @@ class RayPPOTrainer(object):
             no_think_rl=self.config.algorithm.no_think_rl,
             search_url = self.config.retriever.url,
             topk = self.config.retriever.topk,
+            use_inference_scaling = self.config.use_inference_scaling,
+            scaling_config = self.config.scaling_config
         )
 
         # Agent config preparation
@@ -581,8 +583,10 @@ class RayPPOTrainer(object):
                 timing_raw = {}
                 test_batch: DataProto = DataProto.from_single_dict(batch_dict)
                 # test_batch = test_batch.repeat(repeat_times=self.config.actor_rollout_ref.rollout.n_agent, interleave=True)
-                
+                test_batch = test_batch.repeat(repeat_times=self.config.scaling_config.n_candidates, interleave=True)
+
                 test_gen_batch = test_batch.pop(batch_keys=['input_ids', 'attention_mask', 'position_ids'])
+                # test_gen_batch = test_gen_batch.repeat(repeat_times=self.config.scaling_config.n_candidates, interleave=True)
                 test_gen_batch.meta_info = {
                     'eos_token_id': self.tokenizer.eos_token_id,
                     'pad_token_id': self.tokenizer.pad_token_id,
@@ -597,22 +601,23 @@ class RayPPOTrainer(object):
                         final_gen_batch_output = generation_manager.run_llm_loop(
                             gen_batch=test_gen_batch,
                             initial_input_ids=first_input_ids,
+                            reward_fn=self.critic_wg
                         )
-                    
                     test_batch = test_batch.union(final_gen_batch_output)
                     
                     for key in test_batch.batch.keys():
                         test_batch.batch[key] = test_batch.batch[key].long()
-                    
+                        
                     test_batch, _ = self._create_loss_mask(test_batch, {})
                     test_batch = self._split_turn_idx(test_batch)
                     
-                    test_batch = self._split_trajectories(test_batch, save_dir, val_batch_idx=i)
+                    test_batch, trajectories = self._split_trajectories(test_batch, save_dir, val_batch_idx=i)
                     
                     # evaluate using reward_function
                     # for certain reward function (e.g. sandbox), the generation can overlap with reward
                     reward_dict = self.val_reward_fn(test_batch)
                     answer_reward_tensor = reward_dict['answer_correctness']
+                    extracted_answer = reward_dict['extracted_answers']
                     format_reward_tensor = reward_dict['format_correctness']
                     retrieval_reward_tensor = reward_dict['retrieval_correctness']
                     mixed_outcome_reward_tensor = reward_dict['mixed_outcome_reward']
@@ -626,7 +631,22 @@ class RayPPOTrainer(object):
                     final_em_format_reward_tensor_lst.append(final_em_format_reward_tensor)
                     avg_step_retrieval_format_reward_tensor_lst.append(avg_step_retrieval_format_reward_tensor)
                     data_source_lst.append(test_batch.non_tensor_batch.get('data_source', ['unknown'] * answer_reward_tensor.shape[0]))
+                    
+                    ## add answer_reward to trajectories for each sample
+                    for j, traj in enumerate(trajectories):
+                        for sub_i in range(len(traj['samples'])):
+                            idx = j * len(traj['samples']) + sub_i
+                            traj['samples'][sub_i]['answer_reward'] = answer_reward_tensor.sum(-1).tolist()[idx]
+                            traj['samples'][sub_i]['extracted_reward'] = extracted_answer[idx]
+                    if save_dir:
+                        os.makedirs(save_dir, exist_ok=True)
+                        save_path = os.path.join(save_dir, f'trajectories_val_batch_{i}.json')
 
+                        with open(save_path, 'w', encoding='utf-8') as f:
+                            json.dump(trajectories, f, ensure_ascii=False, indent=2)
+
+                        
+                    
         # reward_tensor = torch.cat([rw.sum(-1) for rw in reward_tensor_lst], dim=0).cpu()  # (batch_size,)
         # reward_tensor = torch.cat(reward_tensor_lst, dim=0).sum(-1).cpu()  # (batch_size,)
         answer_reward_tensor = torch.cat([rw.sum(-1, keepdim=True) for rw in answer_reward_tensor_lst], dim=0).cpu()
@@ -646,7 +666,7 @@ class RayPPOTrainer(object):
         metric_dict.update(self._track_reward_metrics(final_em_format_reward_tensor, data_sources, prefix="val/final_em_format_score"))
         metric_dict.update(self._track_reward_metrics(avg_step_retrieval_format_reward_tensor, data_sources, prefix="val/avg_step_retrieval_format_score"))
 
-        return metric_dict
+        return metric_dict, save_dir
 
 
     def init_workers(self):
@@ -1116,56 +1136,130 @@ class RayPPOTrainer(object):
         num_turns = []
 
         turn_indices = batch.meta_info.get("turn_indices", [[] for _ in range(len(batch))])
-
-        for i in range(len(batch)):
-            data_item = batch[i]
-
-            prompt_ids = data_item.batch['prompts']
-            prompt_length = prompt_ids.shape[-1]
-
-            attention_mask = data_item.batch['attention_mask']
-            valid_prompt_length = attention_mask[:prompt_length].sum()
-            valid_prompt_ids = prompt_ids[-valid_prompt_length:]
-
-            prompt_text = self.tokenizer.decode(valid_prompt_ids)
-            prompt_texts.append(prompt_text)
+        n_samples = batch.meta_info.get('n_candidates', 1)
+        
+        # Get rewards from meta_info when n_samples > 1
+        rewards = batch.meta_info.get("rewards") if n_samples > 1 else None
+        
+        if n_samples > 1 and rewards is not None:
+            # Process in groups when we have multiple samples per prompt
+            num_prompts = len(batch) // n_samples
             
-            response_ids = data_item.batch['responses']
-            valid_response_length = attention_mask[prompt_length:].sum()
-            valid_response_ids = response_ids[:valid_response_length]
+            for prompt_idx in range(num_prompts):
+                samples = []
+                prompt_text = None
+                ground_truth = None
+                data_source = None
+                
+                for sample_idx in range(n_samples):
+                    i = prompt_idx * n_samples + sample_idx
+                    data_item = batch[i]
 
-            full_ids = torch.cat((valid_prompt_ids, valid_response_ids))
-            full_text = self.tokenizer.decode(full_ids)
-            full_texts.append(full_text)
-            response_text_lengths.append(valid_response_ids.shape[0])
+                    prompt_ids = data_item.batch['prompts']
+                    prompt_length = prompt_ids.shape[-1]
 
-            # Turn-level decoding
-            turns = []
-            turn_lengths = []
-            for start, end in turn_indices[i]:
-                turn_ids = response_ids[start:end + 1]
-                turn_text = self.tokenizer.decode(turn_ids)
-                turns.append(turn_text)
-                turn_lengths.append(turn_ids.shape[0])
-            turn_texts.append(turns)
-            turn_text_lengths.append(turn_lengths)
-            num_turns.append(len(turns))
+                    attention_mask = data_item.batch['attention_mask']
+                    valid_prompt_length = attention_mask[:prompt_length].sum()
+                    valid_prompt_ids = prompt_ids[-valid_prompt_length:]
 
-            # Optional for logging/saving
-            ground_truth = data_item.non_tensor_batch.get('reward_model', {}).get('ground_truth', {}).get('target', '')
-            data_source = data_item.non_tensor_batch.get('data_source', 'unknown')
-            if isinstance(ground_truth, np.ndarray):
-                ground_truth = ground_truth.tolist()
-            if isinstance(data_source, np.ndarray):
-                data_source = data_source.tolist()
+                    # Only decode prompt once per group
+                    if prompt_text is None:
+                        prompt_text = self.tokenizer.decode(valid_prompt_ids)
+                        prompt_texts.append(prompt_text)
+                    
+                    response_ids = data_item.batch['responses']
+                    valid_response_length = attention_mask[prompt_length:].sum()
+                    valid_response_ids = response_ids[:valid_response_length]
 
-            trajectories.append({
-                "data_source": data_source,
-                "ground_truth": ground_truth,
-                "full_text": full_text,
-                "prompt": prompt_text,
-                "turn_texts": turns,
-            })
+                    full_ids = torch.cat((valid_prompt_ids, valid_response_ids))
+                    full_text = self.tokenizer.decode(full_ids)
+                    full_texts.append(full_text)
+                    response_text_lengths.append(valid_response_ids.shape[0])
+
+                    # Turn-level decoding
+                    turns = []
+                    turn_lengths = []
+                    for start, end in turn_indices[i]:
+                        turn_ids = response_ids[start:end + 1]
+                        turn_text = self.tokenizer.decode(turn_ids)
+                        turns.append(turn_text)
+                        turn_lengths.append(turn_ids.shape[0])
+                    turn_texts.append(turns)
+                    turn_text_lengths.append(turn_lengths)
+                    num_turns.append(len(turns))
+
+                    # Get ground truth and data source from first sample
+                    if ground_truth is None:
+                        ground_truth = data_item.non_tensor_batch.get('reward_model', {}).get('ground_truth', {}).get('target', '')
+                        data_source = data_item.non_tensor_batch.get('data_source', 'unknown')
+                        if isinstance(ground_truth, np.ndarray):
+                            ground_truth = ground_truth.tolist()
+                        if isinstance(data_source, np.ndarray):
+                            data_source = data_source.tolist()
+                    
+                    samples.append({
+                        "turn_texts": turns,
+                        "full_text": full_text,
+                        "reward": rewards[i].item() if i < len(rewards) else None
+                    })
+                
+                trajectories.append({
+                    "data_source": data_source,
+                    "ground_truth": ground_truth,
+                    "prompt": prompt_text,
+                    "samples": samples
+                })
+        else:
+            # Original logic for n_samples == 1
+            for i in range(len(batch)):
+                data_item = batch[i]
+
+                prompt_ids = data_item.batch['prompts']
+                prompt_length = prompt_ids.shape[-1]
+
+                attention_mask = data_item.batch['attention_mask']
+                valid_prompt_length = attention_mask[:prompt_length].sum()
+                valid_prompt_ids = prompt_ids[-valid_prompt_length:]
+
+                prompt_text = self.tokenizer.decode(valid_prompt_ids)
+                prompt_texts.append(prompt_text)
+                
+                response_ids = data_item.batch['responses']
+                valid_response_length = attention_mask[prompt_length:].sum()
+                valid_response_ids = response_ids[:valid_response_length]
+
+                full_ids = torch.cat((valid_prompt_ids, valid_response_ids))
+                full_text = self.tokenizer.decode(full_ids)
+                full_texts.append(full_text)
+                response_text_lengths.append(valid_response_ids.shape[0])
+
+                # Turn-level decoding
+                turns = []
+                turn_lengths = []
+                for start, end in turn_indices[i]:
+                    turn_ids = response_ids[start:end + 1]
+                    turn_text = self.tokenizer.decode(turn_ids)
+                    turns.append(turn_text)
+                    turn_lengths.append(turn_ids.shape[0])
+                turn_texts.append(turns)
+                turn_text_lengths.append(turn_lengths)
+                num_turns.append(len(turns))
+
+                # Optional for logging/saving
+                ground_truth = data_item.non_tensor_batch.get('reward_model', {}).get('ground_truth', {}).get('target', '')
+                data_source = data_item.non_tensor_batch.get('data_source', 'unknown')
+                if isinstance(ground_truth, np.ndarray):
+                    ground_truth = ground_truth.tolist()
+                if isinstance(data_source, np.ndarray):
+                    data_source = data_source.tolist()
+
+                trajectories.append({
+                    "data_source": data_source,
+                    "ground_truth": ground_truth,
+                    "full_text": full_text,
+                    "prompt": prompt_text,
+                    "turn_texts": turns,
+                })
 
         # Inject into batch.meta_info
         batch.meta_info["decoded_full_texts"] = full_texts
@@ -1176,13 +1270,14 @@ class RayPPOTrainer(object):
         batch.meta_info["num_turns"] = num_turns
 
         # Optional: save to JSON
-        if save_dir:
-            os.makedirs(save_dir, exist_ok=True)
-            if val_batch_idx is not None:
-                save_path = os.path.join(save_dir, f'trajectories_val_batch_{val_batch_idx}.json')
-            else:
-                save_path = os.path.join(save_dir, f'trajectories_step_{self.global_steps}.json')
-            with open(save_path, 'w', encoding='utf-8') as f:
-                json.dump(trajectories, f, ensure_ascii=False, indent=2)
+        # if save_dir:
+        #     os.makedirs(save_dir, exist_ok=True)
+        #     if val_batch_idx is not None:
+        #         save_path = os.path.join(save_dir, f'trajectories_val_batch_{val_batch_idx}.json')
+        #     else:
+        #         save_path = os.path.join(save_dir, f'trajectories_step_{self.global_steps}.json')
+        #     with open(save_path, 'w', encoding='utf-8') as f:
+        #         json.dump(trajectories, f, ensure_ascii=False, indent=2)
 
-        return batch
+        return batch, trajectories
+    
