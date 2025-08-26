@@ -277,6 +277,10 @@ def compute_data_metrics(batch, use_critic=True):
             torch.max(valid_adv).detach().item(),
         'critic/advantages/min':
             torch.min(valid_adv).detach().item(),
+        'critic/advantages/var':
+            torch.var(valid_adv).detach().item(),
+        'critic/advantages/std':
+            torch.std(valid_adv).detach().item(),
         # returns
         'critic/returns/mean':
             torch.mean(valid_returns).detach().item(),
