@@ -1,0 +1,9 @@
+*.egg-info
+__pycache__
+*_version.py
+docs/build
+.coverage
+.idea/
+*.gguf
+.venv
+benchmarks/results

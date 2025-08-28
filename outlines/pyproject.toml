@@ -1,0 +1,159 @@
+[build-system]
+requires = ["setuptools>=45", "setuptools_scm[toml]>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "outlines"
+authors= [{name = "Outlines Developers"}]
+description = "Probabilistic Generative Model Programming"
+requires-python = ">=3.8"
+keywords=[
+    "machine learning",
+    "deep learning",
+    "language models",
+    "structured generation",
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Information Technology",
+    "Intended Audience :: Science/Research",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+   "interegular",
+   "jinja2",
+   "lark",
+   "nest_asyncio",
+   "numpy<2.0.0",
+   "cloudpickle",
+   "diskcache",
+   "pydantic>=2.0",
+   "numba",
+   "referencing",
+   "jsonschema",
+   "requests",
+   "tqdm",
+   "datasets",
+   "typing_extensions",
+   "pycountry",
+]
+dynamic = ["version"]
+
+[project.optional-dependencies]
+test = [
+    "pre-commit",
+    "pytest",
+    "pytest-benchmark",
+    "pytest-cov",
+    "pytest-mock",
+    "coverage[toml]>=5.1",
+    "diff-cover",
+    "accelerate",
+    "beartype<0.16.0",
+    "responses",
+    "llama-cpp-python",
+    "mlx-lm",
+    "huggingface_hub",
+    "openai>=1.0.0",
+    "vllm",
+    "torch",
+    "transformers",
+]
+serve = [
+    "vllm>=0.3.0",
+    "uvicorn",
+    "fastapi",
+    "pydantic>=2.0",
+]
+
+[project.urls]
+homepage = "https://github.com/outlines-dev/outlines"
+documentation = "https://outlines-dev.github.io/outlines/"
+repository = "https://github.com/outlines-dev/outlines"
+
+[project.readme]
+file="README.md"
+content-type = "text/markdown"
+
+[tool.setuptools]
+packages = ["outlines"]
+
+[tool.setuptools.package-data]
+"outlines" = ["py.typed"]
+
+[tool.setuptools_scm]
+write_to = "outlines/_version.py"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+filterwarnings = [
+    "error",
+    "ignore::numba.core.errors.NumbaPendingDeprecationWarning",
+    "ignore::pydantic.warnings.PydanticDeprecatedSince20",
+    "ignore::FutureWarning:transformers.*",
+    "ignore::FutureWarning:huggingface_hub.*",
+    "ignore::UserWarning",
+]
+
+[tool.mypy]
+exclude=["examples"]
+enable_incomplete_feature = ["Unpack"]
+
+[[tool.mypy.overrides]]
+module = [
+    "exllamav2.*",
+    "jinja2",
+    "jsonschema.*",
+    "openai.*",
+    "mamba_ssm.*",
+    "mlx_lm.*",
+    "mlx.*",
+    "nest_asyncio",
+    "numpy.*",
+    "cloudpickle.*",
+    "diskcache.*",
+    "pydantic.*",
+    "pytest",
+    "referencing.*",
+    "tiktoken.*",
+    "torch.*",
+    "transformers.*",
+    "llama_cpp",
+    "huggingface_hub",
+    "lark.*",
+    "interegular.*",
+    "datasets.*",
+    "numba.*",
+    "requests.*",
+    "responses.*",
+    "vllm.*",
+    "uvicorn.*",
+    "fastapi.*",
+    "pycountry.*",
+]
+ignore_missing_imports = true
+
+[tool.coverage.run]
+omit = [
+    "outlines/_version.py",
+    "tests/*",
+]
+branch = true
+
+[tool.coverage.report]
+omit = [
+    "tests/*",
+]
+exclude_lines = [
+    "pragma: no cover",
+    "if TYPE_CHECKING:",
+    "...",
+]
+show_missing = true
+
+[tool.diff_cover]
+compare_branch = "origin/main"
+diff_range_notation = ".."
