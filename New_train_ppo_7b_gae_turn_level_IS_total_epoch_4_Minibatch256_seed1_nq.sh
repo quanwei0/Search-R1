@@ -7,8 +7,7 @@ source activate retriever
 # # Pass GPU devices and port to retrieval script
 bash retrieval_launch.sh "$RETRIEVAL_CUDA_VISIBLE_DEVICES" "$RETRIEVAL_PORT"
 sleep 60
-conda init
-conda activate searchr1-test
+conda activate searchr1
 
 export WANDB_API_KEY="810f91e58aa0fd1d03b11c60b0d1cffbb1d941f4"
 export WANDB_ENTITY="rl_agent"
@@ -17,7 +16,7 @@ WAND_PROJECT='Search-R1'
 
 
 export BASE_MODEL='Qwen/Qwen2.5-7B'
-export EXPERIMENT_NAME=H100-search-r1-ppo-qwen2.5-7b-em-gae-turn-IS-total-epoch-4-Minibatch256-seed2
+export EXPERIMENT_NAME=H100-search-r1-ppo-qwen2.5-7b-em-gae-turn-IS-total-epoch-4-Minibatch256-seed1
 # export BASE_MODEL='Qwen/Qwen2.5-1.5B-Instruct'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-1.5b-it-em
 # export BASE_MODEL='Qwen/Qwen2.5-3B'
