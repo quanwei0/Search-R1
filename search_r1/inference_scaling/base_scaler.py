@@ -8,7 +8,7 @@ import torch
 from verl import DataProto
 
 
-class BaseInferenceScaler(ABC):
+class BaseInferenceGenerator(ABC):
     """
     Base class for inference-time scaling algorithms.
     
@@ -25,7 +25,7 @@ class BaseInferenceScaler(ABC):
         self.config = config
     
     @abstractmethod
-    def scale_inference(self, 
+    def generate(self, 
                        generation_manager,
                        gen_batch: DataProto,
                        initial_input_ids: torch.Tensor) -> DataProto:
@@ -39,22 +39,6 @@ class BaseInferenceScaler(ABC):
             
         Returns:
             DataProto: Scaled generation output (may contain multiple candidates)
-        """
-        pass
-    
-    @abstractmethod
-    def select_best(self, candidates: List[DataProto], 
-                   reward_fn=None, **kwargs) -> DataProto:
-        """
-        Select the best candidate from multiple generations.
-        
-        Args:
-            candidates: List of generation candidates
-            reward_fn: Optional reward function for selection
-            **kwargs: Additional selection criteria
-            
-        Returns:
-            DataProto: Best candidate
         """
         pass
     
@@ -80,35 +64,3 @@ class BaseInferenceScaler(ABC):
         except Exception as e:
             print(f"Warning: Failed to compute reward: {e}")
             return 0.0
-
-
-if __name__ == "__main__":
-    """Simple test for BaseInferenceScaler interface."""
-    print("Testing BaseInferenceScaler Interface...")
-    
-    try:
-        # Test abstract class cannot be instantiated
-        try:
-            BaseInferenceScaler({})
-            print("❌ Should not be able to instantiate abstract class")
-        except TypeError:
-            print("✅ Abstract class properly enforced")
-        
-        # Test that subclasses work
-        class TestScaler(BaseInferenceScaler):
-            def scale_inference(self, generation_manager, gen_batch, initial_input_ids):
-                return []
-            def select_best(self, candidates, reward_fn=None, **kwargs):
-                return candidates[0] if candidates else None
-        
-        config = {'test': 'value'}
-        test_scaler = TestScaler(config)
-        assert test_scaler.config == config
-        print("✅ Subclass implementation works")
-        
-        print("🎉 BaseInferenceScaler interface ready!")
-        
-    except Exception as e:
-        print(f"❌ Test failed: {e}")
-        import traceback
-        traceback.print_exc()
