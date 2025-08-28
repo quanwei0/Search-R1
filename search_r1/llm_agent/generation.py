@@ -23,7 +23,6 @@ class GenerationConfig:
     topk: int = 3
     # Inference scaling configuration
     use_inference_scaling: bool = False
-    scaling_algorithm: str = "best_of_n"  # "best_of_n", "beam_search", etc.
     scaling_config: dict = None
 
 class LLMGenerationManager:
@@ -54,19 +53,16 @@ class LLMGenerationManager:
     def _init_inference_scaler(self):
         """Initialize the appropriate inference scaling algorithm."""
         scaling_config = self.config.scaling_config or {}
-        if self.config.scaling_algorithm == "best_of_n":
-            from ..inference_scaling import BestOfNScaler
-            self.inference_scaler = BestOfNScaler(scaling_config)
-        elif self.config.scaling_algorithm == "stepwise_bon":
-            from ..inference_scaling import StepwiseBestOfNScaler
-            self.inference_scaler = StepwiseBestOfNScaler(scaling_config)
-        elif self.config.scaling_algorithm == "beam_search":
-            from ..inference_scaling import BeamSearchScaler  
-            self.inference_scaler = BeamSearchScaler(scaling_config)
+        if scaling_config.algorithm == "bon":
+            from ..inference_scaling import BestOfNGenerator
+            self.inference_scaler = BestOfNGenerator(scaling_config)
+        elif scaling_config.algorithm == "beam_search":
+            from ..inference_scaling import BeamSearchGenerator  
+            self.inference_scaler = BeamSearchGenerator(scaling_config)
         else:
-            raise ValueError(f"Unknown scaling algorithm: {self.config.scaling_algorithm}")
-            
-        print(f"[Generation] Initialized {self.config.scaling_algorithm} with config: {scaling_config}")
+            raise ValueError(f"Unknown scaling algorithm: {scaling_config.algorithm}")
+
+        print(f"[Generation] Initialized {scaling_config.algorithm} with config: {scaling_config}")
         
     def _batch_tokenize(self, responses: List[str]) -> torch.Tensor:
         """Tokenize a batch of responses."""
@@ -257,147 +253,215 @@ class LLMGenerationManager:
         """
         # Use inference scaling if enabled
         if self.config.use_inference_scaling and self.inference_scaler is not None:
-            return self.run_scaled_generation(gen_batch, initial_input_ids, reward_fn)
-        
+            results = self.inference_scaler.generate(
+                generation_manager=self,
+                gen_batch=gen_batch,
+                initial_input_ids=initial_input_ids,
+                reward_fn=reward_fn,
+            )
+        else:
+            results = self._run_single_generation(gen_batch, initial_input_ids)
         # Original generation logic
-        return self._run_single_generation(gen_batch, initial_input_ids)
+        return results
     
-    def run_scaled_generation(self, gen_batch, initial_input_ids: torch.Tensor, reward_fn=None):
-        """
-        Run inference-time scaled generation.
-        
-        Args:
-            gen_batch: Generation batch
-            initial_input_ids: Initial input token IDs
-            reward_fn: Reward function for candidate selection
+    def create_generation_state(self, batch_size, initial_input_ids, max_start_length):
+        """Create a generation state using DataProto."""
+        state = DataProto.from_dict({
+            # Left side - prompt
+            'left_input_ids': initial_input_ids[:, -max_start_length:],
             
-        Returns:
-            Best generation output selected from multiple candidates
-        """
-        print(f"[Generation] Using {self.config.scaling_algorithm} inference scaling...")
-        # Generate multiple candidates
-        candidates = self.inference_scaler.scale_inference(
-            generation_manager=self,
-            gen_batch=gen_batch,
-            initial_input_ids=initial_input_ids,
-            reward_fn=reward_fn,
-        )
+            # Right side - responses
+            'responses': initial_input_ids[:, []],
+            'responses_with_info_mask': initial_input_ids[:, []],
+            
+            # Statistics
+            'active_mask': torch.ones(batch_size, dtype=torch.bool),
+            'turns_stats': torch.ones(batch_size, dtype=torch.int),
+            'valid_action_stats': torch.zeros(batch_size, dtype=torch.int),
+            'valid_search_stats': torch.zeros(batch_size, dtype=torch.int),
+            
+            # For beam search
+            'scores': torch.zeros(batch_size, dtype=torch.float),
+            'completed': torch.zeros(batch_size, dtype=torch.bool)
+        })
         
-        return candidates
-    
-    def _run_single_generation(self, gen_batch, initial_input_ids: torch.Tensor):
-        """Run single generation (original logic)."""
-
-        original_left_side = {'input_ids': initial_input_ids[:, -self.config.max_start_length:]}
-        original_right_side = {'responses': initial_input_ids[:, []], 'responses_with_info_mask': initial_input_ids[:, []]}
-
-        active_mask = torch.ones(gen_batch.batch['input_ids'].shape[0], dtype=torch.bool)
-        turns_stats = torch.ones(gen_batch.batch['input_ids'].shape[0], dtype=torch.int)
-        valid_action_stats = torch.zeros(gen_batch.batch['input_ids'].shape[0], dtype=torch.int)
-        valid_search_stats = torch.zeros(gen_batch.batch['input_ids'].shape[0], dtype=torch.int)
-        active_num_list = [active_mask.sum().item()]
-        rollings = gen_batch
-
-        generation_history = {
+        # Initialize meta_info
+        state.meta_info['active_num_history'] = [state.batch['active_mask'].sum().item()]
+        state.meta_info['history'] = {
             'ids_per_round': [],
             'str_per_round': []
         }
+        
+        return state
+    
+    def update_generation_stats(self, state, curr_active_mask, valid_action, is_search):
+        """Update statistics in the generation state."""
+        state.batch['active_mask'] = state.batch['active_mask'] * curr_active_mask
+        state.meta_info['active_num_history'].append(state.batch['active_mask'].sum().item())
+        state.batch['turns_stats'][curr_active_mask] += 1
+        state.batch['valid_action_stats'] += torch.tensor(valid_action, dtype=torch.int)
+        state.batch['valid_search_stats'] += torch.tensor(is_search, dtype=torch.int)
+        
+    def add_to_generation_history(self, state, response_ids, response_str, obs_ids=None, obs_str=None):
+        """Add generation round to history in the state."""
+        state.meta_info['history']['ids_per_round'].append(response_ids.clone())
+        state.meta_info['history']['str_per_round'].append(response_str.copy())
+        if obs_ids is not None:
+            state.meta_info['history']['ids_per_round'].append(obs_ids.clone())
+        if obs_str is not None:
+            state.meta_info['history']['str_per_round'].append(obs_str.copy())
+    
+    def _generate_candidates(self, rollings, active_mask):
+        """Generate candidate responses for current state.
+        
+        Args:
+            rollings: Current rolling state
+            active_mask: Active trajectories mask
+            beam_size: Number of candidates to generate per trajectory
+            
+        Returns:
+            Tuple of (responses_ids, responses_str, meta_info)
+        """
+        # Prepare input
+        rollings.batch = self.tensor_fn.cut_to_effective_len(
+            rollings.batch,
+            keys=['input_ids', 'attention_mask', 'position_ids']
+        )
+        
+        # Generate with active mask
+        rollings_active = DataProto.from_dict({
+            k: v[active_mask] for k, v in rollings.batch.items()
+        })
+        
+        # Generate sequences (can be extended for beam search)
+        gen_output = self._generate_with_gpu_padding(rollings_active)
+        
+        # Process outputs
+        meta_info = gen_output.meta_info
+        responses_ids, responses_str = self._postprocess_responses(gen_output.batch['responses'])
+        responses_ids, responses_str = self.tensor_fn._example_level_pad(
+            responses_ids, responses_str, active_mask
+        )
+        
+        return responses_ids, responses_str, meta_info
+    
+    def _execute_turn(self, responses_str, active_mask, do_search=True):
+        """Execute a turn and get environment feedback.
+        
+        Args:
+            responses_str: Generated response strings
+            active_mask: Active trajectories mask  
+            do_search: Whether to execute search queries
+            
+        Returns:
+            Tuple of (next_obs, dones, valid_action, is_search, next_obs_ids)
+        """
+        # Execute predictions in environment
+        next_obs, dones, valid_action, is_search = self.execute_predictions(
+            responses_str, self.tokenizer.pad_token, active_mask, do_search=do_search
+        )
+        
+        # Process observations to token IDs if needed
+        next_obs_ids = self._process_next_obs(next_obs) if do_search else None
+        
+        return next_obs, dones, valid_action, is_search, next_obs_ids
+    
+    def _process_generation_turn(self, state: DataProto, rollings, is_final=False):
+        """Process a single generation turn.
+        
+        Args:
+            state: Current generation state
+            rollings: Rolling generation batch
+            is_final: Whether this is the final turn
+            
+        Returns:
+            Updated rollings and meta_info
+        """
+        # Generate candidates
+        responses_ids, responses_str, meta_info = self._generate_candidates(
+            rollings, state.batch['active_mask']
+        )
+        
+        # Execute turn
+        next_obs, dones, valid_action, is_search, next_obs_ids = self._execute_turn(
+            responses_str, state.batch['active_mask'], do_search=not is_final
+        )
+        
+        # Update state
+        curr_active_mask = torch.tensor([not done for done in dones], dtype=torch.bool)
+        self.update_generation_stats(state, curr_active_mask, valid_action, is_search)
+        
+        # Update history
+        if is_final:
+            self.add_to_generation_history(state, responses_ids, responses_str)
+        else:
+            self.add_to_generation_history(state, responses_ids, responses_str, next_obs_ids, next_obs)
+        
+        # Update generation context
+        if not is_final:
+            rollings = self._update_rolling_state(rollings, responses_ids, next_obs_ids)
+            # Update right_side in state
+            right_side = {
+                'responses': state.batch['responses'],
+                'responses_with_info_mask': state.batch['responses_with_info_mask']
+            }
+            updated_right = self._update_right_side(right_side, responses_ids, next_obs_ids)
+            state.batch['responses'] = updated_right['responses']
+            state.batch['responses_with_info_mask'] = updated_right['responses_with_info_mask']
+        else:
+            # Update right_side in state for final turn
+            right_side = {
+                'responses': state.batch['responses'],
+                'responses_with_info_mask': state.batch['responses_with_info_mask']
+            }
+            updated_right = self._update_right_side(right_side, responses_ids)
+            state.batch['responses'] = updated_right['responses']
+            state.batch['responses_with_info_mask'] = updated_right['responses_with_info_mask']
+            
+        return rollings, meta_info
+    
+    def _run_single_generation(self, gen_batch, initial_input_ids: torch.Tensor):
+        """Run single generation (refactored for beam search compatibility)."""
 
-        # Main generation loop
+        # Initialize generation state
+        batch_size = gen_batch.batch['input_ids'].shape[0]
+        state = self.create_generation_state(batch_size, initial_input_ids, self.config.max_start_length)
+        rollings = gen_batch
+        meta_info = {}
+
+        # Main generation loop for intermediate turns
         for step in range(self.config.max_turns):
-            if not active_mask.sum():
+            if not state.batch['active_mask'].sum():
                 break
-            rollings.batch = self.tensor_fn.cut_to_effective_len(
-                rollings.batch,
-                keys=['input_ids', 'attention_mask', 'position_ids']
+                
+            # Process turn with search
+            rollings, meta_info = self._process_generation_turn(
+                state, rollings, is_final=False
             )
 
-            # gen_output = self.actor_rollout_wg.generate_sequences(rollings)
-            rollings_active = DataProto.from_dict({
-                k: v[active_mask] for k, v in rollings.batch.items()
-            })            
-            gen_output = self._generate_with_gpu_padding(rollings_active)
-
-            meta_info = gen_output.meta_info            
-            responses_ids, responses_str = self._postprocess_responses(gen_output.batch['responses'])
-            responses_ids, responses_str = self.tensor_fn._example_level_pad(responses_ids, responses_str, active_mask)
-
-            # Execute in environment and process observations
-            next_obs, dones, valid_action, is_search = self.execute_predictions(
-                responses_str, self.tokenizer.pad_token, active_mask
+        # Final generation turn (without search)
+        if state.batch['active_mask'].sum():
+            rollings, meta_info = self._process_generation_turn(
+                state, rollings, is_final=True
             )
 
-            curr_active_mask = torch.tensor([not done for done in dones], dtype=torch.bool)
-            active_mask = active_mask * curr_active_mask
-            active_num_list.append(active_mask.sum().item())
-            turns_stats[curr_active_mask] += 1
-            valid_action_stats += torch.tensor(valid_action, dtype=torch.int)
-            valid_search_stats += torch.tensor(is_search, dtype=torch.int)
+        # Compile final metadata
+        meta_info['turns_stats'] = state.batch['turns_stats'].tolist()
+        meta_info['active_mask'] = state.batch['active_mask'].tolist()
+        meta_info['valid_action_stats'] = state.batch['valid_action_stats'].tolist()
+        meta_info['valid_search_stats'] = state.batch['valid_search_stats'].tolist()
+        meta_info['generation_history'] = state.meta_info['history']
 
-            next_obs_ids = self._process_next_obs(next_obs)
+        print("ACTIVE_TRAJ_NUM:", state.meta_info['active_num_history'])
 
-            generation_history['ids_per_round'].append(responses_ids.clone())
-            generation_history['str_per_round'].append(responses_str.copy())
-            generation_history['ids_per_round'].append(next_obs_ids.clone())
-            generation_history['str_per_round'].append(next_obs.copy())
-
-            # Update states
-            rollings = self._update_rolling_state(
-                rollings,
-                responses_ids,
-                next_obs_ids
-            )
-            original_right_side = self._update_right_side(
-                original_right_side,
-                responses_ids,
-                next_obs_ids
-            )
-
-        # final LLM rollout
-        if active_mask.sum():
-            rollings.batch = self.tensor_fn.cut_to_effective_len(
-                rollings.batch,
-                keys=['input_ids', 'attention_mask', 'position_ids']
-            )
-
-            # gen_output = self.actor_rollout_wg.generate_sequences(rollings)
-            rollings_active = DataProto.from_dict({
-                k: v[active_mask] for k, v in rollings.batch.items()
-            })            
-            gen_output = self._generate_with_gpu_padding(rollings_active)
-
-            meta_info = gen_output.meta_info            
-            responses_ids, responses_str = self._postprocess_responses(gen_output.batch['responses'])
-            responses_ids, responses_str = self.tensor_fn._example_level_pad(responses_ids, responses_str, active_mask)
-
-            generation_history['ids_per_round'].append(responses_ids.clone())
-            generation_history['str_per_round'].append(responses_str.copy())
-
-            # # Execute in environment and process observations
-            _, dones, valid_action, is_search = self.execute_predictions(
-                responses_str, self.tokenizer.pad_token, active_mask, do_search=False
-            )
-
-            curr_active_mask = torch.tensor([not done for done in dones], dtype=torch.bool)
-            active_mask = active_mask * curr_active_mask
-            active_num_list.append(active_mask.sum().item())
-            valid_action_stats += torch.tensor(valid_action, dtype=torch.int)
-            valid_search_stats += torch.tensor(is_search, dtype=torch.int)
-
-            original_right_side = self._update_right_side(
-                original_right_side,
-                responses_ids,
-            )
-
-        meta_info['turns_stats'] = turns_stats.tolist()
-        meta_info['active_mask'] = active_mask.tolist()
-        meta_info['valid_action_stats'] = valid_action_stats.tolist()
-        meta_info['valid_search_stats'] = valid_search_stats.tolist()
-        meta_info['generation_history'] = generation_history
-
-        print("ACTIVE_TRAJ_NUM:", active_num_list)
-
-        return self._compose_final_output(original_left_side, original_right_side, meta_info)
+        # Extract left_side and right_side for compose_final_output
+        left_side = {'input_ids': state.batch['left_input_ids']}
+        right_side = {
+            'responses': state.batch['responses'],
+            'responses_with_info_mask': state.batch['responses_with_info_mask']
+        }
+        
+        return self._compose_final_output(left_side, right_side, meta_info)
 
     def _compose_final_output(self, left_side: Dict,
                             right_side: Dict,
