@@ -1,4 +1,10 @@
+source activate searchr1
+
+pip install verl==0.1.0
 save_path=./data
 python scripts/download.py --save_path $save_path
 cat $save_path/part_* > $save_path/e5_Flat.index
 gzip -d $save_path/wiki-18.jsonl.gz
+
+python scripts/data_process/nq_search.py
+pip uninstall verl -y
