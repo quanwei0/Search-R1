@@ -29,7 +29,7 @@ WAND_PROJECT='Search-R1'
 # export BASE_MODEL='Qwen/Qwen2.5-3B-Instruct'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-3b-it-em
 export BASE_MODEL='Qwen/Qwen2.5-7B'
-export EXPERIMENT_NAME=qw-nq-hotpotqa-search-r1-ppo-qwen2.5-7b-em-gae
+export EXPERIMENT_NAME=qw-nq-hotpotqa-search-r1-ppo-qwen2.5-7b-em-gae-mixed-reward-new7
 # export BASE_MODEL='Qwen/Qwen2.5-7B-Instruct'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-7b-it-em
 
@@ -53,6 +53,7 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     algorithm.adv_estimator=gae \
     algorithm.gamma=1 \
     algorithm.lam=1 \
+    +algorithm.reward_type='mixed_reward' \
     actor_rollout_ref.model.path=$BASE_MODEL \
     actor_rollout_ref.actor.optim.lr=1e-6 \
     actor_rollout_ref.model.enable_gradient_checkpointing=True \

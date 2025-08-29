@@ -12,7 +12,7 @@ sleep 60
 
 conda activate searchr1
 
-export DATA_DIR='./data/nq_hotpotqa_train'
+export DATA_DIR='./data/nq_search'
 
 export WANDB_API_KEY="810f91e58aa0fd1d03b11c60b0d1cffbb1d941f4"
 export WANDB_ENTITY="rl_agent"
@@ -29,7 +29,7 @@ WAND_PROJECT='Search-R1'
 # export BASE_MODEL='Qwen/Qwen2.5-3B-Instruct'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-3b-it-em
 export BASE_MODEL='Qwen/Qwen2.5-7B'
-export EXPERIMENT_NAME=qw-nq-hotpotqa-search-r1-ppo-qwen2.5-7b-em-gae
+export EXPERIMENT_NAME=qw-nq-search-r1-grpo-qwen2.5-7b-em
 # export BASE_MODEL='Qwen/Qwen2.5-7B-Instruct'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-7b-it-em
 
@@ -50,7 +50,7 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     data.max_start_length=2048 \
     data.max_obs_length=500 \
     data.shuffle_train_dataloader=True \
-    algorithm.adv_estimator=gae \
+    algorithm.adv_estimator=grpo \
     algorithm.gamma=1 \
     algorithm.lam=1 \
     actor_rollout_ref.model.path=$BASE_MODEL \
@@ -69,7 +69,7 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     actor_rollout_ref.rollout.gpu_memory_utilization=0.6 \
     actor_rollout_ref.ref.log_prob_micro_batch_size=128 \
     actor_rollout_ref.ref.fsdp_config.param_offload=True \
-    actor_rollout_ref.rollout.n_agent=1 \
+    actor_rollout_ref.rollout.n_agent=5 \
     actor_rollout_ref.rollout.temperature=1 \
     actor_rollout_ref.actor.state_masking=True \
     critic.optim.lr=1e-5 \
@@ -91,7 +91,7 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     trainer.n_gpus_per_node=8 \
     trainer.nnodes=1 \
     trainer.save_freq=-1 \
-    trainer.test_freq=-1 \
+    trainer.test_freq=25 \
     trainer.project_name=$WAND_PROJECT \
     trainer.experiment_name=$EXPERIMENT_NAME \
     trainer.total_epochs=40 \
