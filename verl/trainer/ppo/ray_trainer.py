@@ -489,7 +489,7 @@ class RayPPOTrainer(object):
         # inject total_training_steps to actor/critic optim_config. This is hacky.
         total_training_steps = len(self.train_dataloader) * self.config.trainer.total_epochs
 
-        if self.config.trainer.total_training_steps < total_training_steps:
+        if self.config.trainer.total_training_steps is not None:
             total_training_steps = self.config.trainer.total_training_steps
 
         self.total_training_steps = total_training_steps
@@ -936,7 +936,7 @@ class RayPPOTrainer(object):
                         train_data_sources = batch.non_tensor_batch.get(
                             'data_source', ['unknown'] * answer_reward_tensor.shape[0]
                         )
-
+                        breakpoint()
                         train_metric_dict = {}
                         train_metric_dict.update(self._track_reward_metrics(answer_reward_tensor, train_data_sources, prefix="train/reward"))
                         train_metric_dict.update(self._track_reward_metrics(format_reward_tensor, train_data_sources, prefix="train/format_reward"))
