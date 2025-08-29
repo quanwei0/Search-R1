@@ -209,8 +209,7 @@ def calculate_metrics(directory_path, k_values=[1, 4, 8, 16], strategies=['simpl
                 best_of_k_correct = best_of_k_answer in ground_truth_normalized
                 best_of_n_scores.append(best_of_k_correct)
                 pass_at_k_scores.append(pass_at_k)
-                # Save detailed results
-                pass_at_k_rewards = [s.get('answer_reward', 0) for s in samples[:k]]
+
                 sample_result = {
                     'prompt': prompt,
                     'strategy': strategy,
@@ -268,7 +267,7 @@ def calculate_metrics(directory_path, k_values=[1, 4, 8, 16], strategies=['simpl
     return all_results
 
 if __name__ == "__main__":
-    directory = "outputs/log_val_traj/nq-search-r1-quan-7b-ckpt1-sampled-512-BoN16_20250826_182339"
+    directory = "outputs/log_val_traj/nq-search-r1-quan-7b-ckpt1-sampled-512-BoN8_20250826_211626"
     
     # Merge trajectory files
     merge_trajectory_files(directory)

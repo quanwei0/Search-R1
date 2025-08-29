@@ -69,7 +69,7 @@ class RewardManager():
         mixed_reward_tensor = torch.zeros_like(data.batch['responses'], dtype=torch.float32)
 
         # all_scores = []
-
+        all_answers = []
         already_print_data_sources = {}
 
         for i in range(len(data)):
@@ -104,13 +104,14 @@ class RewardManager():
             compute_final_em_format_score = _select_rm_score_fn(data_source, reward_type='final_em_format')
             compute_step_retrieval_format_score = _select_rm_score_fn(data_source, reward_type='step_retrieval_format')
 
-            answer_score = compute_answer_score(solution_str=sequences_str, ground_truth=ground_truth)
+            answer_score, answer = compute_answer_score(solution_str=sequences_str, ground_truth=ground_truth)
             format_score = compute_format_score(solution_str=sequences_str)
             retrieval_score = compute_retrieval_score(solution_str=sequences_str, ground_truth=ground_truth)
             mixed_outcome_score = comupte_mixed_outcome_score(solution_str=sequences_str, ground_truth=ground_truth)
             final_em_format_score = compute_final_em_format_score(final_turn_str=decoded_turn_texts[-1], ground_truth=ground_truth)
             step_retrieval_format_score = compute_step_retrieval_format_score(mid_turn_str=decoded_turn_texts[:-1], ground_truth=ground_truth)
 
+            all_answers.append(answer)
             answer_reward_tensor[i, valid_response_length - 1] = answer_score
             format_reward_tensor[i, valid_response_length - 1] = format_score
             retrieval_reward_tensor[i, valid_response_length - 1] = retrieval_score
@@ -153,6 +154,7 @@ class RewardManager():
             'step_retrieval_format': step_retrieval_format_reward_tensor,
             'avg_step_retrieval_format': avg_step_retrieval_format_reward_tensor,
             'mixed_reward': mixed_reward_tensor,
+            'extracted_answers': all_answers,
         }
 
 import ray
@@ -209,7 +211,7 @@ def main_task(config):
     role_worker_mapping = {
         Role.ActorRollout: ray.remote(ActorRolloutRefWorker),
         Role.Critic: ray.remote(CriticWorker),
-        Role.RefPolicy: ray.remote(ActorRolloutRefWorker),
+        # Role.RefPolicy: ray.remote(ActorRolloutRefWorker),
     }
 
     global_pool_id = 'global_pool'
@@ -219,7 +221,7 @@ def main_task(config):
     mapping = {
         Role.ActorRollout: global_pool_id,
         Role.Critic: global_pool_id,
-        Role.RefPolicy: global_pool_id,
+        # Role.RefPolicy: global_pool_id,
     }
 
     # we should adopt a multi-source reward function here
