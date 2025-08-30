@@ -936,7 +936,7 @@ class RayPPOTrainer(object):
                         train_data_sources = batch.non_tensor_batch.get(
                             'data_source', ['unknown'] * answer_reward_tensor.shape[0]
                         )
-                        breakpoint()
+                        
                         train_metric_dict = {}
                         train_metric_dict.update(self._track_reward_metrics(answer_reward_tensor, train_data_sources, prefix="train/reward"))
                         train_metric_dict.update(self._track_reward_metrics(format_reward_tensor, train_data_sources, prefix="train/format_reward"))
