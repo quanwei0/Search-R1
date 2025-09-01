@@ -1045,7 +1045,11 @@ class RayPPOTrainer(object):
         for b in range(loss_mask.size(0)):
             mask = loss_mask[b]
             # valid_response_length = values[b].nonzero(as_tuple=True)[0].shape[0] - 1
-            valid_response_length = mask.nonzero(as_tuple=True)[0][-1] + 1
+            nonzero_indices = mask.nonzero(as_tuple=True)[0]
+            if nonzero_indices.size(0) == 0:
+                valid_response_length = 0
+            else:
+                valid_response_length = nonzero_indices[-1] + 1
 
 
             # Detect where a turn starts: when mask switches from 0 to 1
