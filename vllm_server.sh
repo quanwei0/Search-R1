@@ -1,14 +1,13 @@
 #!/bin/bash
 
 # Configuration parameters
-CUDA_DEVICES=${1:-"3"}
+# CUDA_DEVICES=${1:-"0"}
+# export CUDA_VISIBLE_DEVICES=$CUDA_DEVICES
+TENSOR_PARALLEL_SIZE=1
+HOST="0.0.0.0"
 PORT=8002
-HOST="localhost"
-TENSOR_PARALLEL_SIZE=$(echo $CUDA_DEVICES | tr ',' '\n' | wc -l)
 MODEL="openai/gpt-oss-20b"
 
-# Set CUDA environment
-export CUDA_VISIBLE_DEVICES=$CUDA_DEVICES
 
 # Display system info and configuration
 cat << EOF
@@ -29,7 +28,7 @@ vllm serve $MODEL \
     --tensor-parallel-size $TENSOR_PARALLEL_SIZE \
     --host $HOST \
     --port $PORT \
-    --disable-log-stats
+    --disable-log-stats \
 
 # Display server info
 cat << EOF
