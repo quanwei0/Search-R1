@@ -1,12 +1,12 @@
 #!/bin/bash
 
 # Configuration parameters
-# CUDA_DEVICES=${1:-"0"}
-# export CUDA_VISIBLE_DEVICES=$CUDA_DEVICES
-TENSOR_PARALLEL_SIZE=$(echo $CUDA_DEVICES | tr ',' '\n' | wc -l)
-HOST="0.0.0.0"
-PORT=8002
-MODEL="openai/gpt-oss-20b"
+CUDA_DEVICES=${1:-"0"}
+export CUDA_VISIBLE_DEVICES=$CUDA_DEVICES
+TENSOR_PARALLEL_SIZE=$(echo $CUDA_VISIBLE_DEVICES | tr ',' '\n' | wc -l)
+HOST=${2:-"0.0.0.0"}
+PORT=${3:-8002}
+MODEL=${4:-"openai/gpt-oss-20b"}
 
 
 # Display system info and configuration
