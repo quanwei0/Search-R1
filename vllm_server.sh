@@ -3,7 +3,7 @@
 # Configuration parameters
 # CUDA_DEVICES=${1:-"0"}
 # export CUDA_VISIBLE_DEVICES=$CUDA_DEVICES
-TENSOR_PARALLEL_SIZE=1
+TENSOR_PARALLEL_SIZE=$(echo $CUDA_DEVICES | tr ',' '\n' | wc -l)
 HOST="0.0.0.0"
 PORT=8002
 MODEL="openai/gpt-oss-20b"
@@ -29,10 +29,3 @@ vllm serve $MODEL \
     --host $HOST \
     --port $PORT \
     --disable-log-stats \
-
-# Display server info
-cat << EOF
-
-VLLM server started with PID: $!
-Server available at: http://$HOST:$PORT
-EOF
