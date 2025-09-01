@@ -7,9 +7,9 @@ and answer evaluation with scoring capabilities.
 """
 
 import json
+import logging
 import re
-import sys
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 
 from openai import OpenAI
 
@@ -18,10 +18,15 @@ from openai import OpenAI
 # Configuration Constants
 # ============================================================================
 
+# Server Configuration
 DEFAULT_HOST = "0.0.0.0"
 DEFAULT_PORT = 8002
-DEFAULT_MODEL = "Qwen/Qwen2.5-72B-Instruct"
+
+# Model Configuration
+DEFAULT_MODEL = "openai/gpt-oss-20b"
 DEFAULT_MAX_TOKENS = 2048
+
+# Data Configuration
 DEFAULT_DATA_PATH = "./outputs/log_val_traj/val-search-r1-ppo-qwen2.5-7b-em-gae_20250814_043740/trajectories_val_batch_0.json"
 
 
@@ -32,22 +37,37 @@ DEFAULT_DATA_PATH = "./outputs/log_val_traj/val-search-r1-ppo-qwen2.5-7b-em-gae_
 class VLLMClient:
     """Client for interacting with VLLM servers."""
     
-    def __init__(self, port: int = DEFAULT_PORT, model: str = DEFAULT_MODEL):
+    def __init__(self, port: int = DEFAULT_PORT, model: str = DEFAULT_MODEL, host: str = DEFAULT_HOST):
         """Initialize VLLM client.
         
         Args:
             port: Port number for VLLM server
             model: Model name to use
+            host: Host address for VLLM server
         """
+        self.host = host
         self.port = port
         self.model = model
-        self.api_base = f"http://{DEFAULT_HOST}:{port}/v1"
-        self.client = OpenAI(
-            api_key="EMPTY",
-            base_url=self.api_base,
-        )
+        self.api_base = f"http://{self.host}:{self.port}/v1"
+        self.logger = logging.getLogger(__name__)
+        self.client = self._initialize_client()
     
-    def generate_text(self, prompt: str, max_tokens: int = DEFAULT_MAX_TOKENS) -> str:
+    def _initialize_client(self) -> Optional[OpenAI]:
+        """Initialize OpenAI client for VLLM server.
+        
+        Returns:
+            Configured OpenAI client or None if initialization failed
+        """
+        try:
+            return OpenAI(
+                api_key="EMPTY",
+                base_url=self.api_base,
+            )
+        except Exception as e:
+            self.logger.error(f"Failed to initialize OpenAI client: {e}")
+            return None
+    
+    def generate_text(self, prompt: str, max_tokens: int = DEFAULT_MAX_TOKENS) -> Optional[str]:
         """Generate text using the VLLM server.
         
         Args:
@@ -55,40 +75,47 @@ class VLLMClient:
             max_tokens: Maximum tokens to generate
             
         Returns:
-            Generated text response
+            Generated text response or None if error occurred
         """
-        print(f"Connecting to VLLM server at: {self.api_base}")
-        
-        chat_response = self.client.chat.completions.create(
-            model=self.model,
-            messages=[{"role": "user", "content": prompt}],
-            max_tokens=max_tokens,
-        )
-        
-        return chat_response.choices[0].message.content
+        try:
+            self.logger.info(f"Connecting to VLLM server at: {self.api_base}")
+            
+            chat_response = self.client.chat.completions.create(
+                model=self.model,
+                messages=[{"role": "user", "content": prompt}],
+                max_tokens=max_tokens,
+            )
+            
+            return chat_response.choices[0].message.content
+        except Exception as e:
+            self.logger.error(f"Error generating text: {e}")
+            return None
 
 
 # ============================================================================
-# Prompt Creation Functions
+# Judge and Evaluation Classes
 # ============================================================================
 
-def create_judge_prompt(prompt: str, turns: List[str]) -> str:
-    """Create evaluation prompt for prompt-response assessment.
+class JudgeEvaluator:
+    """Handles judge prompt creation and response evaluation."""
     
-    Args:
-        prompt: Original prompt
-        turns: Pre-divided turn texts
+    @staticmethod
+    def create_judge_prompt(prompt: str, turns: List[str]) -> str:
+        """Create evaluation prompt for prompt-response assessment.
         
-    Returns:
-        Formatted judge prompt
-    """
-    print(f"Creating judge prompt with {len(turns)} turns")
-    
-    turns_text = ""
-    for i, turn in enumerate(turns, 1):
-        turns_text += f"TURN {i}:\n{turn}\n\n"
-    
-    judge_prompt = f"""
+        Args:
+            prompt: Original prompt
+            turns: Pre-divided turn texts
+            
+        Returns:
+            Formatted judge prompt
+        """
+        
+        turns_text = ""
+        for i, turn in enumerate(turns, 1):
+            turns_text += f"TURN {i}:\n{turn}\n\n"
+        
+        judge_prompt = f"""
 Evaluate how effectively each turn of the response addresses the given prompt.
 
 PROMPT:
@@ -131,87 +158,104 @@ Turn2: X.X
      * -0.5 = Poor (errors, weak reasoning or queries, format issues)
      * -1.0 = Very poor (misleading, harmful, or completely wrong)
 """
-    
-    print("JUDGE PROMPT:")
-    print(judge_prompt)
-    print("=" * 100)
-    
-    return judge_prompt
+        
+        
+        return judge_prompt
+
+    @staticmethod
+    def extract_turn_scores_from_judge_response(judge_response: str, num_turns: int) -> List[float]:
+        """Extract individual turn scores from judge response.
+        
+        Args:
+            judge_response: The judge's evaluation response
+            num_turns: Expected number of turns
+            
+        Returns:
+            List of scores for each turn
+        """
+        scores = []
+        try:
+            # Extract score section from the result
+            score_pattern = r'<score>(.*?)</score>'
+            score_match = re.search(score_pattern, judge_response, re.DOTALL)
+            
+            if score_match:
+                score_text = score_match.group(1).strip()
+                # Parse individual turn scores
+                turn_pattern = r'Turn(\d+):\s*([-+]?\d*\.?\d+)'
+                turn_matches = re.findall(turn_pattern, score_text)
+                
+                for turn_num, score_str in turn_matches:
+                    score = float(score_str)
+                    scores.append(score)
+            else:
+                    scores = [0.0] * num_turns
+        
+        except Exception as e:
+            pass
+            scores = [0.0] * num_turns
+        
+        # Ensure we have the right number of scores
+        if len(scores) != num_turns:
+            if len(scores) < num_turns:
+                scores.extend([0.0] * (num_turns - len(scores)))
+            else:
+                scores = scores[:num_turns]
+        
+        return scores
 
 
 # ============================================================================
-# Data Loading Functions
+# Data Processing Classes
 # ============================================================================
 
-def extract_prompt_from_chat_format(text: str) -> str:
-    """Extract the user prompt from chat format.
+class DataProcessor:
+    """Handles data loading and processing operations."""
     
-    Args:
-        text: Chat format text containing <|im_start|>user and <|im_end|> tags
+    @staticmethod
+    def extract_prompt_from_chat_format(text: str) -> str:
+        """Extract the user prompt from chat format.
         
-    Returns:
-        Extracted prompt text
-    """
-    # Find content between <|im_start|>user and <|im_end|>
-    pattern = r'<\|im_start\|>user\s*\n(.*?)\n<\|im_end\|>'
-    match = re.search(pattern, text, re.DOTALL)
-    
-    if match:
-        return match.group(1).strip()
-    return text  # Return original text if no pattern found
-
-
-def get_sample_data(num_samples: int = 10, json_file: str = DEFAULT_DATA_PATH) -> List[Tuple[str, List[str]]]:
-    """Get multiple sample prompts and turn texts from JSON file.
-    
-    Args:
-        num_samples: Number of samples to retrieve
-        json_file: Path to JSON file containing samples
+        Args:
+            text: Chat format text containing <|im_start|>user and <|im_end|> tags
+            
+        Returns:
+            Extracted prompt text
+        """
+        # Find content between <|im_start|>user and <|im_end|>
+        pattern = r'<\|im_start\|>user\s*\n(.*?)\n<\|im_end\|>'
+        match = re.search(pattern, text, re.DOTALL)
         
-    Returns:
-        List of (prompt, turn_texts) tuples
-    """
-    with open(json_file, 'r', encoding='utf-8') as f:
-        data = json.load(f)
-    
-    samples = []
-    for i in range(min(num_samples, len(data))):
-        sample = data[i]
-        raw_prompt = sample["prompt"]
+        if match:
+            return match.group(1).strip()
+        return text  # Return original text if no pattern found
+
+
+    @staticmethod
+    def get_sample_data(num_samples: int = 10, json_file: str = DEFAULT_DATA_PATH) -> List[Tuple[str, List[str]]]:
+        """Get multiple sample prompts and turn texts from JSON file.
         
-        # Extract the actual user prompt from chat format
-        prompt = extract_prompt_from_chat_format(raw_prompt)
-        turn_texts = sample["turn_texts"]
-        samples.append((prompt, turn_texts))
-    
-    return samples
-
-
-# ============================================================================
-# Utility Functions
-# ============================================================================
-
-def generate_text(prompt: str, port: int = DEFAULT_PORT) -> str:
-    """Legacy function for backward compatibility.
-    
-    Args:
-        prompt: Input prompt
-        port: Server port
+        Args:
+            num_samples: Number of samples to retrieve
+            json_file: Path to JSON file containing samples
+            
+        Returns:
+            List of (prompt, turn_texts) tuples
+        """
+        with open(json_file, 'r', encoding='utf-8') as f:
+            data = json.load(f)
         
-    Returns:
-        Generated text
-    """
-    client = VLLMClient(port)
-    return client.generate_text(prompt)
-
-
-def parse_arguments() -> int:
-    """Parse command line arguments.
-    
-    Returns:
-        Port number from command line or default
-    """
-    return int(sys.argv[1]) if len(sys.argv) > 1 else DEFAULT_PORT
+        samples = []
+        for i in range(min(num_samples, len(data))):
+            sample = data[i]
+            raw_prompt = sample["prompt"]
+            
+            # Extract the actual user prompt from chat format
+            prompt = DataProcessor.extract_prompt_from_chat_format(raw_prompt)
+            turn_texts = sample["turn_texts"]
+            samples.append((prompt, turn_texts))
+        
+        return samples
 
 
 # ============================================================================
@@ -220,29 +264,41 @@ def parse_arguments() -> int:
 
 def main():
     """Main function to run the client evaluation."""
-    port = parse_arguments()
-    samples = get_sample_data(5)
-    client = VLLMClient(port)
+    logging.basicConfig(level=logging.INFO)
     
-    print(f"Using port: {port}")
-    print(f"Evaluating {len(samples)} samples...")
-    print("=" * 100)
-    
-    for i, (sample_prompt, sample_turns) in enumerate(samples):
-        print(f"\nSAMPLE {i+1}:")
-        print("-" * 100)
+    try:
+        samples = DataProcessor.get_sample_data(5)
+        client = VLLMClient()
+        judge_evaluator = JudgeEvaluator()
         
-        judge_prompt = create_judge_prompt(sample_prompt, sample_turns)
+        if not client.client:
+            print("Failed to initialize VLLM client")
+            return
         
-        try:
+        print(f"Using port: {DEFAULT_PORT}")
+        print(f"Evaluating {len(samples)} samples...")
+        print("=" * 100)
+        
+        for i, (sample_prompt, sample_turns) in enumerate(samples):
+            print(f"\nSAMPLE {i+1}:")
+            print("-" * 100)
+            
+            judge_prompt = judge_evaluator.create_judge_prompt(sample_prompt, sample_turns)
+            
             print(f"Evaluating sample {i+1}...")
             result = client.generate_text(judge_prompt)
-            print(f"EVALUATION RESULT FOR SAMPLE {i+1}:")
-            print(result)
-        except Exception as e:
-            print(f"Error evaluating sample {i+1}: {e}")
-        
-        print("-" * 100)
+            
+            if result:
+                scores = judge_evaluator.extract_turn_scores_from_judge_response(result, len(sample_turns))
+                print(f"Sample {i+1} scores: {scores}")
+            else:
+                print(f"Failed to evaluate sample {i+1}")
+            
+            print("-" * 100)
+            
+    except Exception as e:
+        print(f"Error in main execution: {e}")
+        logging.error(f"Main execution error: {e}")
 
 
 if __name__ == "__main__":

@@ -918,6 +918,9 @@ class RayPPOTrainer(object):
                         step_retrieval_format_reward_tensor = reward_dict['step_retrieval_format']
                         avg_step_retrieval_format_reward_tensor = reward_dict['avg_step_retrieval_format']
                         mixed_reward_tensor = reward_dict['mixed_reward']
+                        step_retrieval_format_judge_reward_tensor = reward_dict['step_retrieval_format_judge']
+                        avg_step_retrieval_format_judge_reward_tensor = reward_dict['avg_step_retrieval_format_judge']
+                        mixed_judge_reward_tensor = reward_dict['mixed_judge_reward']
                         
                         reward_type = self.config.algorithm.get('reward_type', 'answer_correctness')
                         
@@ -925,6 +928,9 @@ class RayPPOTrainer(object):
                         if reward_type == 'mixed_reward':
                             print("[INFO] Using mixed_reward_tensor for token_level_scores")
                             batch.batch['token_level_scores'] = mixed_reward_tensor
+                        elif reward_type == 'mixed_judge_reward':
+                            print("[INFO] Using mixed_judge_reward_tensor for token_level_scores")
+                            batch.batch['token_level_scores'] = mixed_judge_reward_tensor
                         elif reward_type == 'mixed_outcome_reward':
                             print("[INFO] Using mixed_outcome_reward_tensor for token_level_scores")
                             batch.batch['token_level_scores'] = mixed_outcome_reward_tensor
@@ -944,6 +950,7 @@ class RayPPOTrainer(object):
                         train_metric_dict.update(self._track_reward_metrics(mixed_outcome_reward_tensor, train_data_sources, prefix="train/mixed_outcome_reward"))
                         train_metric_dict.update(self._track_reward_metrics(final_em_format_reward_tensor, train_data_sources, prefix="train/final_em_format_reward"))
                         train_metric_dict.update(self._track_reward_metrics(avg_step_retrieval_format_reward_tensor, train_data_sources, prefix="train/avg_step_retrieval_format_reward"))
+                        train_metric_dict.update(self._track_reward_metrics(avg_step_retrieval_format_judge_reward_tensor, train_data_sources, prefix="train/avg_step_retrieval_format_judge_reward"))
 
                         metrics.update(train_metric_dict)
                         logger.log(data=train_metric_dict, step=self.global_steps)
