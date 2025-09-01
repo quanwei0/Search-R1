@@ -6,6 +6,7 @@ A client for interacting with VLLM servers to perform search-enabled reasoning
 and answer evaluation with scoring capabilities.
 """
 
+import argparse
 import json
 import logging
 import re
@@ -14,19 +15,6 @@ from typing import List, Tuple, Optional
 from openai import OpenAI
 
 
-# ============================================================================
-# Configuration Constants
-# ============================================================================
-
-# Server Configuration
-DEFAULT_HOST = "0.0.0.0"
-DEFAULT_PORT = 8002
-
-# Model Configuration
-DEFAULT_MODEL = "openai/gpt-oss-20b"
-DEFAULT_MAX_TOKENS = 2048
-
-# Data Configuration
 DEFAULT_DATA_PATH = "./outputs/log_val_traj/val-search-r1-ppo-qwen2.5-7b-em-gae_20250814_043740/trajectories_val_batch_0.json"
 
 
@@ -37,13 +25,13 @@ DEFAULT_DATA_PATH = "./outputs/log_val_traj/val-search-r1-ppo-qwen2.5-7b-em-gae_
 class VLLMClient:
     """Client for interacting with VLLM servers."""
     
-    def __init__(self, port: int = DEFAULT_PORT, model: str = DEFAULT_MODEL, host: str = DEFAULT_HOST):
+    def __init__(self, host: str = "0.0.0.0", port: int = 8002, model: str = "openai/gpt-oss-20b"):
         """Initialize VLLM client.
         
         Args:
+            host: Host address for VLLM server
             port: Port number for VLLM server
             model: Model name to use
-            host: Host address for VLLM server
         """
         self.host = host
         self.port = port
@@ -67,7 +55,7 @@ class VLLMClient:
             self.logger.error(f"Failed to initialize OpenAI client: {e}")
             return None
     
-    def generate_text(self, prompt: str, max_tokens: int = DEFAULT_MAX_TOKENS) -> Optional[str]:
+    def generate_text(self, prompt: str, max_tokens: int = 2048) -> Optional[str]:
         """Generate text using the VLLM server.
         
         Args:
@@ -185,22 +173,15 @@ Turn2: X.X
                 turn_pattern = r'Turn(\d+):\s*([-+]?\d*\.?\d+)'
                 turn_matches = re.findall(turn_pattern, score_text)
                 
-                for turn_num, score_str in turn_matches:
+                for _, score_str in turn_matches:
                     score = float(score_str)
                     scores.append(score)
             else:
                     scores = [0.0] * num_turns
         
-        except Exception as e:
+        except Exception:
             pass
             scores = [0.0] * num_turns
-        
-        # Ensure we have the right number of scores
-        if len(scores) != num_turns:
-            if len(scores) < num_turns:
-                scores.extend([0.0] * (num_turns - len(scores)))
-            else:
-                scores = scores[:num_turns]
         
         return scores
 
@@ -232,7 +213,7 @@ class DataProcessor:
 
 
     @staticmethod
-    def get_sample_data(num_samples: int = 10, json_file: str = DEFAULT_DATA_PATH) -> List[Tuple[str, List[str]]]:
+    def get_sample_data(num_samples: int = 5, json_file: str = DEFAULT_DATA_PATH) -> List[Tuple[str, List[str]]]:
         """Get multiple sample prompts and turn texts from JSON file.
         
         Args:
@@ -262,43 +243,46 @@ class DataProcessor:
 # Main Function
 # ============================================================================
 
+def parse_args():
+    """Parse command line arguments."""
+    parser = argparse.ArgumentParser(description="VLLM Client for Search-Enabled Reasoning")
+    parser.add_argument("--host", type=str, default="0.0.0.0")
+    parser.add_argument("--port", type=int, default=8002)
+    parser.add_argument("--model", type=str, default="openai/gpt-oss-20b")
+    return parser.parse_args()
+
+
 def main():
     """Main function to run the client evaluation."""
+    # Parse command line arguments
+    args = parse_args()
+    
+    # Setup logging
     logging.basicConfig(level=logging.INFO)
     
-    try:
-        samples = DataProcessor.get_sample_data(5)
-        client = VLLMClient()
-        judge_evaluator = JudgeEvaluator()
+
+    # Initialize components with parsed arguments
+    samples = DataProcessor.get_sample_data()
+    client = VLLMClient(host=args.host, port=args.port, model=args.model)
+    judge_evaluator = JudgeEvaluator()
+    
+    # Evaluate samples
+    for i, (sample_prompt, sample_turns) in enumerate(samples):
+        print(f"\nSAMPLE {i+1}:")
+        print("-" * 100)
         
-        if not client.client:
-            print("Failed to initialize VLLM client")
-            return
+        judge_prompt = judge_evaluator.create_judge_prompt(sample_prompt, sample_turns)
         
-        print(f"Using port: {DEFAULT_PORT}")
-        print(f"Evaluating {len(samples)} samples...")
-        print("=" * 100)
+        print(f"Evaluating sample {i+1}...")
+        result = client.generate_text(judge_prompt)
         
-        for i, (sample_prompt, sample_turns) in enumerate(samples):
-            print(f"\nSAMPLE {i+1}:")
-            print("-" * 100)
-            
-            judge_prompt = judge_evaluator.create_judge_prompt(sample_prompt, sample_turns)
-            
-            print(f"Evaluating sample {i+1}...")
-            result = client.generate_text(judge_prompt)
-            
-            if result:
-                scores = judge_evaluator.extract_turn_scores_from_judge_response(result, len(sample_turns))
-                print(f"Sample {i+1} scores: {scores}")
-            else:
-                print(f"Failed to evaluate sample {i+1}")
-            
-            print("-" * 100)
-            
-    except Exception as e:
-        print(f"Error in main execution: {e}")
-        logging.error(f"Main execution error: {e}")
+        if result:
+            scores = judge_evaluator.extract_turn_scores_from_judge_response(result, len(sample_turns))
+            print(f"Sample {i+1} scores: {scores}")
+        else:
+            print(f"Failed to evaluate sample {i+1}")
+        
+        print("-" * 100)
 
 
 if __name__ == "__main__":

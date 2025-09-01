@@ -1,17 +1,6 @@
-#!/usr/bin/env python3
-"""
-QA EM Judge - Step Retrieval Format Judge for Search-Enabled Reasoning
-
-Uses VLLM client to evaluate multi-turn reasoning responses with scoring.
-"""
-
-import sys
 from typing import List
 
-# Add the project root to the path to import vllm_client
-sys.path.append('/home/wei00355/code/Search-R1')
-
-from vllm_client import VLLMClient, JudgeEvaluator, DataProcessor
+from vllm_serve.vllm_client import VLLMClient, JudgeEvaluator, DataProcessor
 
 
 # ============================================================================
