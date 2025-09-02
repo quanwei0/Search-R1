@@ -49,7 +49,7 @@ class VLLMClient:
             Generated text response or None if error occurred
         """
         try:
-            self.logger.info(f"Connecting to VLLM server at: {self.api_base}")
+            self.logger.info(f"Connecting to VLLM server at: {self.base_url}")
             
             chat_response = self.client.chat.completions.create(
                 model=self.model,
@@ -95,7 +95,7 @@ PROMPT:
 {turns_text}
 Follow these instructions:
 
-1) First provide step-by-step reasoning, then assign scores turn by turn using the exact output format below (must be exact and include the tags):
+1) IMPORTANT: Your response must use ONLY the following format and no other tags:
 
 <reasoning>
 [Your evaluation of each turn here]
@@ -107,29 +107,32 @@ Turn2: X.X
 ...
 </score>
 
-2) Last turn only:
-   - Format check: must include only <think>...</think> for reasoning followed by <answer>...</answer> for the final answer, in this exact sequence. No other tags are allowed. Apply a penalty if tags are missing, out of order, or extra tags are used.
-   - Answer evaluation: verify that the final answer is factually correct given the original question.
+Do NOT use any other tags like <think>, <search>, <answer>, etc. in your response.
 
-3) Non-last turns:
-   - Format check: must include only three tags in this exact sequence:
-       1) <think>...</think> for reasoning
-       2) <search>...</search> for the search query
-       3) <information>...</information> for retrieved results
-     No other tags are allowed. Apply a penalty if tags are missing, out of order, or extra tags are used.
-   - Reasoning evaluation: assess the quality, clarity, and logic of the content in <think>.
-   - Query evaluation: judge the quality and relevance of the <search> query, and compare it with the previous turn’s query (improved, declined, or same). Penalize unjustified repetition.
+2) Final turn evaluation (score range: [-1, 1]):
+   - Format requirements: Must contain exactly two tags in sequence:
+     • <think>...</think> for reasoning
+     • <answer>...</answer> for the final answer
+     No other tags allowed. If format is incorrect (missing tags, wrong order, or extra tags), assign -1.
+   
+   - Content evaluation: 
+     • If answer is factually correct: assign 1
+     • If answer is incorrect but relevant to the question: assign score in [0, 1] based on relevance
+     • If answer is completely irrelevant or nonsensical: assign score in [-1, 0]
 
-4) Scoring:
-   - Assign a score to each turn in the range [-1, 1].
-   - Use the following scale:
-     * 1.0 = Excellent (correct format, strong reasoning, relevant and accurate)
-     * 0.5 = Adequate (mostly correct, minor flaws)
-     * 0.0 = Neutral (unclear, limited contribution)
-     * -0.5 = Poor (errors, weak reasoning or queries, format issues)
-     * -1.0 = Very poor (misleading, harmful, or completely wrong)
+3) Intermediate turn evaluation (score range: [-0.5, 0.5]):
+   - Format requirements: Must contain exactly three tags in sequence:
+     • <think>...</think> for reasoning
+     • <search>...</search> for the search query  
+     • <information>...</information> for retrieved results
+     No other tags allowed. If format is incorrect, assign -0.5.
+   
+   - Content evaluation:
+     • Assess reasoning quality and clarity in <think>
+     • Evaluate search query relevance and specificity in <search>
+     • Compare search query with previous turns and reward adaptive queries that build on prior findings, penalize identical repetitions or queries that ignore available information
+     • Consider overall progress toward answering the original question
 """
-        
         
         return judge_prompt
 
@@ -258,6 +261,11 @@ def main():
         
         print(f"Evaluating sample {i+1}...")
         result = client.generate_text(judge_prompt)
+        
+        print("=== JUDGE RESPONSE DEBUG ===")
+        print(judge_prompt)
+        print(result)
+        print("=== END JUDGE RESPONSE ===")
         
         if result:
             scores = judge_evaluator.extract_turn_scores_from_judge_response(result, len(sample_turns))
