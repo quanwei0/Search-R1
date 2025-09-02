@@ -83,7 +83,7 @@ class RewardManager():
 
         already_print_data_sources = {}
 
-        for i in tqdm(range(len(data)), desc="Processing data items"):
+        for i in tqdm(range(len(data)), desc="Computing rewards", unit="items"):
             data_item = data[i]  # DataProtoItem
 
             prompt_ids = data_item.batch['prompts']
@@ -138,34 +138,47 @@ class RewardManager():
             else:
                 avg_step_retrieval_format_reward_tensor[i, valid_response_length - 1] = step_retrieval_format_reward_tensor[i, :].sum(dim=-1) / (data.meta_info['num_turns'][i] - 1)
             
-            if reward_type == 'mixed_judge_reward' and not self.is_val:
+        
+        
+        # Process judge rewards in a separate loop if needed
+        if reward_type == 'mixed_judge_reward' and not self.is_val:
+            print("[INFO] Processing judge rewards in separate loop...")
+            for i in tqdm(range(len(data)), desc="Computing judge scores", unit="items", colour="green"):
+                data_item = data[i]  # DataProtoItem
+                
+                prompt_ids = data_item.batch['prompts']
+                prompt_length = prompt_ids.shape[-1]
+                valid_prompt_length = data_item.batch['attention_mask'][:prompt_length].sum()
+                valid_prompt_ids = prompt_ids[-valid_prompt_length:]
+                
+                response_ids = data_item.batch['responses']
+                valid_response_length = data_item.batch['attention_mask'][prompt_length:].sum()
+                valid_response_ids = response_ids[:valid_response_length]
+                
+                sequences = torch.cat((valid_prompt_ids, valid_response_ids))
+                sequences_str = self.tokenizer.decode(sequences)
+                decoded_turn_texts = data_item.meta_info['decoded_turn_texts'][i]
+                data_source = data_item.non_tensor_batch['data_source']
+                
                 compute_step_retrieval_format_judge_score = _select_rm_score_fn(data_source, reward_type='step_retrieval_format_judge')
-                step_retrieval_format_judge_score = compute_step_retrieval_format_judge_score(mid_turn_str=decoded_turn_texts[:-1], final_turn_str=decoded_turn_texts[-1], solution_str=sequences_str, host=self.config.get('judge_host', 'slurm-h100-206-129'), port=self.config.get('judge_port', 8002))
+                step_retrieval_format_judge_score = compute_step_retrieval_format_judge_score(
+                    mid_turn_str=decoded_turn_texts[:-1], 
+                    final_turn_str=decoded_turn_texts[-1], 
+                    solution_str=sequences_str, 
+                    host=self.config.get('judge_host', 'slurm-h100-206-129'), 
+                    port=self.config.get('judge_port', 8002)
+                )
+                
                 for j in range(data.meta_info['num_turns'][i] - 1):
                     step_retrieval_format_judge_reward_tensor[i, data.meta_info['turn_indices'][i][j][1]] = step_retrieval_format_judge_score[j]
-                mixed_judge_reward_tensor = final_em_format_reward_tensor + step_retrieval_format_judge_reward_tensor
-
+                
                 if data.meta_info['num_turns'][i] - 1 == 0:
                     avg_step_retrieval_format_judge_reward_tensor[i, valid_response_length - 1] = 0
                 else:
                     avg_step_retrieval_format_judge_reward_tensor[i, valid_response_length - 1] = step_retrieval_format_judge_reward_tensor[i, :].sum(dim=-1) / (data.meta_info['num_turns'][i] - 1)
-                        
+            
+            mixed_judge_reward_tensor = final_em_format_reward_tensor + step_retrieval_format_judge_reward_tensor
 
-            # all_scores.append(score)
-
-            if data_source not in already_print_data_sources:
-                already_print_data_sources[data_source] = 0
-
-            if already_print_data_sources[data_source] < self.num_examine:
-                already_print_data_sources[data_source] += 1
-                print(sequences_str)
-        
-        # print(f"[DEBUG] all_scores: {all_scores}")
-        # print(f"[DEBUG] all_scores shape: {np.array(all_scores).shape}")
-        # print(f"[DEBUG] all_scores mean: {np.mean(all_scores)}")
-        # print(f"[DEBUG] all_scores max: {np.max(all_scores)}")
-        # print(f"[DEBUG] all_scores min: {np.min(all_scores)}")
-        # print(f"[DEBUG] all_scores std: {np.std(all_scores)}")
 
         if reward_type == 'mixed_judge_reward' and not self.is_val:
             return {
