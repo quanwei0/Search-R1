@@ -13,6 +13,7 @@ import random
 from typing import List, Tuple, Optional
 
 from openai import AsyncOpenAI
+from tqdm.asyncio import tqdm
 
 # Import shared components from vllm_client.py
 from vllm_serve.vllm_client import JudgeEvaluator, DataProcessor, DEFAULT_DATA_PATH
@@ -69,7 +70,13 @@ async def run_batch(
                 await asyncio.sleep(0.5 * (1 + random.random()) * (attempt + 1))
 
     tasks = [asyncio.create_task(one_job(i, s)) for i, s in enumerate(samples)]
-    results = [await t for t in asyncio.as_completed(tasks)]
+    
+    # Use tqdm to track async batch completion progress
+    results = []
+    for coro in tqdm(asyncio.as_completed(tasks), total=len(tasks), desc="Processing batch"):
+        result = await coro
+        results.append(result)
+    
     results.sort(key=lambda x: x[0])
     return [r[1] for r in results]
 
