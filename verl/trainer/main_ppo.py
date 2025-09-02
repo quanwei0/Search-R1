@@ -17,6 +17,7 @@ Note that we don't combine the main with ray_trainer as ray_trainer is used by o
 
 from verl import DataProto
 import torch
+import sys
 from tqdm import tqdm
 from verl.utils.reward_score import qa_em, qa_em_format, qa_em_new, qa_em_judge
 from verl.trainer.ppo.ray_trainer import RayPPOTrainer
@@ -143,20 +144,9 @@ class RewardManager():
         # Process judge rewards in a separate loop if needed
         if reward_type == 'mixed_judge_reward' and not self.is_val:
             print("[INFO] Processing judge rewards in separate loop...")
-            for i in tqdm(range(len(data)), desc="Computing judge scores", unit="items", colour="green"):
-                data_item = data[i]  # DataProtoItem
+            for i in tqdm(range(len(data)), desc="Computing judge scores", unit="items"):
                 
-                prompt_ids = data_item.batch['prompts']
-                prompt_length = prompt_ids.shape[-1]
-                valid_prompt_length = data_item.batch['attention_mask'][:prompt_length].sum()
-                valid_prompt_ids = prompt_ids[-valid_prompt_length:]
-                
-                response_ids = data_item.batch['responses']
-                valid_response_length = data_item.batch['attention_mask'][prompt_length:].sum()
-                valid_response_ids = response_ids[:valid_response_length]
-                
-                sequences = torch.cat((valid_prompt_ids, valid_response_ids))
-                sequences_str = self.tokenizer.decode(sequences)
+                decoded_full_texts = data_item.meta_info['decoded_full_texts'][i]
                 decoded_turn_texts = data_item.meta_info['decoded_turn_texts'][i]
                 data_source = data_item.non_tensor_batch['data_source']
                 
@@ -164,7 +154,7 @@ class RewardManager():
                 step_retrieval_format_judge_score = compute_step_retrieval_format_judge_score(
                     mid_turn_str=decoded_turn_texts[:-1], 
                     final_turn_str=decoded_turn_texts[-1], 
-                    solution_str=sequences_str, 
+                    solution_str=decoded_full_texts, 
                     host=self.config.get('judge_host', 'slurm-h100-206-129'), 
                     port=self.config.get('judge_port', 8002)
                 )
