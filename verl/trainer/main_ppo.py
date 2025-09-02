@@ -17,6 +17,7 @@ Note that we don't combine the main with ray_trainer as ray_trainer is used by o
 
 from verl import DataProto
 import torch
+from tqdm import tqdm
 from verl.utils.reward_score import qa_em, qa_em_format, qa_em_new, qa_em_judge
 from verl.trainer.ppo.ray_trainer import RayPPOTrainer
 import re
@@ -49,10 +50,11 @@ class RewardManager():
     """The reward manager.
     """
 
-    def __init__(self, tokenizer, num_examine, format_score=0., is_val=False) -> None:
+    def __init__(self, tokenizer, num_examine, config, format_score=0., is_val=False) -> None:
         self.tokenizer = tokenizer
         self.num_examine = num_examine  # the number of batches of decoded responses to print to the console
         self.format_score = format_score
+        self.config = config
         self.is_val = is_val
 
     def __call__(self, data: DataProto):
@@ -61,6 +63,8 @@ class RewardManager():
         # If there is rm score, we directly return rm score. Otherwise, we compute via rm_score_fn
         if 'rm_scores' in data.batch.keys():
             return data.batch['rm_scores']
+        
+        reward_type = self.config.algorithm.get('reward_type', 'answer_correctness')
 
         answer_reward_tensor = torch.zeros_like(data.batch['responses'], dtype=torch.float32)
         format_reward_tensor = torch.zeros_like(data.batch['responses'], dtype=torch.float32)
@@ -70,6 +74,7 @@ class RewardManager():
         step_retrieval_format_reward_tensor = torch.zeros_like(data.batch['responses'], dtype=torch.float32)
         avg_step_retrieval_format_reward_tensor = torch.zeros_like(data.batch['responses'], dtype=torch.float32)
         mixed_reward_tensor = torch.zeros_like(data.batch['responses'], dtype=torch.float32)
+        
         step_retrieval_format_judge_reward_tensor = torch.zeros_like(data.batch['responses'], dtype=torch.float32)
         avg_step_retrieval_format_judge_reward_tensor = torch.zeros_like(data.batch['responses'], dtype=torch.float32)
         mixed_judge_reward_tensor = torch.zeros_like(data.batch['responses'], dtype=torch.float32)
@@ -78,7 +83,7 @@ class RewardManager():
 
         already_print_data_sources = {}
 
-        for i in range(len(data)):
+        for i in tqdm(range(len(data)), desc="Processing data items"):
             data_item = data[i]  # DataProtoItem
 
             prompt_ids = data_item.batch['prompts']
@@ -133,9 +138,9 @@ class RewardManager():
             else:
                 avg_step_retrieval_format_reward_tensor[i, valid_response_length - 1] = step_retrieval_format_reward_tensor[i, :].sum(dim=-1) / (data.meta_info['num_turns'][i] - 1)
             
-            if self.is_val == False:
+            if reward_type == 'mixed_judge_reward' and not self.is_val:
                 compute_step_retrieval_format_judge_score = _select_rm_score_fn(data_source, reward_type='step_retrieval_format_judge')
-                step_retrieval_format_judge_score = compute_step_retrieval_format_judge_score(mid_turn_str=decoded_turn_texts[:-1], final_turn_str=decoded_turn_texts[-1], solution_str=sequences_str)
+                step_retrieval_format_judge_score = compute_step_retrieval_format_judge_score(mid_turn_str=decoded_turn_texts[:-1], final_turn_str=decoded_turn_texts[-1], solution_str=sequences_str, host=self.config.get('judge_host', 'slurm-h100-206-129'), port=self.config.get('judge_port', 8002))
                 for j in range(data.meta_info['num_turns'][i] - 1):
                     step_retrieval_format_judge_reward_tensor[i, data.meta_info['turn_indices'][i][j][1]] = step_retrieval_format_judge_score[j]
                 mixed_judge_reward_tensor = final_em_format_reward_tensor + step_retrieval_format_judge_reward_tensor
@@ -162,19 +167,31 @@ class RewardManager():
         # print(f"[DEBUG] all_scores min: {np.min(all_scores)}")
         # print(f"[DEBUG] all_scores std: {np.std(all_scores)}")
 
-        return {
-            'answer_correctness': answer_reward_tensor,
-            'format_correctness': format_reward_tensor,
-            'retrieval_correctness': retrieval_reward_tensor,
-            'mixed_outcome_reward': mixed_outcome_reward_tensor,
-            'final_em_format': final_em_format_reward_tensor,
-            'step_retrieval_format': step_retrieval_format_reward_tensor,
-            'avg_step_retrieval_format': avg_step_retrieval_format_reward_tensor,
-            'mixed_reward': mixed_reward_tensor,
-            'step_retrieval_format_judge': step_retrieval_format_judge_reward_tensor,
-            'avg_step_retrieval_format_judge': avg_step_retrieval_format_judge_reward_tensor,
-            'mixed_judge_reward': mixed_judge_reward_tensor,
-        }
+        if reward_type == 'mixed_judge_reward' and not self.is_val:
+            return {
+                'answer_correctness': answer_reward_tensor,
+                'format_correctness': format_reward_tensor,
+                'retrieval_correctness': retrieval_reward_tensor,
+                'mixed_outcome_reward': mixed_outcome_reward_tensor,
+                'final_em_format': final_em_format_reward_tensor,
+                'step_retrieval_format': step_retrieval_format_reward_tensor,
+                'avg_step_retrieval_format': avg_step_retrieval_format_reward_tensor,
+                'mixed_reward': mixed_reward_tensor,
+                'step_retrieval_format_judge': step_retrieval_format_judge_reward_tensor,
+                'avg_step_retrieval_format_judge': avg_step_retrieval_format_judge_reward_tensor,
+                'mixed_judge_reward': mixed_judge_reward_tensor,
+            }
+        else:
+            return {
+                'answer_correctness': answer_reward_tensor,
+                'format_correctness': format_reward_tensor,
+                'retrieval_correctness': retrieval_reward_tensor,
+                'mixed_outcome_reward': mixed_outcome_reward_tensor,
+                'final_em_format': final_em_format_reward_tensor,
+                'step_retrieval_format': step_retrieval_format_reward_tensor,
+                'avg_step_retrieval_format': avg_step_retrieval_format_reward_tensor,
+                'mixed_reward': mixed_reward_tensor,
+            }
 
 import ray
 import hydra
@@ -259,10 +276,10 @@ def main_task(config):
         role_worker_mapping[Role.RewardModel] = ray.remote(RewardModelWorker)
         mapping[Role.RewardModel] = global_pool_id
 
-    reward_fn = RewardManager(tokenizer=tokenizer, num_examine=0, is_val=False)
+    reward_fn = RewardManager(tokenizer=tokenizer, num_examine=0, config=config, is_val=False)
 
     # Note that we always use function-based RM for validation
-    val_reward_fn = RewardManager(tokenizer=tokenizer, num_examine=1, is_val=True)
+    val_reward_fn = RewardManager(tokenizer=tokenizer, num_examine=1, config=config, is_val=True)
 
     resource_pool_manager = ResourcePoolManager(resource_pool_spec=resource_pool_spec, mapping=mapping)
     trainer = RayPPOTrainer(config=config,

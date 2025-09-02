@@ -7,7 +7,7 @@ from vllm_serve.vllm_client import VLLMClient, JudgeEvaluator, DataProcessor
 # Main Scoring Function
 # ============================================================================
 
-def compute_score_step_retrieval_format_judge(mid_turn_str: List[str], final_turn_str: str, solution_str: str) -> List[float]:
+def compute_score_step_retrieval_format_judge(mid_turn_str: List[str], final_turn_str: str, solution_str: str, host: str, port: int) -> List[float]:
     """Compute step retrieval format judge scores for turns.
     
     Args:
@@ -22,7 +22,7 @@ def compute_score_step_retrieval_format_judge(mid_turn_str: List[str], final_tur
     num_turns_minus_1 = len(mid_turn_str)
     
     # Initialize client and evaluator
-    client = VLLMClient()
+    client = VLLMClient(host=host, port=port)
     judge_evaluator = JudgeEvaluator()
     data_processor = DataProcessor()
     

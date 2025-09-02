@@ -910,6 +910,8 @@ class RayPPOTrainer(object):
 
                         # we combine with rule-based rm
                         reward_dict = self.reward_fn(batch)
+                        
+                        # Extract all reward tensors
                         answer_reward_tensor = reward_dict['answer_correctness']
                         format_reward_tensor = reward_dict['format_correctness']
                         retrieval_reward_tensor = reward_dict['retrieval_correctness']
@@ -918,24 +920,32 @@ class RayPPOTrainer(object):
                         step_retrieval_format_reward_tensor = reward_dict['step_retrieval_format']
                         avg_step_retrieval_format_reward_tensor = reward_dict['avg_step_retrieval_format']
                         mixed_reward_tensor = reward_dict['mixed_reward']
-                        step_retrieval_format_judge_reward_tensor = reward_dict['step_retrieval_format_judge']
-                        avg_step_retrieval_format_judge_reward_tensor = reward_dict['avg_step_retrieval_format_judge']
-                        mixed_judge_reward_tensor = reward_dict['mixed_judge_reward']
-                        
+
+                        # Get reward type and set token_level_scores accordingly
                         reward_type = self.config.algorithm.get('reward_type', 'answer_correctness')
-                        
                         print(f"[INFO] reward_type: {reward_type}")
-                        if reward_type == 'mixed_reward':
-                            print("[INFO] Using mixed_reward_tensor for token_level_scores")
-                            batch.batch['token_level_scores'] = mixed_reward_tensor
-                        elif reward_type == 'mixed_judge_reward':
-                            print("[INFO] Using mixed_judge_reward_tensor for token_level_scores")
-                            batch.batch['token_level_scores'] = mixed_judge_reward_tensor
-                        elif reward_type == 'mixed_outcome_reward':
-                            print("[INFO] Using mixed_outcome_reward_tensor for token_level_scores")
-                            batch.batch['token_level_scores'] = mixed_outcome_reward_tensor
-                        elif reward_type == 'answer_correctness':
-                            print("[INFO] Using answer_reward_tensor for token_level_scores")
+                        
+                        # Reward type mapping
+                        reward_mapping = {
+                            'answer_correctness': answer_reward_tensor,
+                            'mixed_reward': mixed_reward_tensor,
+                            'mixed_outcome_reward': mixed_outcome_reward_tensor,
+                        }
+                        
+                        # Handle special case for mixed_judge_reward
+                        if reward_type == 'mixed_judge_reward':
+                            step_retrieval_format_judge_reward_tensor = reward_dict['step_retrieval_format_judge']
+                            avg_step_retrieval_format_judge_reward_tensor = reward_dict['avg_step_retrieval_format_judge']
+                            mixed_judge_reward_tensor = reward_dict['mixed_judge_reward']
+                            reward_mapping['mixed_judge_reward'] = mixed_judge_reward_tensor
+                        
+                        # Set token_level_scores based on reward_type
+                        if reward_type in reward_mapping:
+                            selected_tensor = reward_mapping[reward_type]
+                            print(f"[INFO] Using {reward_type}_tensor for token_level_scores")
+                            batch.batch['token_level_scores'] = selected_tensor
+                        else:
+                            print(f"[WARNING] Unknown reward_type: {reward_type}, defaulting to answer_correctness")
                             batch.batch['token_level_scores'] = answer_reward_tensor
 
                         # compute training reward metrics by data source
@@ -950,7 +960,8 @@ class RayPPOTrainer(object):
                         train_metric_dict.update(self._track_reward_metrics(mixed_outcome_reward_tensor, train_data_sources, prefix="train/mixed_outcome_reward"))
                         train_metric_dict.update(self._track_reward_metrics(final_em_format_reward_tensor, train_data_sources, prefix="train/final_em_format_reward"))
                         train_metric_dict.update(self._track_reward_metrics(avg_step_retrieval_format_reward_tensor, train_data_sources, prefix="train/avg_step_retrieval_format_reward"))
-                        train_metric_dict.update(self._track_reward_metrics(avg_step_retrieval_format_judge_reward_tensor, train_data_sources, prefix="train/avg_step_retrieval_format_judge_reward"))
+                        if reward_type == 'mixed_judge_reward':
+                            train_metric_dict.update(self._track_reward_metrics(avg_step_retrieval_format_judge_reward_tensor, train_data_sources, prefix="train/avg_step_retrieval_format_judge_reward"))
 
                         metrics.update(train_metric_dict)
                         logger.log(data=train_metric_dict, step=self.global_steps)
