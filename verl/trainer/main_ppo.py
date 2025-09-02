@@ -141,26 +141,47 @@ class RewardManager():
             
         
         
-        # Process judge rewards in a separate loop if needed
+        # Process judge rewards using async batch processing if needed
         if reward_type == 'mixed_judge_reward' and not self.is_val:
-            print("[INFO] Processing judge rewards in separate loop...")
-            for i in tqdm(range(len(data)), desc="Computing judge scores", unit="items"):
-                
+            print("[INFO] Processing judge rewards using async batch processing...")
+            
+            # Collect all data items for batch processing
+            batch_mid_turns = []
+            batch_final_turns = []
+            batch_solutions = []
+            batch_indices = []
+            
+            for i in range(len(data)):
+                data_item = data[i]
                 decoded_full_texts = data_item.meta_info['decoded_full_texts'][i]
                 decoded_turn_texts = data_item.meta_info['decoded_turn_texts'][i]
-                data_source = data_item.non_tensor_batch['data_source']
                 
-                compute_step_retrieval_format_judge_score = _select_rm_score_fn(data_source, reward_type='step_retrieval_format_judge')
-                step_retrieval_format_judge_score = compute_step_retrieval_format_judge_score(
-                    mid_turn_str=decoded_turn_texts[:-1], 
-                    final_turn_str=decoded_turn_texts[-1], 
-                    solution_str=decoded_full_texts, 
-                    host=self.config.get('judge_host', 'slurm-h100-206-129'), 
-                    port=self.config.get('judge_port', 8002)
-                )
+                batch_mid_turns.append(decoded_turn_texts[:-1])
+                batch_final_turns.append(decoded_turn_texts[-1])
+                batch_solutions.append(decoded_full_texts)
+                batch_indices.append(i)
+            
+            # Get the first data source (assuming all items have the same data source for batch processing)
+            first_data_source = data[0].non_tensor_batch['data_source']
+            compute_step_retrieval_format_judge_score = _select_rm_score_fn(first_data_source, reward_type='step_retrieval_format_judge')
+            
+            # Use async batch processing
+            batch_judge_scores = compute_step_retrieval_format_judge_score(
+                mid_turn_str=batch_mid_turns, 
+                final_turn_str=batch_final_turns, 
+                solution_str=batch_solutions, 
+                host=self.config.get('judge_host', 'slurm-h100-206-129'), 
+                port=self.config.get('judge_port', 8002),
+                use_async=True
+            )
+            
+            # Assign batch results to tensors
+            for i, judge_scores in zip(batch_indices, batch_judge_scores):
+                data_item = data[i]
+                valid_response_length = data_item.batch['attention_mask'][data_item.batch['prompts'].shape[-1]:].sum()
                 
                 for j in range(data.meta_info['num_turns'][i] - 1):
-                    step_retrieval_format_judge_reward_tensor[i, data.meta_info['turn_indices'][i][j][1]] = step_retrieval_format_judge_score[j]
+                    step_retrieval_format_judge_reward_tensor[i, data.meta_info['turn_indices'][i][j][1]] = judge_scores[j]
                 
                 if data.meta_info['num_turns'][i] - 1 == 0:
                     avg_step_retrieval_format_judge_reward_tensor[i, valid_response_length - 1] = 0
