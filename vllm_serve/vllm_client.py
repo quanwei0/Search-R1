@@ -33,27 +33,10 @@ class VLLMClient:
             port: Port number for VLLM server
             model: Model name to use
         """
-        self.host = host
-        self.port = port
+        self.base_url = f"http://{host}:{port}/v1"
         self.model = model
-        self.api_base = f"http://{self.host}:{self.port}/v1"
+        self.client = OpenAI(api_key="EMPTY", base_url=self.base_url)
         self.logger = logging.getLogger(__name__)
-        self.client = self._initialize_client()
-    
-    def _initialize_client(self) -> Optional[OpenAI]:
-        """Initialize OpenAI client for VLLM server.
-        
-        Returns:
-            Configured OpenAI client or None if initialization failed
-        """
-        try:
-            return OpenAI(
-                api_key="EMPTY",
-                base_url=self.api_base,
-            )
-        except Exception as e:
-            self.logger.error(f"Failed to initialize OpenAI client: {e}")
-            return None
     
     def generate_text(self, prompt: str, max_tokens: int = 2048) -> Optional[str]:
         """Generate text using the VLLM server.
