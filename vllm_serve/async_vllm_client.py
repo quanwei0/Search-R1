@@ -96,9 +96,9 @@ def parse_args():
                        help="Model name")
     parser.add_argument("--data_path", type=str, default=DEFAULT_DATA_PATH,
                        help="Path to data file")
-    parser.add_argument("--num_samples", type=int, default=50,
+    parser.add_argument("--num_samples", type=int, default=256,
                        help="Number of samples to process")
-    parser.add_argument("--concurrency", type=int, default=16,
+    parser.add_argument("--concurrency", type=int, default=256,
                        help="Number of concurrent requests")
     parser.add_argument("--max_tokens", type=int, default=2048,
                        help="Maximum tokens per generation")
@@ -134,7 +134,7 @@ async def amain(args):
         scores = JudgeEvaluator.extract_turn_scores_from_judge_response(judge_text or "", len(turns))
         print(f"\nSAMPLE {i}:")
         print("-" * 80)
-        print(f"Turns: {len(turns)}")
+        print(f"Num of Turns: {len(turns)}")
         print(f"Scores: {scores}")
 
 

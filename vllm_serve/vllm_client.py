@@ -163,11 +163,21 @@ Do NOT use any other tags like <think>, <search>, <answer>, etc. in your respons
                     score = float(score_str)
                     scores.append(score)
             else:
-                    scores = [0.0] * num_turns
+                print(f"Warning: No score section found in judge response, defaulting to zero scores")
+                scores = [0.0] * num_turns
         
-        except Exception:
-            pass
+        except Exception as e:
+            print(f"Error parsing scores: {e}, defaulting to zero scores")
             scores = [0.0] * num_turns
+        
+        # Ensure we have the correct number of scores for number of turns
+        if len(scores) != num_turns:
+            if len(scores) < num_turns:
+                print(f"\nWarning: Expected {num_turns} scores, got {len(scores)}. Scores: {scores}. Padding.")
+                scores.extend([0.0] * (num_turns - len(scores)))
+            else:
+                print(f"\nWarning: Expected {num_turns} scores, got {len(scores)}. Scores: {scores}. Truncating.")
+                scores = scores[:num_turns]
         
         return scores
 
@@ -213,7 +223,9 @@ class DataProcessor:
             data = json.load(f)
         
         samples = []
-        for i in range(min(num_samples, len(data))):
+        # Handle -1 as "all samples"
+        sample_count = len(data) if num_samples == -1 else min(num_samples, len(data))
+        for i in range(sample_count):
             sample = data[i]
             raw_prompt = sample["prompt"]
             
