@@ -90,52 +90,61 @@ class JudgeEvaluator:
         
         ground_truth_text = f"GROUND TRUTH:\n{ground_truth}\n"
         
-        judge_prompt = f"""
-Evaluate how effectively each turn of the response addresses the given prompt.
+        judge_prompt = f"""You are an expert evaluator for multi-turn search-augmented reasoning systems. Evaluate each turn's effectiveness in addressing the prompt and reaching the ground truth answer.
 
 {prompt_text}
 {ground_truth_text}
 {turns_text}
-Follow these instructions:
+## EVALUATION INSTRUCTIONS
 
-1) IMPORTANT: Your response must use ONLY the following format and no other tags:
+### 1. OUTPUT FORMAT (CRITICAL)
+Your response must use ONLY these XML tags:
 
 <reasoning>
-[Your evaluation of each turn here]
+[Systematic evaluation of each turn: format compliance, reasoning & search quality, solution progress toward correct answer]
 </reasoning>
 
 <score>
 Turn1: X.X
 Turn2: X.X
+Turn3: X.X
 ...
 </score>
 
-Do NOT use any other tags like <think>, <search>, <answer>, etc. in your response.
+⚠️ REQUIREMENTS:
+- Number of scores MUST exactly match the number of provided turns
+- Use NO other XML tags in your response
+- Use decimal format (e.g., 0.5, -0.3)
 
-2) Final turn evaluation (score range: [-1, 1]):
-   - Format requirements: Must contain exactly two tags in sequence:
-     • <think>...</think> for reasoning
-     • <answer>...</answer> for the final answer
-     No other tags allowed. If format is incorrect (missing tags, wrong order, or extra tags), assign -1.
-   
-   - Content evaluation: 
-     • If ground truth is provided, compare answer against ground truth for accuracy
-     • If answer is factually correct (matches ground truth): assign 1
-     • If answer is incorrect but relevant to the question: assign score in [0, 1] based on relevance
-     • If answer is completely irrelevant or nonsensical: assign score in [-1, 0]
+### 2. FINAL TURN EVALUATION [-1.0 to 1.0]
 
-3) Intermediate turn evaluation (score range: [-0.5, 0.5]):
-   - Format requirements: Must contain exactly three tags in sequence:
-     • <think>...</think> for reasoning
-     • <search>...</search> for the search query  
-     • <information>...</information> for retrieved results
-     No other tags allowed. If format is incorrect, assign -0.5.
-   
-   - Content evaluation:
-     • Assess reasoning quality and clarity in <think>
-     • Evaluate search query relevance and specificity in <search>
-     • Compare search query with previous turns and reward adaptive queries that build on prior findings, penalize identical repetitions or queries that ignore available information
-     • Consider overall progress toward answering the original question
+**Format Compliance:**
+- Correct format (`<think>...</think><answer>...</answer>` only): +0.2
+- Wrong format (missing tags, extra tags, wrong order): -1.0
+
+**Answer Correctness:**
+- Correct answer (matches ground truth): +0.8
+- Incorrect answer: +0.0
+
+**Final Score = Format Compliance + Answer Correctness**
+
+### 3. INTERMEDIATE TURN EVALUATION [-0.5 to 0.5]
+
+**Format Compliance:**
+- Correct format (`<think>...</think><search>...</search><information>...</information>` only): +0.2
+- Wrong format (missing tags, extra tags, wrong order): -0.5
+
+**Reasoning & Search Quality:**
+- Good reasoning and relevant search query: +0.3
+- Poor reasoning or irrelevant search query: +0.0
+- Harmful or completely off-topic search query: -0.1
+
+**Solution Progress:**
+- Turn makes progress toward solution: +0.1
+- Turn makes no progress or misleads: -0.1
+
+**Raw Score = Format Compliance + Reasoning & Search Quality + Solution Progress**
+**Final Score = Normalize Raw Score to [-0.5, 0.5] range**
 """
         
         return judge_prompt
