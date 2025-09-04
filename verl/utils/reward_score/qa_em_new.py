@@ -386,9 +386,7 @@ def mid_format_check(mid_turn_str):
 ###################################################################################################
 def compute_score_f1(solution_str, ground_truth):
 
-    ground_truths = ground_truth['target']
-    if isinstance(ground_truths, str):
-        ground_truths = [ground_truths]
+    ground_truths_list = list(ground_truth['target'])
 
     pred_tokens = set(solution_str.strip().split())
 
@@ -400,4 +398,4 @@ def compute_score_f1(solution_str, ground_truth):
         return 0.0 if PN + RN == 0 else 2 * IN / (PN + RN)
 
 
-    return max(f1(pred_tokens, gt) for gt in ground_truths)
+    return max(f1(pred_tokens, gt) for gt in ground_truths_list)

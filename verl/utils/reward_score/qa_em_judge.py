@@ -13,7 +13,7 @@ async def _compute_async_batch_scores(
     batch_mid_turns: List[List[str]],
     batch_final_turns: List[str],
     batch_solutions: List[str],
-    batch_ground_truths: List[Dict[str, Union[str, List[str]]]],
+    batch_ground_truths: List[Dict[str, Union[str, List[str], Any]]],
     host: str,
     port: int,
     judge_model_name: str,
@@ -39,12 +39,9 @@ async def _compute_async_batch_scores(
         else:
             turns = list(mid_turns) + [final_turn]
 
-        # Extract ground truth target and convert to string if needed
-        ground_truth_target = ground_truth['target']
-        if isinstance(ground_truth_target, list):
-            ground_truth_str = ", ".join(ground_truth_target) if ground_truth_target else ""
-        else:
-            ground_truth_str = ground_truth_target
+        # Extract ground truth target and convert to list then string
+        ground_truths_list = list(ground_truth['target'])
+        ground_truth_str = ", ".join(str(item) for item in ground_truths_list) if len(ground_truths_list) > 0 else ""
             
         samples.append((prompt, turns, ground_truth_str))
 
@@ -88,7 +85,7 @@ def _compute_sync_batch_scores(
     batch_mid_turns: List[List[str]],
     batch_final_turns: List[str],
     batch_solutions: List[str],
-    batch_ground_truths: List[Dict[str, Union[str, List[str]]]],
+    batch_ground_truths: List[Dict[str, Union[str, List[str], Any]]],
     host: str,
     port: int,
     judge_model_name: str,
@@ -112,12 +109,9 @@ def _compute_sync_batch_scores(
         prompt = data_processor.extract_prompt_from_chat_format(solution)
         prompts.append(prompt)
         
-        # Extract ground truth target and convert to string if needed
-        ground_truth_target = ground_truth['target']
-        if isinstance(ground_truth_target, list):
-            ground_truth_str = ", ".join(ground_truth_target) if ground_truth_target else ""
-        else:
-            ground_truth_str = ground_truth_target
+        # Extract ground truth target and convert to list then string
+        ground_truths_list = list(ground_truth['target'])
+        ground_truth_str = ", ".join(str(item) for item in ground_truths_list) if len(ground_truths_list) > 0 else ""
         ground_truths.append(ground_truth_str)
 
         # Prepare turns list for this item
@@ -169,7 +163,7 @@ def compute_step_retrieval_format_judge_score(
     batch_mid_turns: List[List[str]],
     batch_final_turns: List[str],
     batch_solutions: List[str],
-    batch_ground_truths: List[Dict[str, Union[str, List[str]]]],
+    batch_ground_truths: List[Dict[str, Union[str, List[str], Any]]],
     host: str,
     port: int,
     judge_model_name: str,
