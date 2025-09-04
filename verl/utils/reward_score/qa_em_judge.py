@@ -49,7 +49,7 @@ async def _compute_async_batch_scores(
     judge_texts = await run_batch(
         samples,
         client=client,
-        concurrency=min(64, len(samples)),  # Limit concurrency
+        concurrency=min(256, len(samples)),  # Limit concurrency
         max_tokens=2048,
         max_retries=2,
     )

@@ -95,13 +95,16 @@ class JudgeEvaluator:
 {prompt_text}
 {ground_truth_text}
 {turns_text}
+**Number of turns to evaluate: {len(turns)}**
+
 ## EVALUATION INSTRUCTIONS
 
 ### 1. OUTPUT FORMAT (CRITICAL)
 Your response must use ONLY these XML tags:
 
 <reasoning>
-[Systematic evaluation of each turn: format compliance, reasoning & search quality, solution progress toward correct answer]
+Systematic evaluation of each turn step by step
+...
 </reasoning>
 
 <score>
@@ -146,7 +149,7 @@ Turn3: X.X
 **Raw Score = Format Compliance + Reasoning & Search Quality + Solution Progress**
 **Final Score = Normalize Raw Score to [-0.5, 0.5] range**
 """
-        
+
         return judge_prompt
 
     @staticmethod
@@ -185,11 +188,13 @@ Turn3: X.X
         
         # Ensure we have the correct number of scores for number of turns
         if len(scores) != num_turns:
+            print(f"\nWarning: Expected {num_turns} scores, got {len(scores)}. Scores: {scores}. Padding.")
+            print(f"Judge response: {judge_response}")
             if len(scores) < num_turns:
-                print(f"\nWarning: Expected {num_turns} scores, got {len(scores)}. Scores: {scores}. Padding.")
+                print(f"Padding with zeros.")              
                 scores.extend([0.0] * (num_turns - len(scores)))
             else:
-                print(f"\nWarning: Expected {num_turns} scores, got {len(scores)}. Scores: {scores}. Truncating.")
+                print(f"Truncating extra scores.")
                 scores = scores[:num_turns]
         
         return scores
