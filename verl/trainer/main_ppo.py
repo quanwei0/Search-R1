@@ -28,6 +28,10 @@ def _select_rm_score_fn(data_source, reward_type='answer_correctness'):
     if data_source in ['nq', 'triviaqa', 'popqa', 'hotpotqa', '2wikimultihopqa', 'musique', 'bamboogle']:
         if reward_type == 'answer_correctness':
             return qa_em_new.compute_score_em
+        elif reward_type == 'answer_sub_em':
+            return qa_em_new.compute_score_subem
+        elif reward_type == 'f1_score':
+            return qa_em_new.compute_score_f1
         elif reward_type == 'format_correctness':
             return qa_em_new.compute_score_format
         elif reward_type == 'retrieval_correctness':
@@ -68,6 +72,8 @@ class RewardManager():
         reward_type = self.config.algorithm.get('reward_type', 'answer_correctness')
 
         answer_reward_tensor = torch.zeros_like(data.batch['responses'], dtype=torch.float32)
+        answer_sub_em_reward_tensor = torch.zeros_like(data.batch['responses'], dtype=torch.float32)
+        f1_score_reward_tensor = torch.zeros_like(data.batch['responses'], dtype=torch.float32)
         format_reward_tensor = torch.zeros_like(data.batch['responses'], dtype=torch.float32)
         retrieval_reward_tensor = torch.zeros_like(data.batch['responses'], dtype=torch.float32)
         mixed_outcome_reward_tensor = torch.zeros_like(data.batch['responses'], dtype=torch.float32)
@@ -110,6 +116,8 @@ class RewardManager():
             # select rm_score
             data_source = data_item.non_tensor_batch['data_source']
             compute_answer_score = _select_rm_score_fn(data_source, reward_type='answer_correctness')
+            compute_answer_sub_em_score = _select_rm_score_fn(data_source, reward_type='answer_sub_em')
+            compute_f1_score = _select_rm_score_fn(data_source, reward_type='f1_score')
             compute_format_score = _select_rm_score_fn(data_source, reward_type='format_correctness')
             compute_retrieval_score = _select_rm_score_fn(data_source, reward_type='retrieval_correctness')
             compute_mixed_outcome_score = _select_rm_score_fn(data_source, reward_type='mixed_outcome_reward')
@@ -117,6 +125,8 @@ class RewardManager():
             compute_step_retrieval_format_score = _select_rm_score_fn(data_source, reward_type='step_retrieval_format')
 
             answer_score = compute_answer_score(solution_str=sequences_str, ground_truth=ground_truth)
+            answer_sub_em_score = compute_answer_sub_em_score(solution_str=sequences_str, ground_truth=ground_truth)
+            f1_score = compute_f1_score(solution_str=sequences_str, ground_truth=ground_truth)
             format_score = compute_format_score(solution_str=sequences_str)
             retrieval_score = compute_retrieval_score(solution_str=sequences_str, ground_truth=ground_truth)
             mixed_outcome_score = compute_mixed_outcome_score(solution_str=sequences_str, ground_truth=ground_truth)
@@ -124,6 +134,8 @@ class RewardManager():
             step_retrieval_format_score = compute_step_retrieval_format_score(mid_turn_str=decoded_turn_texts[:-1], ground_truth=ground_truth)
 
             answer_reward_tensor[i, valid_response_length - 1] = answer_score
+            answer_sub_em_reward_tensor[i, valid_response_length - 1] = answer_sub_em_score
+            f1_score_reward_tensor[i, valid_response_length - 1] = f1_score
             format_reward_tensor[i, valid_response_length - 1] = format_score
             retrieval_reward_tensor[i, valid_response_length - 1] = retrieval_score
             mixed_outcome_reward_tensor[i, valid_response_length - 1] = mixed_outcome_score
@@ -149,16 +161,19 @@ class RewardManager():
             batch_mid_turns = []
             batch_final_turns = []
             batch_solutions = []
+            batch_ground_truths = []
             batch_indices = []
             
             for i in range(len(data)):
                 data_item = data[i]
                 decoded_full_texts = data_item.meta_info['decoded_full_texts'][i]
                 decoded_turn_texts = data_item.meta_info['decoded_turn_texts'][i]
+                ground_truth = data_item.non_tensor_batch['reward_model']['ground_truth']
                 
                 batch_mid_turns.append(decoded_turn_texts[:-1])
                 batch_final_turns.append(decoded_turn_texts[-1])
                 batch_solutions.append(decoded_full_texts)
+                batch_ground_truths.append(ground_truth)
                 batch_indices.append(i)
             
             # Get the first data source (assuming all items have the same data source for batch processing)
@@ -170,8 +185,10 @@ class RewardManager():
                 mid_turn_str=batch_mid_turns, 
                 final_turn_str=batch_final_turns, 
                 solution_str=batch_solutions, 
+                ground_truth_str=batch_ground_truths,
                 host=self.config.get('judge_host', 'slurm-h100-206-129'), 
                 port=self.config.get('judge_port', 8002),
+                judge_model_name=self.config.get('judge_model_name', 'Qwen/Qwen2.5-32B-Instruct'),
                 use_async=True
             )
             
@@ -194,6 +211,8 @@ class RewardManager():
         if reward_type == 'mixed_judge_reward' and not self.is_val:
             return {
                 'answer_correctness': answer_reward_tensor,
+                'answer_sub_em': answer_sub_em_reward_tensor,
+                'f1_score': f1_score_reward_tensor,
                 'format_correctness': format_reward_tensor,
                 'retrieval_correctness': retrieval_reward_tensor,
                 'mixed_outcome_reward': mixed_outcome_reward_tensor,
@@ -208,6 +227,8 @@ class RewardManager():
         else:
             return {
                 'answer_correctness': answer_reward_tensor,
+                'answer_sub_em': answer_sub_em_reward_tensor,
+                'f1_score': f1_score_reward_tensor,
                 'format_correctness': format_reward_tensor,
                 'retrieval_correctness': retrieval_reward_tensor,
                 'mixed_outcome_reward': mixed_outcome_reward_tensor,

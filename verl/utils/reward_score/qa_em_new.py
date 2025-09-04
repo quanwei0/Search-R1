@@ -382,3 +382,19 @@ def mid_format_check(mid_turn_str):
         return False
 
     return True
+
+###################################################################################################
+def compute_score_f1(pred_answer, gt_answer):
+
+    pred_tokens = set(pred_answer.strip().split())
+    gt_tokens = set(gt_answer.strip().split())
+
+    IN = len(pred_tokens & gt_tokens)  # intersection count
+    PN = len(pred_tokens)              # predicted count
+    RN = len(gt_tokens)                # ground truth count
+
+    if PN + RN == 0:
+        return 0.0
+
+    return 2 * IN / (PN + RN)
+

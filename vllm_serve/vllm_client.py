@@ -71,27 +71,30 @@ class JudgeEvaluator:
     """Handles judge prompt creation and response evaluation."""
     
     @staticmethod
-    def create_judge_prompt(prompt: str, turns: List[str]) -> str:
+    def create_judge_prompt(prompt: str, turns: List[str], ground_truth: str) -> str:
         """Create evaluation prompt for prompt-response assessment.
         
         Args:
             prompt: Original prompt
             turns: Pre-divided turn texts
+            ground_truth: Ground truth answer for comparison
             
         Returns:
             Formatted judge prompt
         """
         
+        prompt_text = f"PROMPT:\n{prompt}\n"
         turns_text = ""
         for i, turn in enumerate(turns, 1):
-            turns_text += f"TURN {i}:\n{turn}\n\n"
+            turns_text += f"TURN {i}:\n{turn}\n"
+        
+        ground_truth_text = f"GROUND TRUTH:\n{ground_truth}\n"
         
         judge_prompt = f"""
 Evaluate how effectively each turn of the response addresses the given prompt.
 
-PROMPT:
-{prompt}
-
+{prompt_text}
+{ground_truth_text}
 {turns_text}
 Follow these instructions:
 
@@ -116,7 +119,8 @@ Do NOT use any other tags like <think>, <search>, <answer>, etc. in your respons
      No other tags allowed. If format is incorrect (missing tags, wrong order, or extra tags), assign -1.
    
    - Content evaluation: 
-     • If answer is factually correct: assign 1
+     • If ground truth is provided, compare answer against ground truth for accuracy
+     • If answer is factually correct (matches ground truth): assign 1
      • If answer is incorrect but relevant to the question: assign score in [0, 1] based on relevance
      • If answer is completely irrelevant or nonsensical: assign score in [-1, 0]
 
@@ -209,7 +213,7 @@ class DataProcessor:
 
 
     @staticmethod
-    def get_sample_data(num_samples: int = 5, json_file: str = DEFAULT_DATA_PATH) -> List[Tuple[str, List[str]]]:
+    def get_sample_data(num_samples: int = 5, json_file: str = DEFAULT_DATA_PATH) -> List[Tuple[str, List[str], str]]:
         """Get multiple sample prompts and turn texts from JSON file.
         
         Args:
@@ -217,7 +221,7 @@ class DataProcessor:
             json_file: Path to JSON file containing samples
             
         Returns:
-            List of (prompt, turn_texts) tuples
+            List of (prompt, turn_texts, ground_truth) tuples
         """
         with open(json_file, 'r', encoding='utf-8') as f:
             data = json.load(f)
@@ -232,7 +236,9 @@ class DataProcessor:
             # Extract the actual user prompt from chat format
             prompt = DataProcessor.extract_prompt_from_chat_format(raw_prompt)
             turn_texts = sample["turn_texts"]
-            samples.append((prompt, turn_texts))
+            ground_truth_list = sample["ground_truth"]
+            ground_truth = ", ".join(ground_truth_list) if ground_truth_list else None
+            samples.append((prompt, turn_texts, ground_truth))
         
         return samples
 
@@ -265,11 +271,11 @@ def main():
     judge_evaluator = JudgeEvaluator()
     
     # Evaluate samples
-    for i, (sample_prompt, sample_turns) in enumerate(samples):
+    for i, (sample_prompt, sample_turns, ground_truth) in enumerate(samples):
         print(f"\nSAMPLE {i+1}:")
         print("-" * 100)
         
-        judge_prompt = judge_evaluator.create_judge_prompt(sample_prompt, sample_turns)
+        judge_prompt = judge_evaluator.create_judge_prompt(sample_prompt, sample_turns, ground_truth)
         
         print(f"Evaluating sample {i+1}...")
         result = client.generate_text(judge_prompt)

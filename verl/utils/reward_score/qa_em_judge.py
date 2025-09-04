@@ -9,15 +9,17 @@ from vllm_serve.async_vllm_client import AsyncVLLMClient, run_batch
 # Main Scoring Function
 # ============================================================================
 
-def compute_score_step_retrieval_format_judge(mid_turn_str, final_turn_str, solution_str, host: str, port: int, use_async: bool = False):
+def compute_score_step_retrieval_format_judge(mid_turn_str, final_turn_str, solution_str, ground_truth_str, host: str, port: int, judge_model_name: str, use_async: bool = False):
     """Compute step retrieval format judge scores for turns.
     
     Args:
         mid_turn_str: Middle turn text(s) - can be single item or batch
         final_turn_str: Final turn text - can be single item or batch
         solution_str: Complete solution string - can be single item or batch
+        ground_truth_str: Ground truth answer(s) - can be single item or batch
         host: VLLM server host
         port: VLLM server port
+        judge_model_name: Model name for the judge
         use_async: Whether to use async batch processing (recommended for batches)
         
     Returns:
@@ -30,26 +32,26 @@ def compute_score_step_retrieval_format_judge(mid_turn_str, final_turn_str, solu
     if is_batch and use_async:
         # Use async batch processing for better performance
         return asyncio.run(_compute_async_batch_scores(
-            mid_turn_str, final_turn_str, solution_str, host, port
+            mid_turn_str, final_turn_str, solution_str, ground_truth_str, host, port, judge_model_name
         ))
     elif is_batch:
         # Use sync batch processing
         return _compute_sync_batch_scores(
-            mid_turn_str, final_turn_str, solution_str, host, port
+            mid_turn_str, final_turn_str, solution_str, ground_truth_str, host, port, judge_model_name
         )
     else:
         # Single item processing
         return _compute_single_scores(
-            mid_turn_str, final_turn_str, solution_str, host, port
+            mid_turn_str, final_turn_str, solution_str, ground_truth_str, host, port, judge_model_name
         )
 
 
-def _compute_single_scores(mid_turn_str: List[str], final_turn_str: str, solution_str: str, host: str, port: int) -> List[float]:
+def _compute_single_scores(mid_turn_str: List[str], final_turn_str: str, solution_str: str, ground_truth_str: str, host: str, port: int, judge_model_name: str) -> List[float]:
     """Compute scores for a single item using sync client."""
     num_turns_minus_1 = len(mid_turn_str)
     
     # Initialize client and evaluator
-    client = VLLMClient(host=host, port=port)
+    client = VLLMClient(host=host, port=port, model=judge_model_name)
     judge_evaluator = JudgeEvaluator()
     data_processor = DataProcessor()
     
@@ -63,7 +65,7 @@ def _compute_single_scores(mid_turn_str: List[str], final_turn_str: str, solutio
         turns = list(mid_turn_str) + [final_turn_str]
     
     # Generate judge prompt and get evaluation
-    judge_prompt = judge_evaluator.create_judge_prompt(prompt, turns=turns)
+    judge_prompt = judge_evaluator.create_judge_prompt(prompt, turns, ground_truth_str)
     result = client.generate_text(judge_prompt)
     
     if result:
@@ -84,18 +86,18 @@ def _compute_single_scores(mid_turn_str: List[str], final_turn_str: str, solutio
 
 
 async def _compute_async_batch_scores(mid_turn_str_list: List[List[str]], final_turn_str_list: List[str], 
-                                    solution_str_list: List[str], host: str, port: int) -> List[List[float]]:
+                                    solution_str_list: List[str], ground_truth_str_list: List[str], host: str, port: int, judge_model_name: str) -> List[List[float]]:
     """Compute scores for batch of items using async client for better performance."""
     print(f"Processing batch of {len(solution_str_list)} items with async client...")
     
     # Initialize async client and evaluator  
-    client = AsyncVLLMClient(host=host, port=port)
+    client = AsyncVLLMClient(host=host, port=port, model=judge_model_name)
     judge_evaluator = JudgeEvaluator()
     data_processor = DataProcessor()
     
     # Prepare samples for async batch processing
     samples = []
-    for mid_turns, final_turn, solution in zip(mid_turn_str_list, final_turn_str_list, solution_str_list):
+    for mid_turns, final_turn, solution, ground_truth in zip(mid_turn_str_list, final_turn_str_list, solution_str_list, ground_truth_str_list):
         prompt = data_processor.extract_prompt_from_chat_format(solution)
         
         # Prepare turns list for this item
@@ -104,7 +106,7 @@ async def _compute_async_batch_scores(mid_turn_str_list: List[List[str]], final_
         else:
             turns = list(mid_turns) + [final_turn]
         
-        samples.append((prompt, turns))
+        samples.append((prompt, turns, ground_truth))
     
     # Use async batch processing
     judge_texts = await run_batch(
@@ -135,22 +137,24 @@ async def _compute_async_batch_scores(mid_turn_str_list: List[List[str]], final_
 
 
 def _compute_sync_batch_scores(mid_turn_str_list: List[List[str]], final_turn_str_list: List[str], 
-                             solution_str_list: List[str], host: str, port: int) -> List[List[float]]:
+                             solution_str_list: List[str], ground_truth_str_list: List[str], host: str, port: int, judge_model_name: str) -> List[List[float]]:
     """Compute scores for batch of items using sync client."""
     print(f"Processing batch of {len(solution_str_list)} items with sync client...")
     
     # Initialize client and evaluator
-    client = VLLMClient(host=host, port=port)
+    client = VLLMClient(host=host, port=port, model=judge_model_name)
     judge_evaluator = JudgeEvaluator()
     data_processor = DataProcessor()
     
     # Extract prompts from all solution strings
     prompts = []
     turns_list = []
+    ground_truths = []
     
-    for mid_turns, final_turn, solution in zip(mid_turn_str_list, final_turn_str_list, solution_str_list):
+    for mid_turns, final_turn, solution, ground_truth in zip(mid_turn_str_list, final_turn_str_list, solution_str_list, ground_truth_str_list):
         prompt = data_processor.extract_prompt_from_chat_format(solution)
         prompts.append(prompt)
+        ground_truths.append(ground_truth)
         
         # Prepare turns list for this item
         if isinstance(mid_turns, str):
@@ -160,11 +164,12 @@ def _compute_sync_batch_scores(mid_turn_str_list: List[List[str]], final_turn_st
         
         turns_list.append(turns)
     
-    # Create batch judge prompts
-    judge_prompts = judge_evaluator.create_batch_judge_prompts(prompts, turns_list)
-    
-    # Get batch evaluation results
-    results = client.generate_text_batch(judge_prompts)
+    # Process each item individually since batch methods don't exist
+    results = []
+    for prompt, turns, ground_truth in zip(prompts, turns_list, ground_truths):
+        judge_prompt = judge_evaluator.create_judge_prompt(prompt, turns, ground_truth)
+        result = client.generate_text(judge_prompt)
+        results.append(result)
     
     # Extract scores for each item in the batch
     batch_mid_scores = []
@@ -189,6 +194,20 @@ def _compute_sync_batch_scores(mid_turn_str_list: List[List[str]], final_turn_st
 # Alternative function name for compatibility
 # ============================================================================
 
-def compute_step_retrieval_format_judge_score(mid_turn_str: List[str], final_turn_str: str, solution_str: str) -> List[float]:
-    """Alternative function name for compatibility."""
-    return compute_score_step_retrieval_format_judge(mid_turn_str, final_turn_str, solution_str)
+def compute_step_retrieval_format_judge_score(mid_turn_str, final_turn_str, solution_str, ground_truth_str, host: str, port: int, judge_model_name: str, use_async: bool = False):
+    """Alternative function name for compatibility.
+    
+    Args:
+        mid_turn_str: Middle turn text(s) - can be single item or batch
+        final_turn_str: Final turn text - can be single item or batch  
+        solution_str: Complete solution string - can be single item or batch
+        ground_truth_str: Ground truth answer(s) - can be single item or batch
+        host: VLLM server host
+        port: VLLM server port
+        judge_model_name: Model name for the judge
+        use_async: Whether to use async batch processing (recommended for batches)
+        
+    Returns:
+        List of scores for each turn (excluding final turn)
+    """
+    return compute_score_step_retrieval_format_judge(mid_turn_str, final_turn_str, solution_str, ground_truth_str, host, port, judge_model_name, use_async)

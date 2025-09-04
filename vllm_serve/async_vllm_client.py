@@ -48,7 +48,7 @@ class AsyncVLLMClient:
 # ============================================================================
 
 async def run_batch(
-    samples: List[Tuple[str, List[str]]],
+    samples: List[Tuple[str, List[str], str]],
     client: AsyncVLLMClient,
     concurrency: int = 16,
     max_tokens: int = 2048,
@@ -57,8 +57,8 @@ async def run_batch(
     sem = asyncio.Semaphore(concurrency)
 
     async def one_job(idx: int, sample):
-        prompt, turns = sample
-        judge_prompt = JudgeEvaluator.create_judge_prompt(prompt, turns)
+        prompt, turns, ground_truth = sample
+        judge_prompt = JudgeEvaluator.create_judge_prompt(prompt, turns, ground_truth)
         for attempt in range(max_retries + 1):
             try:
                 async with sem:
@@ -130,7 +130,7 @@ async def amain(args):
 
     # Process results
     print(f"\nProcessing {len(judge_texts)} results...")
-    for i, ((_prompt, turns), judge_text) in enumerate(zip(samples, judge_texts), 1):
+    for i, ((_prompt, turns, _ground_truth), judge_text) in enumerate(zip(samples, judge_texts), 1):
         scores = JudgeEvaluator.extract_turn_scores_from_judge_response(judge_text or "", len(turns))
         print(f"\nSAMPLE {i}:")
         print("-" * 80)
