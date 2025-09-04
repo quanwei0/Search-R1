@@ -182,10 +182,10 @@ class RewardManager():
             
             # Use async batch processing
             batch_judge_scores = compute_step_retrieval_format_judge_score(
-                mid_turn_str=batch_mid_turns, 
-                final_turn_str=batch_final_turns, 
-                solution_str=batch_solutions, 
-                ground_truth_str=batch_ground_truths,
+                batch_mid_turns=batch_mid_turns, 
+                batch_final_turns=batch_final_turns, 
+                batch_solutions=batch_solutions, 
+                batch_ground_truths=batch_ground_truths,
                 host=self.config.get('judge_host', 'slurm-h100-206-129'), 
                 port=self.config.get('judge_port', 8002),
                 judge_model_name=self.config.get('judge_model_name', 'Qwen/Qwen2.5-32B-Instruct'),
