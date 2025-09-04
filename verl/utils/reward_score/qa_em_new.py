@@ -336,7 +336,7 @@ def final_format_check(final_turn_str: str) -> bool:
     return True
 
 
-def compute_score_step_retrieval_format(mid_turn_str, ground_truth, max_turn=3):
+def compute_score_step_retrieval_format(mid_turn_str, ground_truth):
 
     num_turn_minus_1 = len(mid_turn_str)
     step_rewards = []
@@ -384,17 +384,20 @@ def mid_format_check(mid_turn_str):
     return True
 
 ###################################################################################################
-def compute_score_f1(pred_answer, gt_answer):
+def compute_score_f1(solution_str, ground_truth):
 
-    pred_tokens = set(pred_answer.strip().split())
-    gt_tokens = set(gt_answer.strip().split())
+    ground_truths = ground_truth['target']
+    if isinstance(ground_truths, str):
+        ground_truths = [ground_truths]
 
-    IN = len(pred_tokens & gt_tokens)  # intersection count
-    PN = len(pred_tokens)              # predicted count
-    RN = len(gt_tokens)                # ground truth count
+    pred_tokens = set(solution_str.strip().split())
 
-    if PN + RN == 0:
-        return 0.0
+    def f1(pred_tokens, gt_str):
+        gt_tokens = set(gt_str.strip().split())
+        IN = len(pred_tokens & gt_tokens)
+        PN = len(pred_tokens)
+        RN = len(gt_tokens)
+        return 0.0 if PN + RN == 0 else 2 * IN / (PN + RN)
 
-    return 2 * IN / (PN + RN)
 
+    return max(f1(pred_tokens, gt) for gt in ground_truths)
