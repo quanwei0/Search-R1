@@ -159,7 +159,7 @@ def _compute_sync_batch_scores(
 # ============================================================================
 
 
-def compute_step_retrieval_format_judge_score(
+def compute_score_step_retrieval_format_judge(
     batch_mid_turns: List[List[str]],
     batch_final_turns: List[str],
     batch_solutions: List[str],
