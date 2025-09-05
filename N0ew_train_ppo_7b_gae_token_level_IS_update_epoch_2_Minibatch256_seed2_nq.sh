@@ -16,7 +16,7 @@ WAND_PROJECT='Search-R1'
 
 
 export BASE_MODEL='Qwen/Qwen2.5-7B'
-export EXPERIMENT_NAME=H100-search-r1-ppo-qwen2.5-7b-em-gae-turn-IS-total-epoch-4-Minibatch256-seed1
+export EXPERIMENT_NAME=H100-search-r1-ppo-qwen2.5-7b-em-gae-token-IS-update-epoch-2-Minibatch256-variance_reduction-seed2
 # export BASE_MODEL='Qwen/Qwen2.5-1.5B-Instruct'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-1.5b-it-em
 # export BASE_MODEL='Qwen/Qwen2.5-3B'
@@ -53,6 +53,7 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     actor_rollout_ref.actor.optim.lr_warmup_steps_ratio=0.285 \
     actor_rollout_ref.actor.ppo_mini_batch_size=256 \
     actor_rollout_ref.actor.ppo_micro_batch_size=64 \
+    +actor_rollout_ref.actor.update_epochs=2 \
     actor_rollout_ref.actor.fsdp_config.param_offload=True \
     actor_rollout_ref.actor.fsdp_config.grad_offload=True \
     actor_rollout_ref.actor.fsdp_config.optimizer_offload=True \
@@ -65,7 +66,7 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     actor_rollout_ref.rollout.n_agent=1 \
     actor_rollout_ref.rollout.temperature=1 \
     actor_rollout_ref.actor.state_masking=True \
-    +actor_rollout_ref.actor.importance_sampling_level=turn \
+    +actor_rollout_ref.actor.importance_sampling_level=token \
     +actor_rollout_ref.actor.detach_ratio=variance_reduction \
     critic.optim.lr=1e-5 \
     critic.model.use_remove_padding=True \
