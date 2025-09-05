@@ -583,7 +583,11 @@ class RayPPOTrainer(object):
                 timing_raw = {}
                 test_batch: DataProto = DataProto.from_single_dict(batch_dict)
                 # test_batch = test_batch.repeat(repeat_times=self.config.actor_rollout_ref.rollout.n_agent, interleave=True)
-                test_batch = test_batch.repeat(repeat_times=self.config.scaling_config.n_candidates, interleave=True)
+                # Only repeat if n_candidates is specified and greater than 1
+                if hasattr(self.config, 'scaling_config') and hasattr(self.config.scaling_config, 'n_candidates'):
+                    n_candidates = self.config.scaling_config.n_candidates
+                    if n_candidates > 1:
+                        test_batch = test_batch.repeat(repeat_times=n_candidates, interleave=True)
 
                 test_gen_batch = test_batch.pop(batch_keys=['input_ids', 'attention_mask', 'position_ids'])
                 # test_gen_batch = test_gen_batch.repeat(repeat_times=self.config.scaling_config.n_candidates, interleave=True)
@@ -612,7 +616,7 @@ class RayPPOTrainer(object):
                     test_batch = self._split_turn_idx(test_batch)
                     
                     test_batch, trajectories = self._split_trajectories(test_batch, save_dir, val_batch_idx=i)
-                    
+                    breakpoint()
                     # evaluate using reward_function
                     # for certain reward function (e.g. sandbox), the generation can overlap with reward
                     reward_dict = self.val_reward_fn(test_batch)

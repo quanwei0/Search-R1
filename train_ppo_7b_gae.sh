@@ -1,4 +1,20 @@
-export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
+# Number of GPUs to use (configure this)
+export NUM_GPUS=2
+
+# Set CUDA_VISIBLE_DEVICES based on NUM_GPUS
+if [ "$NUM_GPUS" -eq 1 ]; then
+    export CUDA_VISIBLE_DEVICES=0
+elif [ "$NUM_GPUS" -eq 2 ]; then
+    export CUDA_VISIBLE_DEVICES=0,1
+elif [ "$NUM_GPUS" -eq 4 ]; then
+    export CUDA_VISIBLE_DEVICES=0,1,2,3
+elif [ "$NUM_GPUS" -eq 8 ]; then
+    export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
+else
+    echo "Unsupported NUM_GPUS value: $NUM_GPUS"
+    exit 1
+fi
+
 export DATA_DIR='/home/mhong/zhan9359/work/Search-R1/data/nq_search'
 
 # export WANDB_API_KEY="810f91e58aa0fd1d03b11c60b0d1cffbb1d941f4"
@@ -18,10 +34,10 @@ export BASE_MODEL='Qwen/Qwen2.5-1.5B-Instruct'
 # export BASE_MODEL='Qwen/Qwen2.5-7B'
 # export BASE_MODEL='/home/mhong/zhan9359/.cache/models--quanwei0--nq-hotpotqa-search-r1-ppo-qwen2.5-7b-em-gae-maxturn4/snapshots/ee87254eac7617a33dc61a5a4e94beead9a3aab8/actor/global_step_1000'
 # export CRITIC_BASE_MODEL='/home/mhong/zhan9359/.cache/models--quanwei0--nq-hotpotqa-search-r1-ppo-qwen2.5-7b-em-gae-maxturn4/snapshots/ee87254eac7617a33dc61a5a4e94beead9a3aab8/critic/global_step_1000'
-# export BASE_MODEL='/home/mhong/zhan9359/.cache/models--quanwei0--nq-search-r1-ppo-qwen2.5-7b-em-gae-mixed-reward-new7/snapshots/448a8eff359fda6faed1fe7999a96208e3024694/actor/global_step_500'
+export BASE_MODEL='/home/mhong/zhan9359/.cache/models--quanwei0--nq-search-r1-ppo-qwen2.5-7b-em-gae-mixed-reward-new7/snapshots/448a8eff359fda6faed1fe7999a96208e3024694/actor/global_step_500'
 
-# export CRITIC_BASE_MODEL="/home/mhong/zhan9359/.cache/models--quanwei0--nq-search-r1-ppo-qwen2.5-7b-em-gae-mixed-reward-new7/snapshots/448a8eff359fda6faed1fe7999a96208e3024694/critic/global_step_500"
-export CRITIC_BASE_MODEL=$BASE_MODEL
+export CRITIC_BASE_MODEL="/home/mhong/zhan9359/.cache/models--quanwei0--nq-search-r1-ppo-qwen2.5-7b-em-gae-mixed-reward-new7/snapshots/448a8eff359fda6faed1fe7999a96208e3024694/critic/global_step_500"
+# export CRITIC_BASE_MODEL=$BASE_MODEL
 
 export EXPERIMENT_NAME=beam_search_test
 
@@ -117,7 +133,7 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_inference \
     data.train_data_num=null \
     data.val_data_num=null \
     data.train_batch_size=512 \
-    data.val_batch_size=16 \
+    data.val_batch_size=8 \
     data.val_data_num=16 \
     data.max_prompt_length=4096 \
     data.max_response_length=500 \
@@ -140,9 +156,9 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_inference \
     actor_rollout_ref.actor.fsdp_config.grad_offload=True \
     actor_rollout_ref.actor.fsdp_config.optimizer_offload=True \
     actor_rollout_ref.rollout.log_prob_micro_batch_size=128 \
-    actor_rollout_ref.rollout.tensor_model_parallel_size=4 \
+    actor_rollout_ref.rollout.tensor_model_parallel_size=2 \
     actor_rollout_ref.rollout.name=vllm \
-    actor_rollout_ref.rollout.gpu_memory_utilization=0.4 \
+    actor_rollout_ref.rollout.gpu_memory_utilization=0.6 \
     actor_rollout_ref.ref.log_prob_micro_batch_size=128 \
     actor_rollout_ref.ref.fsdp_config.param_offload=True \
     actor_rollout_ref.rollout.n_agent=1 \
@@ -165,7 +181,7 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_inference \
     +trainer.val_before_train=True \
     +trainer.is_save_val_traj=True \
     trainer.default_hdfs_dir=null \
-    trainer.n_gpus_per_node=8 \
+    trainer.n_gpus_per_node=$NUM_GPUS \
     trainer.nnodes=1 \
     trainer.save_freq=-1 \
     trainer.test_freq=-1 \

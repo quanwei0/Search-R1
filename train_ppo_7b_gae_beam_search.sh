@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export CUDA_VISIBLE_DEVICES=0,1,2,3
+export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
 export DATA_DIR='/home/mhong/zhan9359/work/Search-R1/data/nq_search'
 
 # export WANDB_API_KEY="810f91e58aa0fd1d03b11c60b0d1cffbb1d941f4"
@@ -18,38 +18,37 @@ export CRITIC_BASE_MODEL="/home/mhong/zhan9359/.cache/models--quanwei0--nq-searc
 export VLLM_ATTENTION_BACKEND=XFORMERS # vllm + qwen2-7b with flash_attn has some issues
 
 # Best-of-N values to test
-BON_VALUES=(16)
+beam_VALUES=(4 3 2)
 
 # Loop through each Best-of-N value
-for N in "${BON_VALUES[@]}"; do
+for N in "${beam_VALUES[@]}"; do
     echo "========================================="
     echo "Running Best-of-N with N=$N"
     echo "========================================="
     
-    export EXPERIMENT_NAME="nq-search-r1-quan-7b-ckpt1-sampled-512-BoN${N}_cross"
+    export EXPERIMENT_NAME="nq-search-r1-quan-7b-ckpt1-sampled-512-beamsearch_${N}_cross"
     
     # Adjust batch sizes based on N to manage memory
     # As N increases, we may need to reduce batch sizes
     if [ "$N" -le 2 ]; then
-        VAL_BATCH_SIZE=128
-        GPU_MEMORY_UTIL=0.6
-    elif [ "$N" -le 4 ]; then
         VAL_BATCH_SIZE=32
         GPU_MEMORY_UTIL=0.6
-    elif [ "$N" -le 8 ]; then
+    elif [ "$N" -le 3 ]; then
         VAL_BATCH_SIZE=16
         GPU_MEMORY_UTIL=0.6
-    else  # N=16
-        VAL_BATCH_SIZE=16
+    else  # N=4
+        VAL_BATCH_SIZE=8
         GPU_MEMORY_UTIL=0.6
     fi
-    
+    # beam_width=$((16/$N))
     # echo "Using train_batch_size=$TRAIN_BATCH_SIZE, val_batch_size=$VAL_BATCH_SIZE"
     
     PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_inference \
         +use_inference_scaling=true \
-        +scaling_config.algorithm=bon \
-        +scaling_config.n_candidates=$N \
+        +scaling_config.algorithm=beam_search \
+        +scaling_config.n_candidates=1 \
+        +scaling_config.beam_width=$N \
+        +scaling_config.max_turns=3 \
         +scaling_config.selection_metric=critic \
         +scaling_config.temperature=1 \
         data.train_files=$DATA_DIR/train.parquet \
@@ -105,7 +104,7 @@ for N in "${BON_VALUES[@]}"; do
         +trainer.val_before_train=True \
         +trainer.is_save_val_traj=True \
         trainer.default_hdfs_dir=null \
-        trainer.n_gpus_per_node=4 \
+        trainer.n_gpus_per_node=8 \
         trainer.nnodes=1 \
         trainer.save_freq=-1 \
         trainer.test_freq=-1 \

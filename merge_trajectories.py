@@ -267,12 +267,21 @@ def calculate_metrics(directory_path, k_values=[1, 4, 8, 16], strategies=['simpl
     return all_results
 
 if __name__ == "__main__":
-    directory = "outputs/log_val_traj/nq-search-r1-quan-7b-ckpt1-sampled-512-BoN8_20250826_211626"
+    import argparse
     
-    # Merge trajectory files
-    merge_trajectory_files(directory)
+    parser = argparse.ArgumentParser(description='Merge trajectory files and calculate majority voting metrics')
+    parser.add_argument('--directory', '-d', type=str, required=True,
+                        help='Path to directory containing trajectory JSON files')
+    parser.add_argument('--k_values', '-k', type=int, nargs='+', default=[1, 2, 4, 8, 16],
+                        help='K values for pass@k and majority voting calculations (default: 1 2 4 8 16)')
+    parser.add_argument('--no_merge', action='store_true',
+                        help='Skip merging trajectory files')
     
-    # Calculate pass@k for common k values
-    k_values = [1, 4, 8, 16]
+    args = parser.parse_args()
+    
+    # Merge trajectory files unless skipped
+    if not args.no_merge:
+        merge_trajectory_files(args.directory)
+    
     # Calculate majority voting metrics
-    mv_results = calculate_metrics(directory, k_values)
+    mv_results = calculate_metrics(args.directory, args.k_values)

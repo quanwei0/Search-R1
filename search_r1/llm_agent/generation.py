@@ -57,8 +57,23 @@ class LLMGenerationManager:
             from ..inference_scaling import BestOfNGenerator
             self.inference_scaler = BestOfNGenerator(scaling_config)
         elif scaling_config.algorithm == "beam_search":
-            from ..inference_scaling import BeamSearchGenerator  
+            from ..inference_scaling import BeamSearchGenerator 
             self.inference_scaler = BeamSearchGenerator(scaling_config)
+        elif scaling_config.algorithm == "beam_search_vanilla":
+            from ..inference_scaling import BeamSearchVanillaGenerator  
+            self.inference_scaler = BeamSearchVanillaGenerator(scaling_config)
+        elif scaling_config.algorithm == "beam_search_tree":
+            from ..inference_scaling import BeamSearchTreeGenerator  
+            self.inference_scaler = BeamSearchTreeGenerator(scaling_config)
+        elif scaling_config.algorithm == "beam_search_tree2":
+            from ..inference_scaling import BeamSearchTree2Generator  
+            self.inference_scaler = BeamSearchTree2Generator(scaling_config)
+        elif scaling_config.algorithm == "dvts":
+            from ..inference_scaling import DVTSGenerator  
+            self.inference_scaler = DVTSGenerator(scaling_config)
+        elif scaling_config.algorithm == "mcts":
+            from ..inference_scaling import MCTSGenerator
+            self.inference_scaler = MCTSGenerator(scaling_config)
         else:
             raise ValueError(f"Unknown scaling algorithm: {scaling_config.algorithm}")
 

@@ -1,4 +1,4 @@
-export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
+export CUDA_VISIBLE_DEVICES=0,1
 export DATA_DIR='/home/mhong/zhan9359/work/Search-R1/data/nq_search'
 
 # export WANDB_API_KEY="810f91e58aa0fd1d03b11c60b0d1cffbb1d941f4"
@@ -25,12 +25,12 @@ export EXPERIMENT_NAME=nq-search-r1-quan-7b-ckpt1-sampled-512-BoN4
 
 # set -x
 export VLLM_ATTENTION_BACKEND=XFORMERS # vllm + qwen2-7b with flash_attn has some issues
-# export RAY_DEBUG_POST_MORTEM=1
+export RAY_DEBUG_POST_MORTEM=1
 # max_prompt_length = (config['training']['max_start_length'] + config['training']['max_response_length'] * (config['training']['max_turns'] - 1) + config['training']['max_obs_length'] * config['training']['max_turns'])
 
 PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_inference \
     +use_inference_scaling=true \
-    +scaling_algorithm=best_of_n \
+    +scaling_config.algorithm=bon \
     +scaling_config.n_candidates=4 \
     +scaling_config.selection_metric=critic \
     +scaling_config.temperature=1 \
@@ -40,8 +40,8 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_inference \
     data.train_data_num=null \
     data.val_data_num=null \
     data.train_batch_size=512 \
-    data.val_batch_size=128 \
-    data.val_data_num=512 \
+    data.val_batch_size=16 \
+    data.val_data_num=16 \
     data.max_prompt_length=4096 \
     data.max_response_length=500 \
     data.max_start_length=2048 \
@@ -63,7 +63,7 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_inference \
     actor_rollout_ref.actor.fsdp_config.grad_offload=True \
     actor_rollout_ref.actor.fsdp_config.optimizer_offload=True \
     actor_rollout_ref.rollout.log_prob_micro_batch_size=128 \
-    actor_rollout_ref.rollout.tensor_model_parallel_size=4 \
+    actor_rollout_ref.rollout.tensor_model_parallel_size=2 \
     actor_rollout_ref.rollout.name=vllm \
     actor_rollout_ref.rollout.gpu_memory_utilization=0.4 \
     actor_rollout_ref.ref.log_prob_micro_batch_size=128 \
@@ -88,7 +88,7 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_inference \
     +trainer.val_before_train=True \
     +trainer.is_save_val_traj=True \
     trainer.default_hdfs_dir=null \
-    trainer.n_gpus_per_node=8 \
+    trainer.n_gpus_per_node=2 \
     trainer.nnodes=1 \
     trainer.save_freq=-1 \
     trainer.test_freq=-1 \

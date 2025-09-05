@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export CUDA_VISIBLE_DEVICES=0,1,2,3
+export CUDA_VISIBLE_DEVICES=0,1
 export DATA_DIR='/home/mhong/zhan9359/work/Search-R1/data/nq_search'
 
 # export WANDB_API_KEY="810f91e58aa0fd1d03b11c60b0d1cffbb1d941f4"
@@ -8,57 +8,60 @@ export DATA_DIR='/home/mhong/zhan9359/work/Search-R1/data/nq_search'
 
 WAND_PROJECT='Search-R1'
 
-export BASE_MODEL='/home/mhong/zhan9359/.cache/models--quanwei0--nq-hotpotqa-search-r1-ppo-qwen2.5-7b-em-gae-maxturn4/snapshots/ee87254eac7617a33dc61a5a4e94beead9a3aab8/actor/global_step_1000'
+export BASE_MODEL='Qwen/Qwen2.5-1.5B-Instruct'
+# export BASE_MODEL='/home/mhong/zhan9359/.cache/models--quanwei0--nq-hotpotqa-search-r1-ppo-qwen2.5-7b-em-gae-maxturn4/snapshots/ee87254eac7617a33dc61a5a4e94beead9a3aab8/actor/global_step_1000'
 # export CRITIC_BASE_MODEL='/home/mhong/zhan9359/.cache/models--quanwei0--nq-hotpotqa-search-r1-ppo-qwen2.5-7b-em-gae-maxturn4/snapshots/ee87254eac7617a33dc61a5a4e94beead9a3aab8/critic/global_step_1000'
 # export BASE_MODEL='/home/mhong/zhan9359/.cache/models--quanwei0--nq-search-r1-ppo-qwen2.5-7b-em-gae-mixed-reward-new7/snapshots/448a8eff359fda6faed1fe7999a96208e3024694/actor/global_step_500'
 
-export CRITIC_BASE_MODEL="/home/mhong/zhan9359/.cache/models--quanwei0--nq-search-r1-ppo-qwen2.5-7b-em-gae-mixed-reward-new7/snapshots/448a8eff359fda6faed1fe7999a96208e3024694/critic/global_step_500"
-
+# export CRITIC_BASE_MODEL="/home/mhong/zhan9359/.cache/models--quanwei0--nq-search-r1-ppo-qwen2.5-7b-em-gae-mixed-reward-new7/snapshots/448a8eff359fda6faed1fe7999a96208e3024694/critic/global_step_500"
+export CRITIC_BASE_MODEL=$BASE_MODEL
 
 export VLLM_ATTENTION_BACKEND=XFORMERS # vllm + qwen2-7b with flash_attn has some issues
 
-# Best-of-N values to test
-BON_VALUES=(16)
+# MCTS parameters to test
+NUM_SIMULATIONS_VALUES=(5)
 
-# Loop through each Best-of-N value
-for N in "${BON_VALUES[@]}"; do
+# Loop through each MCTS simulation count
+for NUM_SIM in "${NUM_SIMULATIONS_VALUES[@]}"; do
     echo "========================================="
-    echo "Running Best-of-N with N=$N"
+    echo "Running MCTS with num_simulations=$NUM_SIM"
     echo "========================================="
     
-    export EXPERIMENT_NAME="nq-search-r1-quan-7b-ckpt1-sampled-512-BoN${N}_cross"
+    export EXPERIMENT_NAME="nq-search-r1-quan-7b-ckpt1-sampled-512-mcts_${NUM_SIM}"
     
-    # Adjust batch sizes based on N to manage memory
-    # As N increases, we may need to reduce batch sizes
-    if [ "$N" -le 2 ]; then
-        VAL_BATCH_SIZE=128
-        GPU_MEMORY_UTIL=0.6
-    elif [ "$N" -le 4 ]; then
-        VAL_BATCH_SIZE=32
-        GPU_MEMORY_UTIL=0.6
-    elif [ "$N" -le 8 ]; then
+    # Adjust batch sizes based on simulation count to manage memory
+    if [ "$NUM_SIM" -le 50 ]; then
         VAL_BATCH_SIZE=16
         GPU_MEMORY_UTIL=0.6
-    else  # N=16
-        VAL_BATCH_SIZE=16
+    elif [ "$NUM_SIM" -le 100 ]; then
+        VAL_BATCH_SIZE=8
+        GPU_MEMORY_UTIL=0.6
+    else  # NUM_SIM=200
+        VAL_BATCH_SIZE=4
         GPU_MEMORY_UTIL=0.6
     fi
-    
-    # echo "Using train_batch_size=$TRAIN_BATCH_SIZE, val_batch_size=$VAL_BATCH_SIZE"
+    VAL_BATCH_SIZE=4
+    echo "Using val_batch_size=$VAL_BATCH_SIZE"
     
     PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_inference \
         +use_inference_scaling=true \
-        +scaling_config.algorithm=bon \
-        +scaling_config.n_candidates=$N \
-        +scaling_config.selection_metric=critic \
-        +scaling_config.temperature=1 \
+        +scaling_config.algorithm=mcts \
+        +scaling_config.num_simulations=$NUM_SIM \
+        +scaling_config.max_turns=4 \
+        +scaling_config.c_puct=0.1 \
+        +scaling_config.num_expand_actions=5 \
+        +scaling_config.temperature=1.0 \
+        +scaling_config.use_critic=true \
+        +scaling_config.value_discount=0.99 \
+        +scaling_config.critic_worker_group=critic \
+        +scaling_config.reuse_tree=false \
         data.train_files=$DATA_DIR/train.parquet \
         data.val_files=$DATA_DIR/test.parquet \
         data.train_data_num=null \
         data.val_data_num=null \
-        data.train_batch_size=512 \
+        data.train_batch_size=8 \
         data.val_batch_size=$VAL_BATCH_SIZE \
-        data.val_data_num=512 \
+        data.val_data_num=4 \
         data.max_prompt_length=4096 \
         data.max_response_length=500 \
         data.max_start_length=2048 \
@@ -80,7 +83,7 @@ for N in "${BON_VALUES[@]}"; do
         actor_rollout_ref.actor.fsdp_config.grad_offload=True \
         actor_rollout_ref.actor.fsdp_config.optimizer_offload=True \
         actor_rollout_ref.rollout.log_prob_micro_batch_size=128 \
-        actor_rollout_ref.rollout.tensor_model_parallel_size=4 \
+        actor_rollout_ref.rollout.tensor_model_parallel_size=2 \
         actor_rollout_ref.rollout.name=vllm \
         actor_rollout_ref.rollout.gpu_memory_utilization=$GPU_MEMORY_UTIL \
         actor_rollout_ref.ref.log_prob_micro_batch_size=128 \
@@ -105,7 +108,7 @@ for N in "${BON_VALUES[@]}"; do
         +trainer.val_before_train=True \
         +trainer.is_save_val_traj=True \
         trainer.default_hdfs_dir=null \
-        trainer.n_gpus_per_node=4 \
+        trainer.n_gpus_per_node=2 \
         trainer.nnodes=1 \
         trainer.save_freq=-1 \
         trainer.test_freq=-1 \
@@ -116,11 +119,11 @@ for N in "${BON_VALUES[@]}"; do
         trainer.default_hdfs_dir=null \
         trainer.default_local_dir=verl_checkpoints/$EXPERIMENT_NAME \
         max_turns=3 \
-        retriever.url="http://127.0.0.1:8000/retrieve" \
+        retriever.url="http://127.0.0.1:9001/retrieve" \
         retriever.topk=3 \
         2>&1 | tee "${EXPERIMENT_NAME}.log"
     
-    echo "Completed Best-of-N with N=$N"
+    echo "Completed MCTS with num_simulations=$NUM_SIM"
     echo "Results saved to ${EXPERIMENT_NAME}.log"
     echo ""
     
@@ -129,14 +132,14 @@ for N in "${BON_VALUES[@]}"; do
 done
 
 echo "========================================="
-echo "All Best-of-N experiments completed!"
+echo "All MCTS experiments completed!"
 echo "========================================="
 
 # Optional: Summarize results
 echo "Summary of experiments:"
-for N in "${BON_VALUES[@]}"; do
-    LOG_FILE="nq-search-r1-quan-7b-ckpt1-sampled-512-BoN${N}.log"
+for NUM_SIM in "${NUM_SIMULATIONS_VALUES[@]}"; do
+    LOG_FILE="nq-search-r1-quan-7b-ckpt1-sampled-512-mcts_${NUM_SIM}.log"
     if [ -f "$LOG_FILE" ]; then
-        echo "BoN-$N: Check $LOG_FILE for results"
+        echo "MCTS-$NUM_SIM: Check $LOG_FILE for results"
     fi
 done

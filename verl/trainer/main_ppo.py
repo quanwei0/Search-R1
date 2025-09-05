@@ -54,7 +54,7 @@ class RewardManager():
 
     def __call__(self, data: DataProto):
         """We will expand this function gradually based on the available datasets"""
-
+        breakpoint()
         # If there is rm score, we directly return rm score. Otherwise, we compute via rm_score_fn
         if 'rm_scores' in data.batch.keys():
             return data.batch['rm_scores']
@@ -71,7 +71,7 @@ class RewardManager():
         # all_scores = []
         all_answers = []
         already_print_data_sources = {}
-
+        breakpoint()
         for i in range(len(data)):
             data_item = data[i]  # DataProtoItem
 

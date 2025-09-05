@@ -4,7 +4,6 @@ Implements beam search for multi-turn reasoning with search engine integration.
 """
 
 import torch
-import re
 from typing import Dict, List, Tuple, Optional, Any
 from .base_scaler import BaseInferenceGenerator
 from verl.protocol import pad_dataproto_to_divisor, unpad_dataproto
@@ -12,7 +11,7 @@ from verl.protocol import pad_dataproto_to_divisor, unpad_dataproto
 # BeamState removed - we'll use gen_batch directly with additional fields
 
 
-class BeamSearchGenerator(BaseInferenceGenerator):
+class BeamSearchVanillaGenerator(BaseInferenceGenerator):
     """Beam search generator for multi-turn reasoning with search."""
     
     def __init__(self, config: Dict[str, Any]):
@@ -41,10 +40,6 @@ class BeamSearchGenerator(BaseInferenceGenerator):
         # Beam search specific parameters
         self.filter_duplicates = config.get('filter_duplicates', True)
         self.lookahead_steps = config.get('lookahead_steps', 0)
-        
-        # Step reward weights
-        self.use_step_rewards = config.get('use_step_rewards', True)
-        self.step_reward_weight = config.get('step_reward_weight', 1.0)
 
     def generate(
         self,
@@ -105,10 +100,6 @@ class BeamSearchGenerator(BaseInferenceGenerator):
             # Score the composed batch with critic
             scoring_batch = self._score_batch_with_critic(scoring_batch, state, reward_fn)
             
-            # Add step rewards if enabled
-            if self.use_step_rewards:
-                self._add_step_rewards(state, meta_info)
-            
             # Select top candidates based on scores
             rollings, state = self._select_top_candidates(rollings, state, original_batch_size)
 
@@ -141,7 +132,7 @@ class BeamSearchGenerator(BaseInferenceGenerator):
         
         # Apply critic scoring like in best_of_n
         if reward_fn:
-            output = self.batch_score(final_candidates, reward_fn)
+            output = reward_fn.compute_values(final_candidates)
             values = output.batch['values']  # Shape: (batch_size, seq_len)
             
             # Get final rewards like in best_of_n
@@ -176,49 +167,29 @@ class BeamSearchGenerator(BaseInferenceGenerator):
         return output
 
     def _score_batch_with_critic(self, batch, state, reward_fn):
-        """Score batch with critic value function.
-        
-        Only updates scores for active beams (active_mask == 1).
-        Completed beams keep their final scores.
-        """
+        """Score batch with critic value function."""
         if not reward_fn:
             return batch
-        active_mask = state.batch['active_mask']
+            
+        # Get critic values from the properly composed batch
+        output = self.batch_score(batch, reward_fn)
+        values = output.batch['values']  # Shape: (batch_size, seq_len)
         
-        # Find indices of active beams that need scoring
-        active_indices = torch.where(active_mask == 1)[0]
-        
-        if len(active_indices) == 0:
-            # No active beams to score
-            return batch
-        
-        # Extract only active beams for scoring
-        active_batch = batch.select_idxs(active_indices)
-        
-        # Score only the active beams
-        active_output = self.batch_score(active_batch, reward_fn)
-        active_values = active_output.batch['values']  # Shape: (num_active, seq_len)
-        
-        # Update scores for active beams
-        for idx, beam_idx in enumerate(active_indices):
+        # Update scores in state
+        for i in range(values.shape[0]):
             # Get final non-zero value as score
-            non_zero_indices = (active_values[idx] != 0).nonzero(as_tuple=True)[0]
+            non_zero_indices = (values[i] != 0).nonzero(as_tuple=True)[0]
             if len(non_zero_indices) > 0:
                 last_idx = non_zero_indices[-1]
-                critic_score = active_values[idx, last_idx].item()
-                state.batch['scores'][beam_idx] = critic_score
+                critic_score = values[i, last_idx].item()
+                state.batch['scores'][i] = critic_score
             else:
-                state.batch['scores'][beam_idx] = 0.0
-        
-        # Completed beams keep their final scores
+                state.batch['scores'][i] = 0.0
 
         return batch
 
     def _select_top_candidates(self, expanded_batch, state, original_batch_size):
         """Select top n_candidates candidates per original prompt.
-        
-        Keeps completed beams (active_mask == 0) from the original n_candidates and 
-        selects top-k only among active beams (both original and expanded).
         
         Args:
             expanded_batch: Batch after expansion with shape 
@@ -230,108 +201,20 @@ class BeamSearchGenerator(BaseInferenceGenerator):
             Selected batch and state with shape (original_batch_size * n_candidates, ...)
         """
         scores = state.batch['scores']
-        active_mask = state.batch['active_mask']
         total_size = scores.shape[0]
         
-        expanded_per_prompt = total_size // original_batch_size  # n_candidates * beam_width
+        expanded_per_prompt = total_size // original_batch_size
         
-        # Reshape for per-prompt processing
         scores_reshaped = scores.view(original_batch_size, expanded_per_prompt)
-        active_reshaped = active_mask.view(original_batch_size, expanded_per_prompt)
+
+        top_scores, top_indices_2d = torch.topk(scores_reshaped, self.n_candidates, dim=1, largest=True)
         
-        # Build selection indices
-        all_indices = []
-        
-        for i in range(original_batch_size):
-            prompt_offset = i * expanded_per_prompt
-            
-            # The first n_candidates indices are the original beams (before expansion)
-            # Indices [0, n_candidates) are original beam 0, [n_candidates, 2*n_candidates) are original beam 1, etc.
-            # Due to interleave=True in repeat, the pattern is:
-            # [orig_0_copy_0, orig_0_copy_1, ..., orig_1_copy_0, orig_1_copy_1, ...]
-            
-            # Since interleave=True, the original beams are at indices:
-            # 0, beam_width, 2*beam_width, ..., (n_candidates-1)*beam_width
-            original_beam_indices = torch.arange(self.n_candidates, device=scores.device) * self.beam_width
-            
-            # Check which original beams are completed
-            original_active = active_reshaped[i][original_beam_indices]
-            completed_original_mask = (original_active == 0)
-            
-            # Indices of completed original beams (in expanded space)
-            completed_indices = original_beam_indices[completed_original_mask] + prompt_offset
-            num_completed = len(completed_indices)
-            
-            if num_completed >= self.n_candidates:
-                # All slots filled with completed beams, keep first n_candidates completed
-                selected_indices = completed_indices[:self.n_candidates]
-            else:
-                # Need to select (n_candidates - num_completed) from all beams
-                num_to_select = self.n_candidates - num_completed
-                
-                # Mask out completed original beams by setting their scores to -inf
-                # (we want to keep them separately, not compete in top-k)
-                prompt_scores = scores_reshaped[i].clone()
-                prompt_scores[original_beam_indices[completed_original_mask]] = float('-inf')
-                
-                # Select top beams from remaining (active original + all expanded)
-                if (prompt_scores != float('-inf')).any():
-                    # Get more candidates than needed to filter out -inf
-                    top_scores, top_indices = torch.topk(prompt_scores, min(expanded_per_prompt, expanded_per_prompt), largest=True)
-                    # Filter out -inf scores and take only what we need
-                    valid_mask = top_scores != float('-inf')
-                    top_indices = top_indices[valid_mask][:num_to_select]
-                    active_indices = top_indices + prompt_offset
-                else:
-                    # Fallback: no active beams, take first available
-                    active_indices = torch.arange(num_to_select, device=scores.device) + prompt_offset
-                
-                # Combine completed and active indices
-                if num_completed > 0:
-                    selected_indices = torch.cat([completed_indices, active_indices])[:self.n_candidates]
-                else:
-                    selected_indices = active_indices[:self.n_candidates]
-            
-            all_indices.append(selected_indices)
-        
-        # Flatten all indices
-        top_indices_1d = torch.cat(all_indices)
+        prompt_offsets = torch.arange(original_batch_size, device=top_indices_2d.device) * expanded_per_prompt
+        prompt_offsets = prompt_offsets.unsqueeze(1)  # Shape: (original_batch_size, 1)
+        top_indices_1d = (top_indices_2d + prompt_offsets).flatten()  # Shape: (original_batch_size * n_candidates,)
         
         # Select top candidates
         new_batch = expanded_batch.select_idxs(top_indices_1d)
         new_state = state.select_idxs(top_indices_1d)
         
         return new_batch, new_state
-    
-    def _add_step_rewards(self, state):
-        """Add step rewards to the current scores.
-        
-        Args:
-            state: Current state with scores
-            meta_info: Metadata with generation history containing str_per_round
-        """
-        # Access the string history from state's meta_info
-        breakpoint()
-        batch_size = state.batch['scores'].shape[0]
-        
-        # Build turn texts by beam index
-        # str_per_round is a list where each element is a list of strings for each beam
-        # We need to reconstruct the full text for each beam
-        for i in range(batch_size):
-            if not state.batch['active_mask'][i]:
-                continue  # Skip completed beams
-            
-            beam_text = self.generation_manager.tokenizer.decode(state.batch['responses'][0], skip_special_tokens=True)
-            # Check if this is final turn (has <answer> tag)
-            is_final = '<answer>' in beam_text and '</answer>' in beam_text
-            # search_count = 
-            # if is_final:
-            #     # Extract just the final turn (from last <think> to </answer>)
-            #     final_turn = str_per_round[-1]
-            #     final_score = self.compute_final_format_score(final_turn)
-            #     state.batch['scores'][i] += self.step_reward_weight * final_score
-            # else:
-            #     last_turn = last_round[i]
-            #     # Compute step format score with accumulated search count
-            #     step_score = self.compute_step_format_score(last_turn, search_count)
-            #     state.batch['scores'][i] += self.step_reward_weight * step_score

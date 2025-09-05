@@ -5,8 +5,9 @@ Base class for inference-time scaling algorithms.
 from abc import ABC, abstractmethod
 from typing import Dict, List, Tuple, Any
 import torch
+import re
 from verl import DataProto
-
+from verl.utils.reward_score.qa_em_new import *
 
 class BaseInferenceGenerator(ABC):
     """
@@ -64,3 +65,42 @@ class BaseInferenceGenerator(ABC):
         except Exception as e:
             print(f"Warning: Failed to compute reward: {e}")
             return 0.0
+    
+    @staticmethod
+    def compute_step_format_score(turn_text: str, search_count: int = 0) -> float:
+        """
+        Compute format score for intermediate step without ground truth.
+        
+        Args:
+            turn_text: Text of the current turn
+            search_count: Number of searches performed so far
+            
+        Returns:
+            Format score for the step
+        """
+        # Check for proper tag structure
+        format_score = 0.1 if mid_format_check(turn_text) else -0.2
+        
+        # Add search penalty
+        search_penalty = 0.0
+        if "<search>" in turn_text:
+            turn_search_count = turn_text.count("<search>")
+            search_penalty = -0.1 * (search_count + turn_search_count)
+        
+        return format_score + search_penalty
+    
+    @staticmethod
+    def compute_final_format_score(final_turn_str: str) -> float:
+        """
+        Compute format score for final turn without ground truth.
+        
+        Args:
+            final_turn_str: Text of the final turn
+            
+        Returns:
+            Format score for final turn
+        """
+        if not final_format_check(final_turn_str):
+            return -1.0
+        else:
+            return 0.2  # Good format but no answer
