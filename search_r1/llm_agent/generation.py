@@ -297,6 +297,7 @@ class LLMGenerationManager:
             
             # For beam search
             'scores': torch.zeros(batch_size, dtype=torch.float),
+            'process_rewards': torch.zeros(batch_size, dtype=torch.float),
             'completed': torch.zeros(batch_size, dtype=torch.bool)
         })
         
@@ -321,11 +322,10 @@ class LLMGenerationManager:
         """Add generation round to history in the state."""
         state.meta_info['history']['ids_per_round'].append(response_ids.clone())
         state.meta_info['history']['str_per_round'].append(response_str.copy())
-        if obs_ids is not None:
-            state.meta_info['history']['ids_per_round'].append(obs_ids.clone())
-        if obs_str is not None:
+        if obs_str is not None and len(obs_str) > 0:
             state.meta_info['history']['str_per_round'].append(obs_str.copy())
-    
+            state.meta_info['history']['ids_per_round'].append(obs_ids.clone())
+
     def _generate_candidates(self, rollings, active_mask):
         """Generate candidate responses for current state.
         

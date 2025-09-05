@@ -76,7 +76,7 @@ class BeamSearchGenerator(BaseInferenceGenerator):
         # Track original batch size for proper candidate selection
         # gen_batch is already repeated n_candidates times
         original_batch_size = batch_size // self.n_candidates
-        
+        breakpoint()
         # Main beam search loop - expand one level at a time
         for turn in range(self.max_turns):
             # Check if all candidates are completed
@@ -104,10 +104,10 @@ class BeamSearchGenerator(BaseInferenceGenerator):
             
             # Score the composed batch with critic
             scoring_batch = self._score_batch_with_critic(scoring_batch, state, reward_fn)
-            
+            breakpoint()
             # Add step rewards if enabled
             if self.use_step_rewards:
-                self._add_step_rewards(state, meta_info)
+                self._add_step_rewards(state, scoring_batch, current_turn_id=turn)
             
             # Select top candidates based on scores
             rollings, state = self._select_top_candidates(rollings, state, original_batch_size)
@@ -155,8 +155,13 @@ class BeamSearchGenerator(BaseInferenceGenerator):
                     final_rewards.append(torch.tensor(0.0, device=values.device))
             
             final_rewards = torch.stack(final_rewards)
+            
+            if self.use_step_rewards:
+                self._add_step_rewards(state, final_candidates, current_turn_id=self.max_turns)
+                final_candidates.meta_info['process_rewards'] = state.batch['process_rewards']
+                
             final_candidates.meta_info['n_candidates'] = self.n_candidates
-            final_candidates.meta_info['rewards'] = final_rewards
+            final_candidates.meta_info['rewards'] = final_rewards + state.batch['process_rewards']
         
         return final_candidates
     
@@ -229,7 +234,7 @@ class BeamSearchGenerator(BaseInferenceGenerator):
         Returns:
             Selected batch and state with shape (original_batch_size * n_candidates, ...)
         """
-        scores = state.batch['scores']
+        scores = state.batch['scores'] + state.batch['process_rewards']
         active_mask = state.batch['active_mask']
         total_size = scores.shape[0]
         
@@ -302,36 +307,85 @@ class BeamSearchGenerator(BaseInferenceGenerator):
         new_state = state.select_idxs(top_indices_1d)
         
         return new_batch, new_state
-    
-    def _add_step_rewards(self, state):
+
+    def _add_step_rewards(self, state, scoring_batch, current_turn_id):
         """Add step rewards to the current scores.
         
         Args:
             state: Current state with scores
+            scoring_batch: The batch of sequences being scored
             meta_info: Metadata with generation history containing str_per_round
+            current_turn_id: The current turn number (0-indexed)
         """
-        # Access the string history from state's meta_info
-        breakpoint()
         batch_size = state.batch['scores'].shape[0]
-        
-        # Build turn texts by beam index
-        # str_per_round is a list where each element is a list of strings for each beam
-        # We need to reconstruct the full text for each beam
+        pad_token_id = self.generation_manager.tokenizer.pad_token_id  # 151643
+        current_turn_id += 1  # Convert to 1-indexed for easier comparison
+        breakpoint()
         for i in range(batch_size):
-            if not state.batch['active_mask'][i]:
-                continue  # Skip completed beams
+            # Split turns based on responses_with_info_mask
+            # Example: [1,2,3,151643,151643,151643,1,2,151643,151643]
+            # Turn 1: indices 0-5, Turn 2: indices 6-9
+            responses_mask = state.batch['responses_with_info_mask'][i]
             
-            beam_text = self.generation_manager.tokenizer.decode(state.batch['responses'][0], skip_special_tokens=True)
-            # Check if this is final turn (has <answer> tag)
-            is_final = '<answer>' in beam_text and '</answer>' in beam_text
-            # search_count = 
-            # if is_final:
-            #     # Extract just the final turn (from last <think> to </answer>)
-            #     final_turn = str_per_round[-1]
-            #     final_score = self.compute_final_format_score(final_turn)
-            #     state.batch['scores'][i] += self.step_reward_weight * final_score
-            # else:
-            #     last_turn = last_round[i]
-            #     # Compute step format score with accumulated search count
-            #     step_score = self.compute_step_format_score(last_turn, search_count)
-            #     state.batch['scores'][i] += self.step_reward_weight * step_score
+            # Find turn boundaries by detecting transitions
+            turn_str = []
+            tokens = state.batch['responses'][i].tolist()
+            for start, end in self.turns_from_tokens(tokens, pad_token_id):
+                turn_tokens = state.batch['responses'][i][start:end+1]
+                turn_text = self.generation_manager.tokenizer.decode(
+                    turn_tokens, skip_special_tokens=True
+                )
+                turn_str.append(turn_text)
+            
+            # Check if trajectory is already finished
+            if len(turn_str) < current_turn_id:
+                # Trajectory already finished, don't update score
+                continue
+            
+            # Path is ongoing, update score with the newest turn
+            if len(turn_str) > 0:
+                newest_turn = turn_str[-1]  # Get the latest turn
+                
+                # Check if this is final turn (has <answer> tag)
+                is_final = '<answer>' in newest_turn and '</answer>' in newest_turn
+                
+                if is_final:
+                    # Compute final turn score
+                    final_score = self.compute_final_format_score(newest_turn)
+                    state.batch['process_rewards'][i] += self.step_reward_weight * final_score
+                else:
+                    # Count search operations in the newest turn
+                    search_count = ''.join(turn_str[:-1]).count("<search>") if len(turn_str) > 1 else 0
+                    # Compute step format score
+                    step_score = self.compute_step_format_score(newest_turn, search_count)
+                    state.batch['process_rewards'][i] += self.step_reward_weight * step_score
+
+    def turns_from_tokens(self, tokens, pad_id):
+        """
+        Returns a list of (start_idx, end_idx) ranges where each turn is:
+        [non-pad tokens] + [immediately following pad tokens].
+        Leading pads are skipped.
+        """
+        n = len(tokens)
+        i = 0
+        turns = []
+
+        # skip leading pads (if any)
+        while i < n and tokens[i] == pad_id:
+            i += 1
+
+        while i < n:
+            start = i
+
+            # consume non-pad stretch
+            while i < n and tokens[i] != pad_id:
+                i += 1
+
+            # consume following pads (belong to the same turn)
+            while i < n and tokens[i] == pad_id:
+                i += 1
+
+            end = i - 1
+            turns.append((start, end))
+
+        return turns
