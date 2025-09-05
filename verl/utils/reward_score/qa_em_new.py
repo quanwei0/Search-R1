@@ -388,7 +388,7 @@ def compute_score_f1(solution_str, ground_truth):
 
     ground_truths_list = list(ground_truth['target'])
 
-    pred_tokens = set(solution_str.strip().split())
+    answer = set(extract_solution(solution_str=solution_str).strip().split())
 
     def f1(pred_tokens, gt_str):
         gt_tokens = set(gt_str.strip().split())
@@ -397,5 +397,6 @@ def compute_score_f1(solution_str, ground_truth):
         RN = len(gt_tokens)
         return 0.0 if PN + RN == 0 else 2 * IN / (PN + RN)
 
-
-    return max(f1(pred_tokens, gt) for gt in ground_truths_list)
+    max_f1 = max(f1(answer, gt) for gt in ground_truths_list)
+    print(max_f1)
+    return max_f1

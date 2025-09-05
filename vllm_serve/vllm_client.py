@@ -90,12 +90,8 @@ class JudgeEvaluator:
         
         ground_truth_text = f"GROUND TRUTH:\n{ground_truth}\n"
         
-        judge_prompt = f"""You are an expert evaluator for multi-turn search-augmented reasoning systems. Evaluate each turn's effectiveness in addressing the prompt and reaching the ground truth answer.
-
-{prompt_text}
-{ground_truth_text}
-{turns_text}
-**Number of turns to evaluate: {len(turns)}**
+        judge_prompt = f"""
+You are an expert evaluator for multi-turn search-augmented reasoning systems. Given a prompt, a ground truth, and a generated response turn-by-turn, you need to evaluate each turn's effectiveness in addressing the prompt and reaching the ground truth answer by following the instructions below.
 
 ## EVALUATION INSTRUCTIONS
 
@@ -148,6 +144,12 @@ Turn3: X.X
 
 **Raw Score = Format Compliance + Reasoning & Search Quality + Solution Progress**
 **Final Score = Normalize Raw Score to [-0.5, 0.5] range**
+
+{prompt_text}
+{ground_truth_text}
+{turns_text}
+**Number of turns to evaluate: {len(turns)}**
+
 """
 
         return judge_prompt
