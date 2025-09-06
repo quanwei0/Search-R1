@@ -71,7 +71,7 @@ class RewardManager():
         # all_scores = []
         all_answers = []
         already_print_data_sources = {}
-        breakpoint()
+
         for i in range(len(data)):
             data_item = data[i]  # DataProtoItem
 

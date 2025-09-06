@@ -67,7 +67,7 @@ class BaseInferenceGenerator(ABC):
             return 0.0
     
     @staticmethod
-    def compute_step_format_score(turn_list: list, search_count: int = 0) -> float:
+    def compute_step_format_score(turn_list: list) -> float:
         """
         Compute format score for intermediate step without ground truth.
         

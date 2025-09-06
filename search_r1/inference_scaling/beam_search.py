@@ -346,8 +346,6 @@ class BeamSearchGenerator(BaseInferenceGenerator):
                     final_score = self.compute_final_format_score(newest_turn)
                     state.batch['process_rewards'][i] += self.step_reward_weight * final_score
                 else:
-                    # Count search operations in the newest turn
-                    search_count = ''.join(turn_str[:-1]).count("<search>") if len(turn_str) > 1 else 0
-                    # Compute step format score
-                    step_score = self.compute_step_format_score(newest_turn, search_count)
+
+                    step_score = self.compute_step_format_score(turn_str)
                     state.batch['process_rewards'][i] += self.step_reward_weight * step_score

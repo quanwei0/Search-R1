@@ -25,14 +25,13 @@ class BestOfNGenerator(BaseInferenceGenerator):
             n_candidates: Number of candidates to generate (default: 4)
             selection_metric: Metric for selection ('reward', 'critic', 'length', 'random')
             temperature: Sampling temperature for generation (default: 1.0)
-            use_stepwise: Whether to use stepwise BoN (default: False)
-            critic_worker_group: Optional critic worker group for 'critic' selection
         """
         super().__init__(config)
         self.n_candidates = config.get('n_candidates', 4)
         self.selection_metric = config.get('selection_metric', 'reward')
         self.temperature = config.get('temperature', 1.0)
-        self.use_stepwise = config.get('use_stepwise', False)
+        self.use_step_rewards = config.get('use_step_rewards', True)
+        self.step_reward_weight = config.get('step_reward_weight', 1.0)
         
     def generate(self, generation_manager,
                        gen_batch: DataProto,
@@ -75,44 +74,53 @@ class BestOfNGenerator(BaseInferenceGenerator):
         
         # Stack into tensor
         final_rewards = torch.stack(final_rewards)  # Shape: (batch_size * n_samples,)
-        
+
         candidates.meta_info['n_candidates'] = self.n_candidates
+        breakpoint()
+        if self.use_step_rewards:
+            process_rewards = self._add_step_rewards(candidates)
+            final_rewards += self.step_reward_weight * process_rewards
+
         candidates.meta_info['rewards'] = final_rewards
 
         return candidates
 
-    def _select_with_critic(self, candidates: List[DataProto]) -> DataProto:
-        """Select best candidate using critic model."""
-        if self.critic_wg is None:
-            print("[Warning] Critic worker group not provided, falling back to first candidate")
-            return candidates[0]
+    def _add_step_rewards(self, candidates):
+        """Add step rewards to the current scores.
         
-        best_candidate = candidates[0]
-        best_value = float('-inf')
+        Args:
+            state: Current state with scores
+            meta_info: Metadata with generation history containing str_per_round
+        """
+        batch_size = candidates.batch['prompts'].shape[0]
+        pad_token_id = self.generation_manager.tokenizer.pad_token_id  # 151643
         
-        print(f"[Critic Selection] Evaluating {len(candidates)} candidates...")
+        process_rewards = torch.zeros(batch_size, device=candidates.batch['prompts'].device)
         
-        for i, candidate in enumerate(candidates):
-            try:
-                # Compute critic value for this candidate
-                values_output = self.critic_wg.compute_values(candidate)
+        for i in range(batch_size):
+            # Split turns based on responses_with_info_mask
+            responses_mask = candidates.batch['responses_with_info_mask'][i]
+
+            # Find turn boundaries by detecting transitions
+            turn_str = []
+            for start, end in self.turns_from_tokens(responses_mask, pad_token_id):
+                turn_tokens = candidates.batch['responses'][i][start:end+1]
+                turn_text = self.generation_manager.tokenizer.decode(
+                    turn_tokens, skip_special_tokens=True
+                )
+                turn_str.append(turn_text)
+
+            # Path is ongoing, update score with the newest turn
+            if len(turn_str) > 0:
+                # Compute final score for the last turn only
+                final_score = self.compute_final_format_score(turn_str[-1])
                 
-                # Extract value score (usually the last token value or mean)
-                values = values_output.batch['values']  # Shape: (batch_size, seq_len)
+                # Compute step scores for all turns except the last
+                sum_step_scores = 0.0
+                for t in range(1, len(turn_str)):  # From 1 to len(turn_str)-1 turns
+                    step_score = self.compute_step_format_score(turn_str[:t])
+                    sum_step_scores += step_score
+
+                process_rewards[i] = final_score + sum_step_scores
                 
-                # Use mean value as selection criterion
-                mean_value = values.mean().item()
-                
-                print(f"[Critic Selection] Candidate {i+1} value: {mean_value:.4f}")
-                
-                if mean_value > best_value:
-                    best_value = mean_value
-                    best_candidate = candidate
-                    
-            except Exception as e:
-                print(f"[Critic Selection] Error evaluating candidate {i+1}: {e}")
-                continue
-        
-        print(f"[Critic Selection] Selected candidate with value: {best_value:.4f}")
-        return best_candidate
-    
+        return process_rewards
