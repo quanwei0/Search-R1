@@ -76,7 +76,7 @@ class BestOfNGenerator(BaseInferenceGenerator):
         final_rewards = torch.stack(final_rewards)  # Shape: (batch_size * n_samples,)
 
         candidates.meta_info['n_candidates'] = self.n_candidates
-        breakpoint()
+
         if self.use_step_rewards:
             process_rewards = self._add_step_rewards(candidates)
             final_rewards += self.step_reward_weight * process_rewards
