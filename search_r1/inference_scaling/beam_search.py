@@ -35,9 +35,6 @@ class BeamSearchGenerator(BaseInferenceGenerator):
         self.max_turns = config.get('max_turns', 10)
         self.temperature = config.get('temperature', 1.0)
         
-        # Scoring parameters
-        self.score_fn = config.get('score_fn', 'critic')  # Default to critic scoring
-        self.critic_wg = config.get('critic_worker_group', None)  # Critic worker group for scoring
         # Beam search specific parameters
         self.filter_duplicates = config.get('filter_duplicates', True)
         self.lookahead_steps = config.get('lookahead_steps', 0)
@@ -76,7 +73,6 @@ class BeamSearchGenerator(BaseInferenceGenerator):
         # Track original batch size for proper candidate selection
         # gen_batch is already repeated n_candidates times
         original_batch_size = batch_size // self.n_candidates
-        breakpoint()
         # Main beam search loop - expand one level at a time
         for turn in range(self.max_turns):
             # Check if all candidates are completed
@@ -108,7 +104,7 @@ class BeamSearchGenerator(BaseInferenceGenerator):
             # Add step rewards if enabled
             if self.use_step_rewards:
                 self._add_step_rewards(state, current_turn_id=turn)
-
+            state.batch['Q_values'] = state.batch['scores'] + state.batch['process_rewards']
             # Select top candidates based on scores
             rollings, state = self._select_top_candidates(rollings, state, original_batch_size)
 
@@ -139,12 +135,12 @@ class BeamSearchGenerator(BaseInferenceGenerator):
         if self.n_candidates == 1:
             return final_candidates
         
-        # Apply critic scoring like in best_of_n
+        # Apply critic scoring
         if reward_fn:
             output = self.batch_score(final_candidates, reward_fn)
             values = output.batch['values']  # Shape: (batch_size, seq_len)
             
-            # Get final rewards like in best_of_n
+            # Get final rewards
             final_rewards = []
             for b in range(values.shape[0]):
                 non_zero_indices = (values[b] != 0).nonzero(as_tuple=True)[0]
@@ -234,7 +230,7 @@ class BeamSearchGenerator(BaseInferenceGenerator):
         Returns:
             Selected batch and state with shape (original_batch_size * n_candidates, ...)
         """
-        scores = state.batch['scores'] + state.batch['process_rewards']
+        scores = state.batch['Q_values']
         active_mask = state.batch['active_mask']
         total_size = scores.shape[0]
         
@@ -355,33 +351,3 @@ class BeamSearchGenerator(BaseInferenceGenerator):
                     # Compute step format score
                     step_score = self.compute_step_format_score(newest_turn, search_count)
                     state.batch['process_rewards'][i] += self.step_reward_weight * step_score
-
-    def turns_from_tokens(self, tokens, pad_id):
-        """
-        Returns a list of (start_idx, end_idx) ranges where each turn is:
-        [non-pad tokens] + [immediately following pad tokens].
-        Leading pads are skipped.
-        """
-        n = len(tokens)
-        i = 0
-        turns = []
-
-        # skip leading pads (if any)
-        while i < n and tokens[i] == pad_id:
-            i += 1
-
-        while i < n:
-            start = i
-
-            # consume non-pad stretch
-            while i < n and tokens[i] != pad_id:
-                i += 1
-
-            # consume following pads (belong to the same turn)
-            while i < n and tokens[i] == pad_id:
-                i += 1
-
-            end = i - 1
-            turns.append((start, end))
-
-        return turns

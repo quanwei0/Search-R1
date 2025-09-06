@@ -106,3 +106,32 @@ class BaseInferenceGenerator(ABC):
         else:
             return 0.2  # Good format but no answer
         
+    def turns_from_tokens(self, tokens, pad_id):
+        """
+        Returns a list of (start_idx, end_idx) ranges where each turn is:
+        [non-pad tokens] + [immediately following pad tokens].
+        Leading pads are skipped.
+        """
+        n = len(tokens)
+        i = 0
+        turns = []
+
+        # skip leading pads (if any)
+        while i < n and tokens[i] == pad_id:
+            i += 1
+
+        while i < n:
+            start = i
+
+            # consume non-pad stretch
+            while i < n and tokens[i] != pad_id:
+                i += 1
+
+            # consume following pads (belong to the same turn)
+            while i < n and tokens[i] == pad_id:
+                i += 1
+
+            end = i - 1
+            turns.append((start, end))
+
+        return turns

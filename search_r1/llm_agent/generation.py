@@ -298,6 +298,7 @@ class LLMGenerationManager:
             # For beam search
             'scores': torch.zeros(batch_size, dtype=torch.float),
             'process_rewards': torch.zeros(batch_size, dtype=torch.float),
+            'Q_values': torch.zeros(batch_size, dtype=torch.float),
             'completed': torch.zeros(batch_size, dtype=torch.bool)
         })
         
