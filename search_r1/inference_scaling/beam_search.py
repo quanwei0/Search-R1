@@ -104,11 +104,11 @@ class BeamSearchGenerator(BaseInferenceGenerator):
             
             # Score the composed batch with critic
             scoring_batch = self._score_batch_with_critic(scoring_batch, state, reward_fn)
-            breakpoint()
+
             # Add step rewards if enabled
             if self.use_step_rewards:
-                self._add_step_rewards(state, scoring_batch, current_turn_id=turn)
-            
+                self._add_step_rewards(state, current_turn_id=turn)
+
             # Select top candidates based on scores
             rollings, state = self._select_top_candidates(rollings, state, original_batch_size)
 
@@ -157,7 +157,7 @@ class BeamSearchGenerator(BaseInferenceGenerator):
             final_rewards = torch.stack(final_rewards)
             
             if self.use_step_rewards:
-                self._add_step_rewards(state, final_candidates, current_turn_id=self.max_turns)
+                self._add_step_rewards(state, current_turn_id=self.max_turns)
                 final_candidates.meta_info['process_rewards'] = state.batch['process_rewards']
                 
             final_candidates.meta_info['n_candidates'] = self.n_candidates
@@ -308,29 +308,25 @@ class BeamSearchGenerator(BaseInferenceGenerator):
         
         return new_batch, new_state
 
-    def _add_step_rewards(self, state, scoring_batch, current_turn_id):
+    def _add_step_rewards(self, state, current_turn_id):
         """Add step rewards to the current scores.
         
         Args:
             state: Current state with scores
-            scoring_batch: The batch of sequences being scored
             meta_info: Metadata with generation history containing str_per_round
             current_turn_id: The current turn number (0-indexed)
         """
         batch_size = state.batch['scores'].shape[0]
         pad_token_id = self.generation_manager.tokenizer.pad_token_id  # 151643
         current_turn_id += 1  # Convert to 1-indexed for easier comparison
-        breakpoint()
+
         for i in range(batch_size):
             # Split turns based on responses_with_info_mask
-            # Example: [1,2,3,151643,151643,151643,1,2,151643,151643]
-            # Turn 1: indices 0-5, Turn 2: indices 6-9
             responses_mask = state.batch['responses_with_info_mask'][i]
             
             # Find turn boundaries by detecting transitions
             turn_str = []
-            tokens = state.batch['responses'][i].tolist()
-            for start, end in self.turns_from_tokens(tokens, pad_token_id):
+            for start, end in self.turns_from_tokens(responses_mask, pad_token_id):
                 turn_tokens = state.batch['responses'][i][start:end+1]
                 turn_text = self.generation_manager.tokenizer.decode(
                     turn_tokens, skip_special_tokens=True
