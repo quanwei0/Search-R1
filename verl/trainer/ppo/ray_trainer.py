@@ -616,7 +616,6 @@ class RayPPOTrainer(object):
                     test_batch = self._split_turn_idx(test_batch)
                     
                     test_batch, trajectories = self._split_trajectories(test_batch, save_dir, val_batch_idx=i)
-                    breakpoint()
                     # evaluate using reward_function
                     # for certain reward function (e.g. sandbox), the generation can overlap with reward
                     reward_dict = self.val_reward_fn(test_batch)
