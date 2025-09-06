@@ -1,12 +1,12 @@
 #!/bin/bash
 
 # Configuration parameters
-CUDA_DEVICES=${1:-"0"}
+CUDA_DEVICES=${1:-"2,3"}
 export CUDA_VISIBLE_DEVICES=$CUDA_DEVICES
 TENSOR_PARALLEL_SIZE=$(echo $CUDA_VISIBLE_DEVICES | tr ',' '\n' | wc -l)
 HOST=${2:-"0.0.0.0"}
 PORT=${3:-8002}
-MODEL=${4:-"openai/gpt-oss-20b"}
+MODEL=${4:-"Qwen/Qwen2.5-72B-Instruct"}
 
 
 # Display system info and configuration
@@ -28,4 +28,4 @@ vllm serve $MODEL \
     --tensor-parallel-size $TENSOR_PARALLEL_SIZE \
     --host $HOST \
     --port $PORT \
-    --disable-log-stats \
+    --disable-log-stats &
