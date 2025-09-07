@@ -21,7 +21,8 @@ sleep 60
 
 conda activate search
 
-bash vllm_serve/vllm_server.sh "4,5,6,7" "127.0.0.1" "8002" "Qwen/Qwen2.5-72B-Instruct" &
+judge_model_name="/code/hongpaul-sandbox/temp/Search-R1/qwen_models/qwen-72b-it"
+bash vllm_serve/vllm_server.sh "4,5,6,7" "127.0.0.1" 8002 $judge_model_name &
 
 export DATA_DIR='./data/nq_search'
 
