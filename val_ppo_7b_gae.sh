@@ -19,7 +19,7 @@ conda activate retriever
 bash retrieval_launch.sh "$CUDA_VISIBLE_DEVICES" "$RETRIEVAL_PORT" &
 sleep 60
 
-conda activate search
+conda activate searchr1
 
 export DATA_DIR='./data/nq_hotpotqa_train'
 
@@ -37,8 +37,8 @@ WAND_PROJECT='Search-R1'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-3b-em-gae
 # export BASE_MODEL='Qwen/Qwen2.5-3B-Instruct'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-3b-it-em
-export BASE_MODEL='PeterJinGo/SearchR1-nq_hotpotqa_train-qwen2.5-7b-em-ppo'
-export EXPERIMENT_NAME=val-nq_hotpotqa_train-qwen2.5-7b-em-ppo-maxturn4
+export BASE_MODEL='/home/wei00355/mnt_data1/.cache/huggingface/hub/models--quanwei0--nq-hotpotqa-search-r1-ppo-qwen2.5-7b-em-gae-mixed-reward-new7-maxturn4/snapshots/9cddc0094b33d014c6069d6b9256b5d6c880f08f/actor/global_step_1000'
+export EXPERIMENT_NAME=val-nq-hotpotqa-ppo-qwen2.5-7b-em-gae-mixed-reward-new7-maxturn4
 # export BASE_MODEL='Qwen/Qwen2.5-7B-Instruct'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-7b-it-em
 
