@@ -21,7 +21,7 @@ sleep 60
 
 conda activate search
 
-bash vllm_serve/vllm_server.sh "4,5,6,7"
+bash vllm_serve/vllm_server.sh "4,5,6,7" "127.0.0.1" "8002" "Qwen/Qwen2.5-72B-Instruct" &
 
 export DATA_DIR='./data/nq_search'
 
@@ -111,7 +111,7 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     trainer.default_hdfs_dir=null \
     trainer.default_local_dir=verl_checkpoints/$EXPERIMENT_NAME \
     max_turns=3 \
-    +judge_host="0.0.0.0" \
+    +judge_host="127.0.0.1" \
     +judge_port=8002 \
     +judge_model_name="Qwen/Qwen2.5-72B-Instruct" \
     retriever.url="http://127.0.0.1:$RETRIEVAL_PORT/retrieve" \
