@@ -28,4 +28,4 @@ vllm serve $MODEL \
     --tensor-parallel-size $TENSOR_PARALLEL_SIZE \
     --host $HOST \
     --port $PORT \
-    --disable-log-stats &
+    --disable-log-stats 
