@@ -1,4 +1,26 @@
-export CUDA_VISIBLE_DEVICES=0,1,2,3
+#!/bin/bash
+
+# Parse command line arguments
+CUDA_DEVICES=${1:-"0,1,2,3"}
+RETRIEVAL_PORT=${2:-8001}
+
+echo "Using CUDA devices: $CUDA_DEVICES"
+echo "Using retrieval port: $RETRIEVAL_PORT"
+
+source /mnt/data1/wei00355/miniconda/bin/activate
+conda init
+
+# Set shared configuration parameters
+export CUDA_VISIBLE_DEVICES=$CUDA_DEVICES
+export RETRIEVAL_PORT=$RETRIEVAL_PORT
+
+conda activate retriever
+# Pass GPU devices and port to retrieval script
+bash retrieval_launch.sh "$CUDA_VISIBLE_DEVICES" "$RETRIEVAL_PORT" &
+sleep 60
+
+conda activate search
+
 export DATA_DIR='./data/nq_hotpotqa_train'
 
 export WANDB_API_KEY="810f91e58aa0fd1d03b11c60b0d1cffbb1d941f4"

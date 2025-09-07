@@ -1,4 +1,26 @@
-export CUDA_VISIBLE_DEVICES=0,1,2,3
+#!/bin/bash
+
+# Parse command line arguments
+CUDA_DEVICES=${1:-"0,1,2,3"}
+RETRIEVAL_PORT=${2:-8001}
+
+echo "Using CUDA devices: $CUDA_DEVICES"
+echo "Using retrieval port: $RETRIEVAL_PORT"
+
+source /mnt/data1/wei00355/miniconda/bin/activate
+conda init
+
+# Set shared configuration parameters
+export CUDA_VISIBLE_DEVICES=$CUDA_DEVICES
+export RETRIEVAL_PORT=$RETRIEVAL_PORT
+
+conda activate retriever
+# Pass GPU devices and port to retrieval script
+bash retrieval_launch.sh "$CUDA_VISIBLE_DEVICES" "$RETRIEVAL_PORT" &
+sleep 60
+
+conda activate search
+
 export DATA_DIR='./data/nq_search'
 
 export WANDB_API_KEY="810f91e58aa0fd1d03b11c60b0d1cffbb1d941f4"
@@ -81,8 +103,8 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     trainer.test_freq=-1 \
     trainer.project_name=$WAND_PROJECT \
     trainer.experiment_name=$EXPERIMENT_NAME \
-    trainer.total_epochs=4 \
-    trainer.total_training_steps=2000 \
+    trainer.total_epochs=40 \
+    trainer.total_training_steps=600 \
     trainer.default_hdfs_dir=null \
     trainer.default_local_dir=verl_checkpoints/$EXPERIMENT_NAME \
     max_turns=3 \
