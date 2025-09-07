@@ -6,6 +6,8 @@ import random
 import sys
 import glob
 
+from tabulate import tabulate
+
 
 def normalize_answer(s):
     def remove_articles(text):
@@ -32,6 +34,19 @@ def em_check(prediction, golden_answers):
     for golden_answer in golden_answers:
         golden_answer = normalize_answer(golden_answer)
         if golden_answer == normalized_prediction:
+            score = 1
+            break
+    return score
+
+
+def subem_check(prediction, golden_answers):
+    if isinstance(golden_answers, str):
+        golden_answers = [golden_answers]
+    normalized_prediction = normalize_answer(prediction)
+    score = 0
+    for golden_answer in golden_answers:
+        golden_answer = normalize_answer(golden_answer)
+        if golden_answer in normalized_prediction:
             score = 1
             break
     return score
@@ -174,6 +189,37 @@ def compute_score_retrieval(solution_str, ground_truth):
     else:
         return 0.0
 
+def compute_score_subem(solution_str, ground_truth):
+    answer = extract_solution(solution_str=solution_str)
+    
+    if answer is None:
+        return 0
+    else:
+        if subem_check(answer, ground_truth["target"]):
+            return 1
+        else:
+            return 0
+
+
+def compute_score_f1(solution_str, ground_truth):
+    answer = extract_solution(solution_str=solution_str)
+    
+    if answer is None:
+        return 0.0
+    
+    ground_truths_list = ground_truth['target'] if isinstance(ground_truth['target'], list) else [ground_truth['target']]
+    pred_tokens = set(answer.strip().split())
+
+    def f1(pred_tokens, gt_str):
+        gt_tokens = set(gt_str.strip().split())
+        IN = len(pred_tokens & gt_tokens)
+        PN = len(pred_tokens)
+        RN = len(gt_tokens)
+        return 0.0 if PN + RN == 0 else 2 * IN / (PN + RN)
+
+    max_f1 = max(f1(pred_tokens, gt) for gt in ground_truths_list)
+    return max_f1
+
 
 def test_trajectory_comprehensive(json_file_path):
     """
@@ -192,6 +238,8 @@ def test_trajectory_comprehensive(json_file_path):
     accuracy_correct = 0
     format_correct = 0
     retrieval_correct = 0
+    subem_correct = 0
+    f1_scores = 0
 
     # Track metrics by data source
     data_source_stats = {}
@@ -208,14 +256,18 @@ def test_trajectory_comprehensive(json_file_path):
         # Construct ground_truth dict format for compute_score_em
         gt_dict = {"target": ground_truth}
 
-        # Calculate all three scores
+        # Calculate all scores
         acc_score = compute_score_em(full_text, gt_dict)
         format_score = compute_score_format(full_text)
         retrieval_score = compute_score_retrieval(full_text, gt_dict)
+        subem_score = compute_score_subem(full_text, gt_dict)
+        f1_score = compute_score_f1(full_text, gt_dict)
 
         accuracy_correct += acc_score
         format_correct += format_score
         retrieval_correct += retrieval_score
+        subem_correct += subem_score
+        f1_scores += f1_score
 
         # Track by data source
         if data_source not in data_source_stats:
@@ -223,31 +275,39 @@ def test_trajectory_comprehensive(json_file_path):
                 "accuracy_correct": 0,
                 "format_correct": 0,
                 "retrieval_correct": 0,
+                "subem_correct": 0,
+                "f1_scores": 0,
                 "total": 0,
             }
         data_source_stats[data_source]["accuracy_correct"] += acc_score
         data_source_stats[data_source]["format_correct"] += format_score
         data_source_stats[data_source]["retrieval_correct"] += retrieval_score
+        data_source_stats[data_source]["subem_correct"] += subem_score
+        data_source_stats[data_source]["f1_scores"] += f1_score
         data_source_stats[data_source]["total"] += 1
 
         # Calculate current metrics
         current_accuracy = accuracy_correct / (i + 1)
         current_format = format_correct / (i + 1)
         current_retrieval = retrieval_correct / (i + 1)
+        current_subem = subem_correct / (i + 1)
+        current_f1 = f1_scores / (i + 1)
 
         # Stream print current metrics
         print(
-            f"\rProgress: {i+1}/{total_samples} | Acc: {current_accuracy:.4f} | Format: {current_format:.4f} | Retrieval: {current_retrieval:.4f}",
+            f"\rProgress: {i+1}/{total_samples} | Acc: {current_accuracy:.4f} | Format: {current_format:.4f} | Retrieval: {current_retrieval:.4f} | SubEM: {current_subem:.4f} | F1: {current_f1:.4f}",
             end="",
             flush=True,
         )
 
     # Print final results
     print(f"\n\nFINAL RESULTS:")
-    print("=" * 60)
+    print("=" * 80)
     final_accuracy = accuracy_correct / total_samples
     final_format = format_correct / total_samples
     final_retrieval = retrieval_correct / total_samples
+    final_subem = subem_correct / total_samples
+    final_f1 = f1_scores / total_samples
 
     print(
         f"Accuracy:  {int(accuracy_correct):4d}/{total_samples:4d} = {final_accuracy:.4f} ({final_accuracy*100:.2f}%)"
@@ -258,22 +318,36 @@ def test_trajectory_comprehensive(json_file_path):
     print(
         f"Retrieval: {int(retrieval_correct):4d}/{total_samples:4d} = {final_retrieval:.4f} ({final_retrieval*100:.2f}%)"
     )
+    print(
+        f"SubEM:     {int(subem_correct):4d}/{total_samples:4d} = {final_subem:.4f} ({final_subem*100:.2f}%)"
+    )
+    print(
+        f"F1:        {f1_scores:8.2f}/{total_samples:4d} = {final_f1:.4f}"
+    )
 
     # Print metrics by data source
     print(f"\nMETRICS BY DATA SOURCE:")
-    print("=" * 80)
-    print(f"{'Source':<20} | {'Accuracy':<12} | {'Format':<12} | {'Retrieval':<12}")
-    print("-" * 80)
+    table_data = []
     for source, stats in sorted(data_source_stats.items()):
         if stats["total"] > 0:
             acc_pct = (stats["accuracy_correct"] / stats["total"]) * 100
             fmt_pct = (stats["format_correct"] / stats["total"]) * 100
             ret_pct = (stats["retrieval_correct"] / stats["total"]) * 100
-            print(
-                f"{source:<20} | {acc_pct:8.2f}%    | {fmt_pct:8.2f}%    | {ret_pct:8.2f}%"
-            )
+            subem_pct = (stats["subem_correct"] / stats["total"]) * 100
+            f1_avg = stats["f1_scores"] / stats["total"]
+            table_data.append([
+                source,
+                f"{acc_pct:.2f}%",
+                f"{fmt_pct:.2f}%", 
+                f"{ret_pct:.2f}%",
+                f"{subem_pct:.2f}%",
+                f"{f1_avg:.4f}"
+            ])
+    
+    headers = ["Source", "Accuracy", "Format", "Retrieval", "SubEM", "F1"]
+    print(tabulate(table_data, headers=headers, tablefmt="grid"))
 
-    return final_accuracy, final_format, final_retrieval
+    return final_accuracy, final_format, final_retrieval, final_subem, final_f1
 
 
 def test_directory_comprehensive(directory_path):
@@ -309,6 +383,8 @@ def test_directory_comprehensive(directory_path):
     total_accuracy_correct = 0
     total_format_correct = 0
     total_retrieval_correct = 0
+    total_subem_correct = 0
+    total_f1_scores = 0
     combined_data_source_stats = {}
 
     for file_idx, json_file in enumerate(json_files):
@@ -324,6 +400,8 @@ def test_directory_comprehensive(directory_path):
         file_accuracy_correct = 0
         file_format_correct = 0
         file_retrieval_correct = 0
+        file_subem_correct = 0
+        file_f1_scores = 0
 
         for i, trajectory in enumerate(trajectories):
             # Get generated text and ground truth labels
@@ -334,17 +412,23 @@ def test_directory_comprehensive(directory_path):
             # Construct ground_truth dict format for compute_score_em
             gt_dict = {"target": ground_truth}
 
-            # Calculate all three scores
+            # Calculate all scores
             acc_score = compute_score_em(full_text, gt_dict)
             format_score = compute_score_format(full_text)
             retrieval_score = compute_score_retrieval(full_text, gt_dict)
+            subem_score = compute_score_subem(full_text, gt_dict)
+            f1_score = compute_score_f1(full_text, gt_dict)
 
             file_accuracy_correct += acc_score
             file_format_correct += format_score
             file_retrieval_correct += retrieval_score
+            file_subem_correct += subem_score
+            file_f1_scores += f1_score
             total_accuracy_correct += acc_score
             total_format_correct += format_score
             total_retrieval_correct += retrieval_score
+            total_subem_correct += subem_score
+            total_f1_scores += f1_score
 
             # Track by data source
             if data_source not in combined_data_source_stats:
@@ -352,6 +436,8 @@ def test_directory_comprehensive(directory_path):
                     "accuracy_correct": 0,
                     "format_correct": 0,
                     "retrieval_correct": 0,
+                    "subem_correct": 0,
+                    "f1_scores": 0,
                     "total": 0,
                 }
             combined_data_source_stats[data_source]["accuracy_correct"] += acc_score
@@ -359,18 +445,9 @@ def test_directory_comprehensive(directory_path):
             combined_data_source_stats[data_source][
                 "retrieval_correct"
             ] += retrieval_score
+            combined_data_source_stats[data_source]["subem_correct"] += subem_score
+            combined_data_source_stats[data_source]["f1_scores"] += f1_score
             combined_data_source_stats[data_source]["total"] += 1
-
-            # Progress update every 10 samples
-            if (i + 1) % 10 == 0 or i == file_samples - 1:
-                current_file_accuracy = file_accuracy_correct / (i + 1)
-                current_file_format = file_format_correct / (i + 1)
-                current_file_retrieval = file_retrieval_correct / (i + 1)
-                print(
-                    f"\r  Progress: {i+1}/{file_samples} | Acc: {current_file_accuracy:.4f} | Format: {current_file_format:.4f} | Retrieval: {current_file_retrieval:.4f}",
-                    end="",
-                    flush=True,
-                )
 
         total_samples += file_samples
         file_accuracy = file_accuracy_correct / file_samples if file_samples > 0 else 0
@@ -378,8 +455,10 @@ def test_directory_comprehensive(directory_path):
         file_retrieval = (
             file_retrieval_correct / file_samples if file_samples > 0 else 0
         )
+        file_subem = file_subem_correct / file_samples if file_samples > 0 else 0
+        file_f1 = file_f1_scores / file_samples if file_samples > 0 else 0
         print(
-            f"\n  File {os.path.basename(json_file)}: Acc {file_accuracy:.4f} | Format {file_format:.4f} | Retrieval {file_retrieval:.4f}"
+            f"File {os.path.basename(json_file)}: Acc {file_accuracy:.4f} | Format {file_format:.4f} | Retrieval {file_retrieval:.4f} | SubEM {file_subem:.4f} | F1 {file_f1:.4f}"
         )
 
     # Calculate overall metrics
@@ -390,8 +469,10 @@ def test_directory_comprehensive(directory_path):
     overall_retrieval = (
         total_retrieval_correct / total_samples if total_samples > 0 else 0
     )
+    overall_subem = total_subem_correct / total_samples if total_samples > 0 else 0
+    overall_f1 = total_f1_scores / total_samples if total_samples > 0 else 0
 
-    print(f"\n" + "=" * 80)
+    print(f"\n" + "=" * 90)
     print(f"COMBINED RESULTS:")
     print(f"Total files processed: {len(json_files)}")
     print(f"Total samples: {total_samples}")
@@ -404,22 +485,37 @@ def test_directory_comprehensive(directory_path):
     print(
         f"Retrieval: {int(total_retrieval_correct):4d}/{total_samples:4d} = {overall_retrieval:.4f} ({overall_retrieval*100:.2f}%)"
     )
+    print(
+        f"SubEM:     {int(total_subem_correct):4d}/{total_samples:4d} = {overall_subem:.4f} ({overall_subem*100:.2f}%)"
+    )
+    print(
+        f"F1:        {total_f1_scores:8.2f}/{total_samples:4d} = {overall_f1:.4f}"
+    )
 
     # Print metrics by data source
     print(f"\nMETRICS BY DATA SOURCE:")
-    print("=" * 80)
-    print(f"{'Source':<20} | {'Accuracy':<12} | {'Format':<12} | {'Retrieval':<12}")
-    print("-" * 80)
+    table_data = []
     for source, stats in sorted(combined_data_source_stats.items()):
         if stats["total"] > 0:
             acc_pct = (stats["accuracy_correct"] / stats["total"]) * 100
             fmt_pct = (stats["format_correct"] / stats["total"]) * 100
             ret_pct = (stats["retrieval_correct"] / stats["total"]) * 100
-            print(
-                f"{source:<20} | {acc_pct:8.2f}%    | {fmt_pct:8.2f}%    | {ret_pct:8.2f}%"
-            )
+            subem_pct = (stats["subem_correct"] / stats["total"]) * 100
+            f1_avg = stats["f1_scores"] / stats["total"]
+            table_data.append([
+                source,
+                f"{acc_pct:.2f}%",
+                f"{fmt_pct:.2f}%", 
+                f"{ret_pct:.2f}%",
+                f"{subem_pct:.2f}%",
+                f"{f1_avg:.4f}"
+            ])
+    
+    headers = ["Source", "Accuracy", "Format", "Retrieval", "SubEM", "F1"]
+    print(tabulate(table_data, headers=headers, tablefmt="grid"))
 
-    return overall_accuracy, overall_format, overall_retrieval
+
+    return overall_accuracy, overall_format, overall_retrieval, overall_subem, overall_f1
 
 
 if __name__ == "__main__":
