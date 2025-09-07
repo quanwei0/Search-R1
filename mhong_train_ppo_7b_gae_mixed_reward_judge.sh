@@ -21,8 +21,12 @@ sleep 60
 
 conda activate search
 
+judge_host="127.0.0.1"
+judge_port=8002
+# huggingface-cli download Qwen/Qwen2.5-72B-Instruct --local-dir /data/hongpaul-sandbox/qwen_models/qwen-72b-it
 judge_model_name="/data/hongpaul-sandbox/qwen_models/qwen-72b-it"
-bash vllm_serve/vllm_server.sh "4,5,6,7" "127.0.0.1" 8002 $judge_model_name &
+bash vllm_serve/vllm_server.sh "4,5,6,7" $judge_host $judge_port $judge_model_name &
+sleep 60
 
 export DATA_DIR='./data/nq_search'
 
@@ -33,7 +37,7 @@ WAND_PROJECT='Search-R1'
 
 
 export BASE_MODEL="/code/hongpaul-sandbox/temp/Search-R1/qwen_models/qwen-7b"
-export EXPERIMENT_NAME=qw-nq-search-r1-ppo-qwen2.5-7b-em-gae-mixed-reward-judge
+export EXPERIMENT_NAME=qw-mhong-nq-search-r1-ppo-qwen2.5-7b-em-gae-mixed-reward-judge
 # export BASE_MODEL='Qwen/Qwen2.5-1.5B-Instruct'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-1.5b-it-em
 # export BASE_MODEL='Qwen/Qwen2.5-3B'
@@ -108,12 +112,12 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     trainer.project_name=$WAND_PROJECT \
     trainer.experiment_name=$EXPERIMENT_NAME \
     trainer.total_epochs=40 \
-    trainer.total_training_steps=650 \
+    trainer.total_training_steps=600 \
     trainer.default_hdfs_dir=null \
     trainer.default_local_dir=verl_checkpoints/$EXPERIMENT_NAME \
     max_turns=3 \
-    +judge_host="127.0.0.1" \
-    +judge_port=8002 \
+    +judge_host=$judge_host \
+    +judge_port=$judge_port \
     +judge_model_name=$judge_model_name \
     retriever.url="http://127.0.0.1:$RETRIEVAL_PORT/retrieve" \
     retriever.topk=3 \

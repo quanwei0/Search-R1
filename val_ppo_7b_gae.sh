@@ -15,8 +15,8 @@ WAND_PROJECT='Search-R1'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-3b-em-gae
 # export BASE_MODEL='Qwen/Qwen2.5-3B-Instruct'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-3b-it-em
-export BASE_MODEL='/home/wei00355/mnt_data1/.cache/huggingface/hub/models--quanwei0--nq-hotpotqa-search-r1-ppo-qwen2.5-7b-em-gae-mixed-reward-new7-maxturn4/snapshots/9cddc0094b33d014c6069d6b9256b5d6c880f08f/actor/global_step_1000'
-export EXPERIMENT_NAME=val-nq-hotpotqa-search-r1-ppo-qwen2.5-7b-em-gae-mixed-reward-new7-maxturn4
+export BASE_MODEL='PeterJinGo/SearchR1-nq_hotpotqa_train-qwen2.5-7b-em-ppo'
+export EXPERIMENT_NAME=val-nq_hotpotqa_train-qwen2.5-7b-em-ppo-maxturn4
 # export BASE_MODEL='Qwen/Qwen2.5-7B-Instruct'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-7b-it-em
 
@@ -87,7 +87,7 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     trainer.default_local_dir=verl_checkpoints/$EXPERIMENT_NAME \
     +trainer.is_save_train_traj=True \
     +trainer.is_save_val_traj=True \
-    max_turns=3 \
+    max_turns=4 \
     retriever.url="http://127.0.0.1:8001/retrieve" \
     retriever.topk=3 \
     2>&1 | tee $EXPERIMENT_NAME.log

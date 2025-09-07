@@ -7,7 +7,7 @@ export RETRIEVAL_PORT=8001
 
 conda activate retriever
 # Pass GPU devices and port to retrieval script
-bash retrieval_launch.sh "$CUDA_VISIBLE_DEVICES" "$RETRIEVAL_PORT"
+bash retrieval_launch.sh "$CUDA_VISIBLE_DEVICES" "$RETRIEVAL_PORT" &
 sleep 60
 
 conda activate searchr1
@@ -95,7 +95,7 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     trainer.project_name=$WAND_PROJECT \
     trainer.experiment_name=$EXPERIMENT_NAME \
     trainer.total_epochs=40 \
-    trainer.total_training_steps=1000 \
+    trainer.total_training_steps=600 \
     trainer.default_hdfs_dir=null \
     trainer.default_local_dir=verl_checkpoints/$EXPERIMENT_NAME \
     max_turns=3 \
