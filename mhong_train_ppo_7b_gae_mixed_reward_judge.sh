@@ -114,7 +114,7 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     max_turns=3 \
     +judge_host="127.0.0.1" \
     +judge_port=8002 \
-    +judge_model_name="Qwen/Qwen2.5-72B-Instruct" \
+    +judge_model_name=$judge_model_name \
     retriever.url="http://127.0.0.1:$RETRIEVAL_PORT/retrieve" \
     retriever.topk=3 \
     2>&1 | tee $EXPERIMENT_NAME.log
