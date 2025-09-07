@@ -398,5 +398,5 @@ def compute_score_f1(solution_str, ground_truth):
         return 0.0 if PN + RN == 0 else 2 * IN / (PN + RN)
 
     max_f1 = max(f1(answer, gt) for gt in ground_truths_list)
-    print(max_f1)
+    
     return max_f1
