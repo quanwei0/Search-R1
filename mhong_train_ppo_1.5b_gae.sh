@@ -30,7 +30,8 @@ WAND_PROJECT='Search-R1'
 
 
 export BASE_MODEL="/code/hongpaul-sandbox/temp/Search-R1/qwen_models/qwen-1.5b"
-export EXPERIMENT_NAME=qw-mhong-nq-search-r1-ppo-qwen2.5-1.5b-em-gae
+EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-1.5b-em-gae
+export EXPERIMENT_NAME=qw-mhong-$EXPERIMENT_NAME-$(date +%Y%m%d-%H%M%S)
 # export BASE_MODEL='Qwen/Qwen2.5-1.5B-Instruct'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-1.5b-it-em
 # export BASE_MODEL='Qwen/Qwen2.5-3B'
@@ -110,4 +111,4 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     max_turns=3 \
     retriever.url="http://127.0.0.1:$RETRIEVAL_PORT/retrieve" \
     retriever.topk=3 \
-    2>&1 | tee $EXPERIMENT_NAME.log
+    2>&1 | tee ./outputs/log/$EXPERIMENT_NAME.log

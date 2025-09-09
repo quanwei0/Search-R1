@@ -38,7 +38,8 @@ WAND_PROJECT='Search-R1'
 # export BASE_MODEL='Qwen/Qwen2.5-3B-Instruct'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-3b-it-em
 export BASE_MODEL='/home/wei00355/mnt_data1/.cache/huggingface/hub/models--quanwei0--nq-search-r1-ppo-qwen2.5-7b-em-gae-mixed-reward-new7/snapshots/448a8eff359fda6faed1fe7999a96208e3024694/actor/global_step_500'
-export EXPERIMENT_NAME=val-nq-ppo-qwen2.5-7b-em-gae-mixed-reward-new7
+EXPERIMENT_NAME=val-nq-ppo-qwen2.5-7b-em-gae-mixed-reward-new7
+export EXPERIMENT_NAME=qw-$EXPERIMENT_NAME-$(date +%Y%m%d-%H%M%S)
 # export BASE_MODEL='Qwen/Qwen2.5-7B-Instruct'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-7b-it-em
 
@@ -54,7 +55,7 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     data.val_data_num=null \
     data.train_batch_size=512 \
     data.val_batch_size=4096 \
-    data.max_prompt_length=4096 \
+    data.max_prompt_length=8192 \
     data.max_response_length=500 \
     data.max_start_length=2048 \
     data.max_obs_length=500 \
@@ -102,4 +103,4 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     max_turns=3 \
     retriever.url="http://127.0.0.1:8001/retrieve" \
     retriever.topk=3 \
-    2>&1 | tee $EXPERIMENT_NAME.log
+    2>&1 | tee ./outputs/log/$EXPERIMENT_NAME.log

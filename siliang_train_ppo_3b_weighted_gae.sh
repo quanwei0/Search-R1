@@ -25,7 +25,8 @@ WAND_PROJECT='Search-R1'
 # export BASE_MODEL='Qwen/Qwen2.5-1.5B-Instruct'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-1.5b-it-em
 export BASE_MODEL='Qwen/Qwen2.5-3B'
-export EXPERIMENT_NAME=qw-nq-search-r1-ppo-qwen2.5-3b-em-weighted-gae-weight0.1
+EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-3b-em-weighted-gae-weight0.1
+export EXPERIMENT_NAME=qw-$EXPERIMENT_NAME-$(date +%Y%m%d-%H%M%S)
 # export BASE_MODEL='Qwen/Qwen2.5-3B-Instruct'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-3b-it-em
 # export BASE_MODEL='Qwen/Qwen2.5-7B'
@@ -101,4 +102,4 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     max_turns=3 \
     retriever.url="http://127.0.0.1:$RETRIEVAL_PORT/retrieve" \
     retriever.topk=3 \
-    2>&1 | tee $EXPERIMENT_NAME.log
+    2>&1 | tee ./outputs/log/$EXPERIMENT_NAME.log
