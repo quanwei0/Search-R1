@@ -122,28 +122,26 @@ Turn3: X.X
 - Wrong format (missing tags, extra tags, wrong order): -1.0
 
 **Answer Correctness:**
-- Correct answer (matches ground truth): +0.8
+- Correct answer in `<answer>` tag (matches ground truth): +0.8
 - Incorrect answer: +0.0
 
 **Final Score = Format Compliance + Answer Correctness**
 
-### 3. INTERMEDIATE TURN EVALUATION [-0.5 to 0.5]
+### 3. INTERMEDIATE TURN EVALUATION
 
 **Format Compliance:**
-- Correct format (`<think>...</think><search>...</search><information>...</information>` only): +0.2
-- Wrong format (missing tags, extra tags, wrong order): -0.5
+- Correct format (`<think>...</think><search>...</search><information>...</information>` only): +0.1
+- Wrong format (missing tags, extra tags, wrong order): -0.2
 
-**Reasoning & Search Quality:**
-- Good reasoning and relevant search query: +0.3
-- Poor reasoning or irrelevant search query: +0.0
-- Harmful or completely off-topic search query: -0.1
+**Search Quality:**
+- If ground truth information is found in `<information>` tag: +0.3
+- If ground truth information is not found in `<information>` tag: +0.0
 
-**Solution Progress:**
-- Turn makes progress toward solution: +0.1
-- Turn makes no progress or misleads: -0.1
+**Search Penalty:**
+- Count total number of `<search>` tags from Turn 1 up to current turn
+- Apply penalty: -0.1 × total_search_count
 
-**Raw Score = Format Compliance + Reasoning & Search Quality + Solution Progress**
-**Final Score = Normalize Raw Score to [-0.5, 0.5] range**
+**Final Score = Format Compliance + Search Quality + Search Penalty**
 
 {prompt_text}
 {ground_truth_text}
