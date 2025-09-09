@@ -224,6 +224,7 @@ def compute_score_f1(solution_str, ground_truth):
 def test_trajectory_comprehensive(json_file_path):
     """
     Read trajectory JSON file and compute accuracy, format, and retrieval metrics
+    Groups trajectories by ground truth and takes max accuracy for each group
     """
 
     if not os.path.exists(json_file_path):
@@ -234,7 +235,23 @@ def test_trajectory_comprehensive(json_file_path):
     with open(json_file_path, "r", encoding="utf-8") as f:
         trajectories = json.load(f)
 
-    total_samples = len(trajectories)
+    # Group trajectories by ground truth
+    ground_truth_groups = {}
+    for trajectory in trajectories:
+        ground_truth = trajectory.get("ground_truth", [])
+        # Convert list to tuple so it can be used as dict key
+        gt_key = tuple(ground_truth) if isinstance(ground_truth, list) else ground_truth
+        
+        if gt_key not in ground_truth_groups:
+            ground_truth_groups[gt_key] = []
+        ground_truth_groups[gt_key].append(trajectory)
+
+    print(f"Total samples: {len(trajectories)}")
+    print(f"Unique ground truths: {len(ground_truth_groups)}")
+    print("=" * 60)
+
+    # Process each group and take max accuracy
+    selected_trajectories = []
     accuracy_correct = 0
     format_correct = 0
     retrieval_correct = 0
@@ -244,10 +261,26 @@ def test_trajectory_comprehensive(json_file_path):
     # Track metrics by data source
     data_source_stats = {}
 
-    print(f"Total samples: {total_samples}")
-    print("=" * 60)
+    for gt_key, group_trajectories in ground_truth_groups.items():
+        best_trajectory = None
+        best_acc_score = -1
+        
+        # Find trajectory with highest accuracy in this group
+        for trajectory in group_trajectories:
+            full_text = trajectory.get("full_text", "")
+            ground_truth = trajectory.get("ground_truth", [])
+            gt_dict = {"target": ground_truth}
+            
+            acc_score = compute_score_em(full_text, gt_dict)
+            if acc_score > best_acc_score:
+                best_acc_score = acc_score
+                best_trajectory = trajectory
+        
+        selected_trajectories.append(best_trajectory)
 
-    for i, trajectory in enumerate(trajectories):
+    total_samples = len(selected_trajectories)
+    
+    for i, trajectory in enumerate(selected_trajectories):
         # Get generated text and ground truth labels
         full_text = trajectory.get("full_text", "")
         ground_truth = trajectory.get("ground_truth", [])
@@ -353,6 +386,7 @@ def test_trajectory_comprehensive(json_file_path):
 def test_directory_comprehensive(directory_path):
     """
     Read all JSON files in directory and compute combined accuracy, format, and retrieval metrics
+    Groups trajectories by ground truth and takes max accuracy for each group
     """
     if not os.path.exists(directory_path):
         print(f"Error: Directory {directory_path} does not exist")
@@ -378,8 +412,48 @@ def test_directory_comprehensive(directory_path):
     print(f"Directory: {directory_path}")
     print("=" * 60)
 
+    # Collect all trajectories first
+    all_trajectories = []
+    for json_file in json_files:
+        with open(json_file, "r", encoding="utf-8") as f:
+            trajectories = json.load(f)
+            all_trajectories.extend(trajectories)
+
+    # Group all trajectories by ground truth
+    ground_truth_groups = {}
+    for trajectory in all_trajectories:
+        ground_truth = trajectory.get("ground_truth", [])
+        # Convert list to tuple so it can be used as dict key
+        gt_key = tuple(ground_truth) if isinstance(ground_truth, list) else ground_truth
+        
+        if gt_key not in ground_truth_groups:
+            ground_truth_groups[gt_key] = []
+        ground_truth_groups[gt_key].append(trajectory)
+
+    print(f"Total trajectories: {len(all_trajectories)}")
+    print(f"Unique ground truths: {len(ground_truth_groups)}")
+
+    # Process each group and take max accuracy
+    selected_trajectories = []
+    for gt_key, group_trajectories in ground_truth_groups.items():
+        best_trajectory = None
+        best_acc_score = -1
+        
+        # Find trajectory with highest accuracy in this group
+        for trajectory in group_trajectories:
+            full_text = trajectory.get("full_text", "")
+            ground_truth = trajectory.get("ground_truth", [])
+            gt_dict = {"target": ground_truth}
+            
+            acc_score = compute_score_em(full_text, gt_dict)
+            if acc_score > best_acc_score:
+                best_acc_score = acc_score
+                best_trajectory = trajectory
+        
+        selected_trajectories.append(best_trajectory)
+
     # Combined statistics
-    total_samples = 0
+    total_samples = len(selected_trajectories)
     total_accuracy_correct = 0
     total_format_correct = 0
     total_retrieval_correct = 0
@@ -387,79 +461,44 @@ def test_directory_comprehensive(directory_path):
     total_f1_scores = 0
     combined_data_source_stats = {}
 
-    for file_idx, json_file in enumerate(json_files):
-        print(
-            f"\nProcessing file {file_idx + 1}/{len(json_files)}: {os.path.basename(json_file)}"
-        )
+    for trajectory in selected_trajectories:
+        # Get generated text and ground truth labels
+        full_text = trajectory.get("full_text", "")
+        ground_truth = trajectory.get("ground_truth", [])
+        data_source = trajectory.get("data_source", "unknown")
 
-        # Read JSON file
-        with open(json_file, "r", encoding="utf-8") as f:
-            trajectories = json.load(f)
+        # Construct ground_truth dict format for compute_score_em
+        gt_dict = {"target": ground_truth}
 
-        file_samples = len(trajectories)
-        file_accuracy_correct = 0
-        file_format_correct = 0
-        file_retrieval_correct = 0
-        file_subem_correct = 0
-        file_f1_scores = 0
+        # Calculate all scores
+        acc_score = compute_score_em(full_text, gt_dict)
+        format_score = compute_score_format(full_text)
+        retrieval_score = compute_score_retrieval(full_text, gt_dict)
+        subem_score = compute_score_subem(full_text, gt_dict)
+        f1_score = compute_score_f1(full_text, gt_dict)
 
-        for i, trajectory in enumerate(trajectories):
-            # Get generated text and ground truth labels
-            full_text = trajectory.get("full_text", "")
-            ground_truth = trajectory.get("ground_truth", [])
-            data_source = trajectory.get("data_source", "unknown")
+        total_accuracy_correct += acc_score
+        total_format_correct += format_score
+        total_retrieval_correct += retrieval_score
+        total_subem_correct += subem_score
+        total_f1_scores += f1_score
 
-            # Construct ground_truth dict format for compute_score_em
-            gt_dict = {"target": ground_truth}
-
-            # Calculate all scores
-            acc_score = compute_score_em(full_text, gt_dict)
-            format_score = compute_score_format(full_text)
-            retrieval_score = compute_score_retrieval(full_text, gt_dict)
-            subem_score = compute_score_subem(full_text, gt_dict)
-            f1_score = compute_score_f1(full_text, gt_dict)
-
-            file_accuracy_correct += acc_score
-            file_format_correct += format_score
-            file_retrieval_correct += retrieval_score
-            file_subem_correct += subem_score
-            file_f1_scores += f1_score
-            total_accuracy_correct += acc_score
-            total_format_correct += format_score
-            total_retrieval_correct += retrieval_score
-            total_subem_correct += subem_score
-            total_f1_scores += f1_score
-
-            # Track by data source
-            if data_source not in combined_data_source_stats:
-                combined_data_source_stats[data_source] = {
-                    "accuracy_correct": 0,
-                    "format_correct": 0,
-                    "retrieval_correct": 0,
-                    "subem_correct": 0,
-                    "f1_scores": 0,
-                    "total": 0,
-                }
-            combined_data_source_stats[data_source]["accuracy_correct"] += acc_score
-            combined_data_source_stats[data_source]["format_correct"] += format_score
-            combined_data_source_stats[data_source][
-                "retrieval_correct"
-            ] += retrieval_score
-            combined_data_source_stats[data_source]["subem_correct"] += subem_score
-            combined_data_source_stats[data_source]["f1_scores"] += f1_score
-            combined_data_source_stats[data_source]["total"] += 1
-
-        total_samples += file_samples
-        file_accuracy = file_accuracy_correct / file_samples if file_samples > 0 else 0
-        file_format = file_format_correct / file_samples if file_samples > 0 else 0
-        file_retrieval = (
-            file_retrieval_correct / file_samples if file_samples > 0 else 0
-        )
-        file_subem = file_subem_correct / file_samples if file_samples > 0 else 0
-        file_f1 = file_f1_scores / file_samples if file_samples > 0 else 0
-        print(
-            f"File {os.path.basename(json_file)}: Acc {file_accuracy:.4f} | Format {file_format:.4f} | Retrieval {file_retrieval:.4f} | SubEM {file_subem:.4f} | F1 {file_f1:.4f}"
-        )
+        # Track by data source
+        if data_source not in combined_data_source_stats:
+            combined_data_source_stats[data_source] = {
+                "accuracy_correct": 0,
+                "format_correct": 0,
+                "retrieval_correct": 0,
+                "subem_correct": 0,
+                "f1_scores": 0,
+                "total": 0,
+            }
+        combined_data_source_stats[data_source]["accuracy_correct"] += acc_score
+        combined_data_source_stats[data_source]["format_correct"] += format_score
+        combined_data_source_stats[data_source]["retrieval_correct"] += retrieval_score
+        combined_data_source_stats[data_source]["subem_correct"] += subem_score
+        combined_data_source_stats[data_source]["f1_scores"] += f1_score
+        combined_data_source_stats[data_source]["total"] += 1
 
     # Calculate overall metrics
     overall_accuracy = (
@@ -522,7 +561,7 @@ if __name__ == "__main__":
 
     # Directory containing all JSON files
     directory_path = (
-        "./outputs/log_val_traj/qw-val-search-r1-ppo-qwen2.5-7b-em-gae-pass1-20250909-213010_20250909_213721"
+        "./outputs/log_val_traj/qw-val-search-r1-ppo-qwen2.5-7b-em-gae-pass4-20250909-215151_20250909_215339"
     )
 
     # Use command line argument if provided

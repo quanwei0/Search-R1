@@ -582,7 +582,7 @@ class RayPPOTrainer(object):
             for i, batch_dict in enumerate(self.val_dataloader):
                 timing_raw = {}
                 test_batch: DataProto = DataProto.from_single_dict(batch_dict)
-                # test_batch = test_batch.repeat(repeat_times=self.config.actor_rollout_ref.rollout.n_agent, interleave=True)
+                test_batch = test_batch.repeat(repeat_times=self.config.actor_rollout_ref.rollout.n_agent, interleave=True)
                 
                 test_gen_batch = test_batch.pop(batch_keys=['input_ids', 'attention_mask', 'position_ids'])
                 test_gen_batch.meta_info = {
