@@ -235,19 +235,23 @@ def test_trajectory_comprehensive(json_file_path):
     with open(json_file_path, "r", encoding="utf-8") as f:
         trajectories = json.load(f)
 
-    # Group trajectories by ground truth
-    ground_truth_groups = {}
+    # Group trajectories by prompt
+    prompt_groups = {}
     for trajectory in trajectories:
-        ground_truth = trajectory.get("ground_truth", [])
-        # Convert list to tuple so it can be used as dict key
-        gt_key = tuple(ground_truth) if isinstance(ground_truth, list) else ground_truth
+        prompt = trajectory.get("prompt", "")
         
-        if gt_key not in ground_truth_groups:
-            ground_truth_groups[gt_key] = []
-        ground_truth_groups[gt_key].append(trajectory)
+        if prompt not in prompt_groups:
+            prompt_groups[prompt] = []
+        prompt_groups[prompt].append(trajectory)
 
     print(f"Total samples: {len(trajectories)}")
-    print(f"Unique ground truths: {len(ground_truth_groups)}")
+    print(f"Unique prompts: {len(prompt_groups)}")
+    
+    # # Print groups with same prompt
+    # for prompt, group_trajectories in prompt_groups.items():
+    #     if len(group_trajectories) > 1:
+    #         print(f"Same prompt (showing first 100 chars): '{prompt[:100]}...': {len(group_trajectories)} trajectories")
+    
     print("=" * 60)
 
     # Process each group and take max accuracy
@@ -261,7 +265,7 @@ def test_trajectory_comprehensive(json_file_path):
     # Track metrics by data source
     data_source_stats = {}
 
-    for gt_key, group_trajectories in ground_truth_groups.items():
+    for prompt, group_trajectories in prompt_groups.items():
         best_trajectory = None
         best_acc_score = -1
         
@@ -419,23 +423,26 @@ def test_directory_comprehensive(directory_path):
             trajectories = json.load(f)
             all_trajectories.extend(trajectories)
 
-    # Group all trajectories by ground truth
-    ground_truth_groups = {}
+    # Group all trajectories by prompt
+    prompt_groups = {}
     for trajectory in all_trajectories:
-        ground_truth = trajectory.get("ground_truth", [])
-        # Convert list to tuple so it can be used as dict key
-        gt_key = tuple(ground_truth) if isinstance(ground_truth, list) else ground_truth
+        prompt = trajectory.get("prompt", "")
         
-        if gt_key not in ground_truth_groups:
-            ground_truth_groups[gt_key] = []
-        ground_truth_groups[gt_key].append(trajectory)
+        if prompt not in prompt_groups:
+            prompt_groups[prompt] = []
+        prompt_groups[prompt].append(trajectory)
 
     print(f"Total trajectories: {len(all_trajectories)}")
-    print(f"Unique ground truths: {len(ground_truth_groups)}")
+    print(f"Unique prompts: {len(prompt_groups)}")
+    
+    # # Print groups with same prompt
+    # for prompt, group_trajectories in prompt_groups.items():
+    #     if len(group_trajectories) > 1:
+    #         print(f"Same prompt (showing first 100 chars): '{prompt[:100]}...': {len(group_trajectories)} trajectories")
 
     # Process each group and take max accuracy
     selected_trajectories = []
-    for gt_key, group_trajectories in ground_truth_groups.items():
+    for prompt, group_trajectories in prompt_groups.items():
         best_trajectory = None
         best_acc_score = -1
         
