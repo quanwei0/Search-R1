@@ -610,7 +610,9 @@ class RayPPOTrainer(object):
                     test_batch = test_batch.union(final_gen_batch_output)
                     
                     for key in test_batch.batch.keys():
-                        test_batch.batch[key] = test_batch.batch[key].long()
+                        # Keep float32 keys as they are (e.g., log_probs, entropy, kl_uniform, gini_impurity)
+                        if test_batch.batch[key].dtype != torch.float32:
+                            test_batch.batch[key] = test_batch.batch[key].long()
                         
                     test_batch, _ = self._create_loss_mask(test_batch, {})
                     test_batch = self._split_turn_idx(test_batch)
@@ -1122,6 +1124,64 @@ class RayPPOTrainer(object):
 
         return metric_dict
     
+    def _get_turn_boundaries_from_mask(self, mask: torch.Tensor):
+        """
+        Get turn boundaries from a boolean mask tensor.
+        A turn is defined as a continuous sequence of 1s in the mask.
+        
+        Args:
+            mask: Boolean tensor of shape (seq_len,)
+            
+        Returns:
+            List of (start, end) tuples for each turn
+        """
+        if mask.sum() == 0:
+            return []
+        
+        turns = []
+        in_turn = False
+        start = 0
+        
+        for i in range(len(mask)):
+            if mask[i] == 1 and not in_turn:
+                # Start of a new turn
+                start = i
+                in_turn = True
+            elif mask[i] == 0 and in_turn:
+                # End of current turn
+                turns.append((start, i - 1))
+                in_turn = False
+        
+        # Handle case where mask ends with 1
+        if in_turn:
+            turns.append((start, len(mask) - 1))
+        
+        return turns
+    
+    def _compute_turn_metrics(self, metric_tensor: torch.Tensor, turn_boundaries) -> Dict[str, List]:
+        """
+        Compute mean and full values for a metric tensor across turns.
+        
+        Args:
+            metric_tensor: Tensor of shape (seq_len,) containing metric values
+            turn_boundaries: List of (start, end) tuples for each turn
+            
+        Returns:
+            Dictionary with 'mean' and 'full' lists for each turn
+        """
+        turn_means = []
+        turn_fulls = []
+        
+        for start, end in turn_boundaries:
+            turn_values = metric_tensor[start:end + 1]
+            turn_means.append(turn_values.mean().item())
+            turn_fulls.append(turn_values.tolist())
+        
+        return {
+            'mean': turn_means,
+            'full': turn_fulls
+        }
+
     def _split_trajectories(self, batch, save_dir: Optional[str] = None, val_batch_idx: Optional[int] = None) -> DataProto:
         """
         Decode full trajectories and per-turn sequences from the batch, and store them
@@ -1143,7 +1203,7 @@ class RayPPOTrainer(object):
         
         # Get rewards from meta_info when n_samples > 1
         rewards = batch.meta_info.get("rewards") if n_samples > 1 else None
-        
+        process_rewards = batch.meta_info.get("process_rewards") if n_samples > 1 else None
         if n_samples > 1 and rewards is not None:
             # Process in groups when we have multiple samples per prompt
             num_prompts = len(batch) // n_samples
@@ -1190,7 +1250,37 @@ class RayPPOTrainer(object):
                     turn_texts.append(turns)
                     turn_text_lengths.append(turn_lengths)
                     num_turns.append(len(turns))
-
+                    
+                    # Compute turn-level metrics using info_mask
+                    info_mask = data_item.batch['info_mask'][prompt_length:]
+                    turn_boundaries = self._get_turn_boundaries_from_mask(info_mask)
+                    # Initialize metrics dictionary for this sample
+                    turn_metrics = {}
+                    
+                    # Compute metrics for entropy if available
+                    if 'entropy' in data_item.batch:
+                        entropy_values = data_item.batch['entropy']
+                        if entropy_values is not None and len(entropy_values) > 0:
+                            turn_metrics['entropy'] = self._compute_turn_metrics(entropy_values, turn_boundaries)
+                    
+                    # Compute metrics for kl_uniform if available
+                    if 'kl_uniform' in data_item.batch:
+                        kl_uniform_values = data_item.batch['kl_uniform']
+                        if kl_uniform_values is not None and len(kl_uniform_values) > 0:
+                            turn_metrics['kl_uniform'] = self._compute_turn_metrics(kl_uniform_values, turn_boundaries)
+                    
+                    # Compute metrics for gini_impurity if available
+                    if 'gini_impurity' in data_item.batch:
+                        gini_values = data_item.batch['gini_impurity']
+                        if gini_values is not None and len(gini_values) > 0:
+                            turn_metrics['gini_impurity'] = self._compute_turn_metrics(gini_values, turn_boundaries)
+                    
+                    # Compute metrics for log_probs if available
+                    if 'log_probs' in data_item.batch:
+                        log_probs_values = data_item.batch['log_probs']
+                        if log_probs_values is not None and len(log_probs_values) > 0:
+                            turn_metrics['log_probs'] = self._compute_turn_metrics(log_probs_values, turn_boundaries)
+                    
                     # Get ground truth and data source from first sample
                     if ground_truth is None:
                         ground_truth = data_item.non_tensor_batch.get('reward_model', {}).get('ground_truth', {}).get('target', '')
@@ -1203,7 +1293,9 @@ class RayPPOTrainer(object):
                     samples.append({
                         "turn_texts": turns,
                         "full_text": full_text,
-                        "reward": rewards[i].item() if i < len(rewards) else None
+                        "reward": rewards[i].item() if i < len(rewards) else None,
+                        "process_reward": process_rewards[i].item() if i < len(rewards) and process_rewards is not None else None,
+                        "turn_metrics": turn_metrics,  # Add turn-level metrics
                     })
                 
                 trajectories.append({

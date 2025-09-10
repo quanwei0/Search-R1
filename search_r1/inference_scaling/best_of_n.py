@@ -54,7 +54,8 @@ class BestOfNGenerator(BaseInferenceGenerator):
         self.generation_manager = generation_manager
         
         candidates = self.generation_manager._run_single_generation(gen_batch, initial_input_ids)
-        
+        metrics = self.generation_manager.actor_rollout_wg.compute_log_prob_inference(candidates)
+
         if self.n_candidates == 1:
             return candidates
         
@@ -83,6 +84,8 @@ class BestOfNGenerator(BaseInferenceGenerator):
 
         candidates.meta_info['rewards'] = final_rewards
 
+        candidates = candidates.union(metrics)
+        
         return candidates
 
     def _add_step_rewards(self, candidates):

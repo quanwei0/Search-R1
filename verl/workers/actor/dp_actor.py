@@ -33,6 +33,8 @@ import verl.utils.torch_functional as verl_F
 
 from flash_attn.bert_padding import pad_input, unpad_input, rearrange, index_first_axis
 
+from search_r1.inference_scaling.utils import gini_impurity_from_logits, kl_uniform_from_logits
+
 __all__ = ['DataParallelPPOActor']
 
 
@@ -54,6 +56,8 @@ class DataParallelPPOActor(BasePPOActor):
         self.use_ulysses_sp = self.ulysses_sequence_parallel_size > 1
 
         self.compute_entropy_from_logits = torch.compile(verl_F.entropy_from_logits, dynamic=True)
+        self.compute_gini_impurity_from_logits = torch.compile(gini_impurity_from_logits, dynamic=True)
+        self.compute_kl_uniform_from_logits = torch.compile(kl_uniform_from_logits, dynamic=True)
 
     def _forward_micro_batch(self, micro_batch, temperature) -> Tuple[torch.Tensor, torch.Tensor]:
         """
@@ -304,3 +308,179 @@ class DataParallelPPOActor(BasePPOActor):
             append_to_dict(metrics, data)
         self.actor_optimizer.zero_grad()
         return metrics
+    
+    def _forward_micro_batch_inference(self, micro_batch, temperature) -> Tuple[torch.Tensor, torch.Tensor]:
+        """
+        Returns: 
+            entropy: # (bs, response_len)
+            log_probs: # (bs, response_len)
+        """
+        response_length = micro_batch['responses'].size(-1)
+        with torch.autocast(device_type='cuda', dtype=torch.bfloat16):
+            input_ids = micro_batch['input_ids']
+            batch_size, seqlen = input_ids.shape
+            attention_mask = micro_batch['attention_mask']
+            position_ids = micro_batch['position_ids']
+
+            if self.use_remove_padding:
+                input_ids_rmpad, indices, *_ = unpad_input(input_ids.unsqueeze(-1),
+                                                           attention_mask)  # input_ids_rmpad (total_nnz, ...)
+                input_ids_rmpad = input_ids_rmpad.transpose(0, 1)  # (1, total_nnz)
+
+                # unpad the position_ids to align the rotary
+                position_ids_rmpad = index_first_axis(rearrange(position_ids.unsqueeze(-1), "b s ... -> (b s) ..."),
+                                                      indices).transpose(0, 1)
+
+                # for compute the log_prob
+                input_ids_rmpad_rolled = torch.roll(input_ids_rmpad, shifts=-1, dims=1)  # (1, total_nnz)
+
+                # pad and slice the inputs if sp > 1
+                if self.use_ulysses_sp:
+                    input_ids_rmpad, position_ids_rmpad, pad_size = ulysses_pad_and_slice_inputs(input_ids_rmpad, \
+                                                                                                position_ids_rmpad, \
+                                                                                                sp_size=self.ulysses_sequence_parallel_size)
+                    input_ids_rmpad_rolled, _, _ = ulysses_pad_and_slice_inputs(input_ids_rmpad_rolled, None,
+                                                                                self.ulysses_sequence_parallel_size)
+
+                input_ids_rmpad_rolled = input_ids_rmpad_rolled.squeeze(0)  # ((total_nnz / sp) + pad)
+
+                # only pass input_ids and position_ids to enable flash_attn_varlen
+                output = self.actor_module(input_ids=input_ids_rmpad,
+                                           attention_mask=None,
+                                           position_ids=position_ids_rmpad,
+                                           use_cache=False)  # prevent model thinks we are generating
+                logits_rmpad = output.logits.squeeze(0)  # (total_nnz, vocab_size)
+
+                logits_rmpad.div_(temperature)
+
+                # compute entropy
+                entropy_rmpad = self.compute_entropy_from_logits(logits_rmpad)  # ((total_nnz / sp) + pad)
+
+                # compute inference scaling metrics
+                gini_impurity_rmpad = self.compute_gini_impurity_from_logits(logits_rmpad)  # ((total_nnz / sp) + pad)
+                kl_uniform_rmpad = self.compute_kl_uniform_from_logits(logits_rmpad)  # ((total_nnz / sp) + pad)
+
+                # if use_sp: ((total_nnz / sp) + pad) ; if not use_sp: (batch, seqlen)
+                log_probs = logprobs_from_logits(logits=logits_rmpad, labels=input_ids_rmpad_rolled)
+
+                # gather log_prob if sp > 1
+                if self.use_ulysses_sp:
+                    # gather and unpad for the ulysses sp
+                    log_probs = gather_outpus_and_unpad(log_probs, gather_dim=0, unpad_dim=0, padding_size=pad_size)
+                    entropy_rmpad = gather_outpus_and_unpad(entropy_rmpad,
+                                                            gather_dim=0,
+                                                            unpad_dim=0,
+                                                            padding_size=pad_size)
+                    kl_uniform_rmpad = gather_outpus_and_unpad(kl_uniform_rmpad,  
+                                                               gather_dim=0, 
+                                                               unpad_dim=0, 
+                                                               padding_size=pad_size)
+                    gini_impurity_rmpad = gather_outpus_and_unpad(gini_impurity_rmpad,  
+                                                                 gather_dim=0, 
+                                                                 unpad_dim=0, 
+                                                                 padding_size=pad_size)
+                # pad back to (bsz, seqlen)
+                full_entropy = pad_input(hidden_states=entropy_rmpad.unsqueeze(-1),
+                                         indices=indices,
+                                         batch=batch_size,
+                                         seqlen=seqlen)
+                full_log_probs = pad_input(hidden_states=log_probs.unsqueeze(-1),
+                                           indices=indices,
+                                           batch=batch_size,
+                                           seqlen=seqlen)
+                full_kl_uniform = pad_input(hidden_states=kl_uniform_rmpad.unsqueeze(-1),
+                                         indices=indices,
+                                         batch=batch_size,
+                                         seqlen=seqlen)
+                full_gini_impurity = pad_input(hidden_states=gini_impurity_rmpad.unsqueeze(-1),
+                                               indices=indices,
+                                               batch=batch_size,
+                                               seqlen=seqlen)
+
+                # only return response part:
+                entropy = full_entropy.squeeze(-1)[:, -response_length - 1:-1]  # (bsz, response_length)
+                log_probs = full_log_probs.squeeze(-1)[:, -response_length - 1:-1]  # (bsz, response_length)
+                kl_uniform = full_kl_uniform.squeeze(-1)[:, -response_length - 1:-1]  # (bsz, response_length)
+                gini_impurity = full_gini_impurity.squeeze(-1)[:, -response_length - 1:-1]  # (bsz, response_length)
+
+            else:  # not using rmpad and no ulysses sp
+                output = self.actor_module(input_ids=input_ids,
+                                           attention_mask=attention_mask,
+                                           position_ids=position_ids,
+                                           use_cache=False)  # prevent model thinks we are generating
+                logits = output.logits
+                logits.div_(temperature)
+                logits = logits[:, -response_length - 1:-1]  # (bsz, response_length)
+                log_probs = logprobs_from_logits(logits, micro_batch['responses'])
+                entropy = verl_F.entropy_from_logits(logits)  # (bsz, response_length)
+                kl_uniform = self.compute_kl_uniform_from_logits(logits)  # (bsz, response_length)
+                gini_impurity = self.compute_gini_impurity_from_logits(logits)  # (bsz, response_length)
+
+            return entropy, log_probs, kl_uniform, gini_impurity
+
+    def compute_log_prob_inference(self, data: DataProto) -> torch.Tensor:
+        """Compute the log probability of the responses given input_ids, attention_mask and position_ids
+
+        Args:
+            data (DataProto): a DataProto containing keys
+
+                ``input_ids``: tensor of shape [batch_size, sequence_length]. torch.int64. Note that input_ids is the
+                concatenation of prompt and response. Note that ``sequence_length = prompt_length + response_length``.
+
+                ``attention_mask``: tensor of shape [batch_size, sequence_length]. torch.int64.
+
+                ``position_ids``: tensor of shape [batch_size, sequence_length]. torch.int64.
+
+                ``responses``:  tensor of shape [batch_size, response_length]. torch.int64.
+
+        Returns:
+            torch.Tensor: the log_prob tensor
+        """
+        # set to eval
+        self.actor_module.eval()
+
+        micro_batch_size = data.meta_info['micro_batch_size']
+        temperature = data.meta_info['temperature']  # temperature must be in the data.meta_info to avoid slient error
+        use_dynamic_bsz = data.meta_info['use_dynamic_bsz']
+
+        select_keys = ['responses', 'input_ids', 'attention_mask', 'position_ids']
+        batch = data.select(batch_keys=select_keys).batch
+
+        if use_dynamic_bsz:
+            # split using dynamic bsz
+            max_token_len = data.meta_info['max_token_len'] * self.ulysses_sequence_parallel_size
+            micro_batches, indices = rearrange_micro_batches(batch=batch, max_token_len=max_token_len)
+        else:
+            micro_batches = batch.split(micro_batch_size)
+
+        log_probs_lst = []
+        entropy_lst = []
+        kl_uniform_lst = []
+        gini_impurity_lst = []
+        for micro_batch in micro_batches:
+            with torch.no_grad():
+                entropy, log_probs, kl_uniform, gini_impurity = self._forward_micro_batch_inference(micro_batch, temperature=temperature)
+            log_probs_lst.append(log_probs)
+            entropy_lst.append(entropy)
+            kl_uniform_lst.append(kl_uniform)
+            gini_impurity_lst.append(gini_impurity)
+        log_probs = torch.concat(log_probs_lst, dim=0)
+        entropy = torch.concat(entropy_lst, dim=0)
+        kl_uniform = torch.concat(kl_uniform_lst, dim=0)
+        gini_impurity = torch.concat(gini_impurity_lst, dim=0)
+
+        if use_dynamic_bsz:
+            indices = list(itertools.chain.from_iterable(indices))
+            assert len(indices) == log_probs.size(0), f"{len(indices)} vs. {log_probs.size()}"
+            revert_indices = torch.tensor(get_reverse_idx(indices), dtype=torch.long)
+            log_probs = log_probs[revert_indices]
+            entropy = entropy[revert_indices]
+            kl_uniform = kl_uniform[revert_indices]
+            gini_impurity = gini_impurity[revert_indices]
+
+        return {
+            "log_probs": log_probs,
+            "entropy": entropy,
+            "kl_uniform": kl_uniform,
+            "gini_impurity": gini_impurity
+        }

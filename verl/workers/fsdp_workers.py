@@ -505,6 +505,33 @@ class ActorRolloutRefWorker(Worker):
         torch.cuda.empty_cache()
         return output
 
+    @register(dispatch_mode=Dispatch.DP_COMPUTE_PROTO)
+    def compute_log_prob_inference(self, data: DataProto) -> DataProto:
+        """Compute log probabilities for inference (with additional metrics)"""
+        data = data.to('cuda')
+        
+        assert self._is_actor
+        
+        import torch
+        if self._is_offload_param:
+            load_fsdp_param_and_grad(module=self.actor_module_fsdp,
+                                     device_id=torch.cuda.current_device(),
+                                     load_grad=self._is_offload_grad)
+        
+        # This must be after vLLM Engine, because vLLM Engine will make ulysses a no-op
+        with self.ulysses_sharding_manager:
+            data = self.ulysses_sharding_manager.preprocess_data(data)
+            result = self.actor.compute_log_prob_inference(data=data)
+            output = DataProto.from_dict(tensors=result)
+            output = self.ulysses_sharding_manager.postprocess_data(output)
+        
+        output = output.to('cpu')
+        
+        if self._is_offload_param:
+            offload_fsdp_param_and_grad(module=self.actor_module_fsdp, offload_grad=self._is_offload_grad)
+        torch.cuda.empty_cache()
+        return output
+
     @register(dispatch_mode=Dispatch.ONE_TO_ALL)
     def save_checkpoint(self, local_path, hdfs_path=None):
         assert self._is_actor
