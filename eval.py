@@ -221,6 +221,15 @@ def compute_score_f1(solution_str, ground_truth):
     return max_f1
 
 
+def compute_num_turns(trajectory):
+    """
+    Compute the number of turns in a trajectory.
+    A turn is represented by each element in the turn_texts array.
+    """
+    turn_texts = trajectory.get("turn_texts", [])
+    return len(turn_texts)
+
+
 def test_trajectory_comprehensive(json_file_path):
     """
     Read trajectory JSON file and compute accuracy, format, and retrieval metrics
@@ -240,6 +249,7 @@ def test_trajectory_comprehensive(json_file_path):
     retrieval_correct = 0
     subem_correct = 0
     f1_scores = 0
+    total_num_turns = 0
 
     # Track metrics by data source
     data_source_stats = {}
@@ -262,12 +272,14 @@ def test_trajectory_comprehensive(json_file_path):
         retrieval_score = compute_score_retrieval(full_text, gt_dict)
         subem_score = compute_score_subem(full_text, gt_dict)
         f1_score = compute_score_f1(full_text, gt_dict)
+        num_turns = compute_num_turns(trajectory)
 
         accuracy_correct += acc_score
         format_correct += format_score
         retrieval_correct += retrieval_score
         subem_correct += subem_score
         f1_scores += f1_score
+        total_num_turns += num_turns
 
         # Track by data source
         if data_source not in data_source_stats:
@@ -277,6 +289,7 @@ def test_trajectory_comprehensive(json_file_path):
                 "retrieval_correct": 0,
                 "subem_correct": 0,
                 "f1_scores": 0,
+                "num_turns": 0,
                 "total": 0,
             }
         data_source_stats[data_source]["accuracy_correct"] += acc_score
@@ -284,6 +297,7 @@ def test_trajectory_comprehensive(json_file_path):
         data_source_stats[data_source]["retrieval_correct"] += retrieval_score
         data_source_stats[data_source]["subem_correct"] += subem_score
         data_source_stats[data_source]["f1_scores"] += f1_score
+        data_source_stats[data_source]["num_turns"] += num_turns
         data_source_stats[data_source]["total"] += 1
 
         # Calculate current metrics
@@ -292,10 +306,11 @@ def test_trajectory_comprehensive(json_file_path):
         current_retrieval = retrieval_correct / (i + 1)
         current_subem = subem_correct / (i + 1)
         current_f1 = f1_scores / (i + 1)
+        current_avg_turns = total_num_turns / (i + 1)
 
         # Stream print current metrics
         print(
-            f"\rProgress: {i+1}/{total_samples} | Acc: {current_accuracy:.4f} | Format: {current_format:.4f} | Retrieval: {current_retrieval:.4f} | SubEM: {current_subem:.4f} | F1: {current_f1:.4f}",
+            f"\rProgress: {i+1}/{total_samples} | Acc: {current_accuracy:.4f} | Format: {current_format:.4f} | Retrieval: {current_retrieval:.4f} | SubEM: {current_subem:.4f} | F1: {current_f1:.4f} | Avg Turns: {current_avg_turns:.2f}",
             end="",
             flush=True,
         )
@@ -308,6 +323,7 @@ def test_trajectory_comprehensive(json_file_path):
     final_retrieval = retrieval_correct / total_samples
     final_subem = subem_correct / total_samples
     final_f1 = f1_scores / total_samples
+    final_avg_turns = total_num_turns / total_samples
 
     print(
         f"Accuracy:  {int(accuracy_correct):4d}/{total_samples:4d} = {final_accuracy:.4f} ({final_accuracy*100:.2f}%)"
@@ -324,6 +340,9 @@ def test_trajectory_comprehensive(json_file_path):
     print(
         f"F1:        {f1_scores:8.2f}/{total_samples:4d} = {final_f1:.4f}"
     )
+    print(
+        f"Avg Turns: {total_num_turns:8.0f}/{total_samples:4d} = {final_avg_turns:.2f}"
+    )
 
     # Print metrics by data source
     print(f"\nMETRICS BY DATA SOURCE:")
@@ -335,19 +354,21 @@ def test_trajectory_comprehensive(json_file_path):
             ret_pct = (stats["retrieval_correct"] / stats["total"]) * 100
             subem_pct = (stats["subem_correct"] / stats["total"]) * 100
             f1_avg = stats["f1_scores"] / stats["total"]
+            turns_avg = stats["num_turns"] / stats["total"]
             table_data.append([
                 source,
                 f"{acc_pct:.2f}%",
                 f"{fmt_pct:.2f}%", 
                 f"{ret_pct:.2f}%",
                 f"{subem_pct:.2f}%",
-                f"{f1_avg:.4f}"
+                f"{f1_avg:.4f}",
+                f"{turns_avg:.2f}"
             ])
     
-    headers = ["Source", "Accuracy", "Format", "Retrieval", "SubEM", "F1"]
+    headers = ["Source", "Accuracy", "Format", "Retrieval", "SubEM", "F1", "Avg Turns"]
     print(tabulate(table_data, headers=headers, tablefmt="grid"))
 
-    return final_accuracy, final_format, final_retrieval, final_subem, final_f1
+    return final_accuracy, final_format, final_retrieval, final_subem, final_f1, final_avg_turns
 
 
 def test_directory_comprehensive(directory_path):
@@ -385,6 +406,7 @@ def test_directory_comprehensive(directory_path):
     total_retrieval_correct = 0
     total_subem_correct = 0
     total_f1_scores = 0
+    total_num_turns = 0
     combined_data_source_stats = {}
 
     for file_idx, json_file in enumerate(json_files):
@@ -402,6 +424,7 @@ def test_directory_comprehensive(directory_path):
         file_retrieval_correct = 0
         file_subem_correct = 0
         file_f1_scores = 0
+        file_num_turns = 0
 
         for i, trajectory in enumerate(trajectories):
             # Get generated text and ground truth labels
@@ -418,17 +441,20 @@ def test_directory_comprehensive(directory_path):
             retrieval_score = compute_score_retrieval(full_text, gt_dict)
             subem_score = compute_score_subem(full_text, gt_dict)
             f1_score = compute_score_f1(full_text, gt_dict)
+            num_turns = compute_num_turns(trajectory)
 
             file_accuracy_correct += acc_score
             file_format_correct += format_score
             file_retrieval_correct += retrieval_score
             file_subem_correct += subem_score
             file_f1_scores += f1_score
+            file_num_turns += num_turns
             total_accuracy_correct += acc_score
             total_format_correct += format_score
             total_retrieval_correct += retrieval_score
             total_subem_correct += subem_score
             total_f1_scores += f1_score
+            total_num_turns += num_turns
 
             # Track by data source
             if data_source not in combined_data_source_stats:
@@ -438,6 +464,7 @@ def test_directory_comprehensive(directory_path):
                     "retrieval_correct": 0,
                     "subem_correct": 0,
                     "f1_scores": 0,
+                    "num_turns": 0,
                     "total": 0,
                 }
             combined_data_source_stats[data_source]["accuracy_correct"] += acc_score
@@ -447,6 +474,7 @@ def test_directory_comprehensive(directory_path):
             ] += retrieval_score
             combined_data_source_stats[data_source]["subem_correct"] += subem_score
             combined_data_source_stats[data_source]["f1_scores"] += f1_score
+            combined_data_source_stats[data_source]["num_turns"] += num_turns
             combined_data_source_stats[data_source]["total"] += 1
 
         total_samples += file_samples
@@ -457,8 +485,9 @@ def test_directory_comprehensive(directory_path):
         )
         file_subem = file_subem_correct / file_samples if file_samples > 0 else 0
         file_f1 = file_f1_scores / file_samples if file_samples > 0 else 0
+        file_avg_turns = file_num_turns / file_samples if file_samples > 0 else 0
         print(
-            f"File {os.path.basename(json_file)}: Acc {file_accuracy:.4f} | Format {file_format:.4f} | Retrieval {file_retrieval:.4f} | SubEM {file_subem:.4f} | F1 {file_f1:.4f}"
+            f"File {os.path.basename(json_file)}: Acc {file_accuracy:.4f} | Format {file_format:.4f} | Retrieval {file_retrieval:.4f} | SubEM {file_subem:.4f} | F1 {file_f1:.4f} | Avg Turns {file_avg_turns:.2f}"
         )
 
     # Calculate overall metrics
@@ -471,6 +500,7 @@ def test_directory_comprehensive(directory_path):
     )
     overall_subem = total_subem_correct / total_samples if total_samples > 0 else 0
     overall_f1 = total_f1_scores / total_samples if total_samples > 0 else 0
+    overall_avg_turns = total_num_turns / total_samples if total_samples > 0 else 0
 
     print(f"\n" + "=" * 90)
     print(f"COMBINED RESULTS:")
@@ -491,6 +521,9 @@ def test_directory_comprehensive(directory_path):
     print(
         f"F1:        {total_f1_scores:8.2f}/{total_samples:4d} = {overall_f1:.4f}"
     )
+    print(
+        f"Avg Turns: {total_num_turns:8.0f}/{total_samples:4d} = {overall_avg_turns:.2f}"
+    )
 
     # Print metrics by data source
     print(f"\nMETRICS BY DATA SOURCE:")
@@ -502,27 +535,29 @@ def test_directory_comprehensive(directory_path):
             ret_pct = (stats["retrieval_correct"] / stats["total"]) * 100
             subem_pct = (stats["subem_correct"] / stats["total"]) * 100
             f1_avg = stats["f1_scores"] / stats["total"]
+            turns_avg = stats["num_turns"] / stats["total"]
             table_data.append([
                 source,
                 f"{acc_pct:.2f}%",
                 f"{fmt_pct:.2f}%", 
                 f"{ret_pct:.2f}%",
                 f"{subem_pct:.2f}%",
-                f"{f1_avg:.4f}"
+                f"{f1_avg:.4f}",
+                f"{turns_avg:.2f}"
             ])
     
-    headers = ["Source", "Accuracy", "Format", "Retrieval", "SubEM", "F1"]
+    headers = ["Source", "Accuracy", "Format", "Retrieval", "SubEM", "F1", "Avg Turns"]
     print(tabulate(table_data, headers=headers, tablefmt="grid"))
 
 
-    return overall_accuracy, overall_format, overall_retrieval, overall_subem, overall_f1
+    return overall_accuracy, overall_format, overall_retrieval, overall_subem, overall_f1, overall_avg_turns
 
 
 if __name__ == "__main__":
 
     # Directory containing all JSON files
     directory_path = (
-        "./outputs/log_val_traj/qw-val-search-r1-ppo-qwen2.5-7b-em-gae-pass1-20250909-213010_20250909_213721"
+        "./outputs/log_val_traj/val-nq-hotpotqa-ppo-qwen2.5-7b-em-gae-mixed-reward-new7-maxturn4_20250907_224559"
     )
 
     # Use command line argument if provided
