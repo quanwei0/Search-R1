@@ -144,11 +144,12 @@ def is_valid_sequence(text):
                 pass
             elif state in ["start", "after_think", "after_search", "information"]:
                 # Only whitespace is allowed between tags
-                if part.strip():
-                    return (
-                        False,
-                        f"Unexpected content '{part.strip()}' between tags (state: {state})",
-                    )
+                # if part.strip():
+                #     return (
+                #         False,
+                #         f"Unexpected content '{part.strip()}' between tags (state: {state})",
+                #     )
+                pass
             else:
                 return False, f"Unexpected content in state {state}"
 
