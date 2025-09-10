@@ -16,7 +16,7 @@ WAND_PROJECT='Search-R1'
 
 
 export BASE_MODEL='Qwen/Qwen2.5-7B'
-export EXPERIMENT_NAME=H100-search-r1-ppo-qwen2.5-7b-em-gae-token-IS-update-epoch-1-Minibatch128-variance_reduction-seed1
+export EXPERIMENT_NAME=H100-search-r1-ppo-qwen2.5-7b-em-gae-token-IS-update-epoch-1-Minibatch128-variance_reduction-seed2
 # export BASE_MODEL='Qwen/Qwen2.5-1.5B-Instruct'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-1.5b-it-em
 # export BASE_MODEL='Qwen/Qwen2.5-3B'
