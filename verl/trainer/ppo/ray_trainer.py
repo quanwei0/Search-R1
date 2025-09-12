@@ -931,7 +931,7 @@ class RayPPOTrainer(object):
                         final_em_format_reward_tensor = reward_dict['final_em_format']
                         step_retrieval_format_reward_tensor = reward_dict['step_retrieval_format']
                         avg_step_retrieval_format_reward_tensor = reward_dict['avg_step_retrieval_format']
-                        mixed_reward_tensor = reward_dict['mixed_reward']
+                        turn_level_reward_tensor = reward_dict['turn_level_reward']
 
                         # Get reward type and set token_level_scores accordingly
                         reward_type = self.config.algorithm.get('reward_type', 'answer_correctness')
@@ -940,16 +940,16 @@ class RayPPOTrainer(object):
                         # Reward type mapping
                         reward_mapping = {
                             'answer_correctness': answer_reward_tensor,
-                            'mixed_reward': mixed_reward_tensor,
+                            'turn_level_reward': turn_level_reward_tensor,
                             'mixed_outcome_reward': mixed_outcome_reward_tensor,
                         }
                         
                         # Handle special case for mixed_judge_reward
                         if 'judge' in reward_type:
                             judge_outcome_reward_tensor = reward_dict['judge_outcome_reward']
-                            judge_turn_level_reward_tensor = reward_dict['judge_turn_level_reward']
+                            judge_turn_level_reward_tensor = reward_dict['judge_turn_reward']
                             reward_mapping['judge_outcome_reward'] = judge_outcome_reward_tensor
-                            reward_mapping['judge_turn_level_reward'] = judge_turn_level_reward_tensor
+                            reward_mapping['judge_turn_reward'] = judge_turn_level_reward_tensor
                         
                         # Set token_level_scores based on reward_type
                         if reward_type in reward_mapping:

@@ -208,7 +208,7 @@ def compute_score_judge_outcome(
     )
 
 
-def compute_score_judge_turn_level(
+def compute_score_judge_turn(
     batch_mid_turns: List[List[str]],
     batch_final_turns: List[str],
     batch_solutions: List[str],

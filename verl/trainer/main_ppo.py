@@ -46,8 +46,8 @@ def _select_rm_score_fn(data_source, reward_type='answer_correctness'):
             return qa_em_judge.compute_score_step_retrieval_format_judge
         elif reward_type == 'judge_outcome_reward':
             return qa_em_judge.compute_score_judge_outcome
-        elif reward_type == 'judge_turn_level_reward':
-            return qa_em_judge.compute_score_judge_turn_level
+        elif reward_type == 'judge_turn_reward':
+            return qa_em_judge.compute_score_judge_turn
         else:
             raise NotImplementedError(f"Unsupported reward type: {reward_type} for data source: {data_source}")
         
@@ -206,8 +206,8 @@ class RewardManager():
                 judge_outcome_reward_tensor[i, valid_response_length - 1] = judge_outcome_scores
             
             
-            if reward_type == 'judge_turn_level_reward':
-                compute_judge_turn_level_score = _select_rm_score_fn(first_data_source, reward_type='judge_turn_level_reward')
+            if reward_type == 'judge_turn_reward':
+                compute_judge_turn_level_score = _select_rm_score_fn(first_data_source, reward_type='judge_turn_reward')
                 
                 # Use async batch processing
                 batch_judge_turn_level_scores = compute_judge_turn_level_score(
@@ -240,7 +240,7 @@ class RewardManager():
                 'avg_step_retrieval_format': avg_step_retrieval_format_reward_tensor,
                 'turn_level_reward': turn_level_reward_tensor,
                 'judge_outcome_reward': judge_outcome_reward_tensor,
-                'judge_turn_level_reward': judge_turn_level_reward_tensor,
+                'judge_turn_reward': judge_turn_level_reward_tensor,
             }
         else:
             return {
