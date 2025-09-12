@@ -84,7 +84,13 @@ class RewardManager():
         avg_step_retrieval_format_reward_tensor = torch.zeros_like(data.batch['responses'], dtype=torch.float32)
         turn_level_reward_tensor = torch.zeros_like(data.batch['responses'], dtype=torch.float32)
         
-        # all_scores = []
+        # Prepare batch data collection for judge processing if needed
+        batch_mid_turns = []
+        batch_final_turns = []
+        batch_solutions = []
+        batch_ground_truths = []
+        batch_indices = []
+        is_judge = 'judge' in reward_type and not self.is_val
 
         already_print_data_sources = {}
 
@@ -107,7 +113,7 @@ class RewardManager():
             sequences_str = self.tokenizer.decode(sequences)
 
             ground_truth = data_item.non_tensor_batch['reward_model']['ground_truth']
-            # decoded_full_texts = data_item.meta_info['decoded_full_texts'][i]
+            decoded_full_texts = data_item.meta_info['decoded_full_texts'][i]
             decoded_turn_texts = data_item.meta_info['decoded_turn_texts'][i]
 
             # select rm_score
@@ -148,6 +154,14 @@ class RewardManager():
             else:
                 avg_step_retrieval_format_reward_tensor[i, valid_response_length - 1] = step_retrieval_format_reward_tensor[i, :].sum(dim=-1) / (data.meta_info['num_turns'][i] - 1)
             
+            # Collect batch data for judge processing if needed
+            if is_judge:
+                batch_mid_turns.append(decoded_turn_texts[:-1])
+                batch_final_turns.append(decoded_turn_texts[-1])
+                batch_solutions.append(decoded_full_texts)
+                batch_ground_truths.append(ground_truth)
+                batch_indices.append(i)
+            
         # Build reward dictionary with all standard rewards
         reward_dict = {
             'answer_correctness': answer_reward_tensor,
@@ -157,41 +171,17 @@ class RewardManager():
             'retrieval_correctness': retrieval_reward_tensor,
             'mixed_outcome_reward': mixed_outcome_reward_tensor,
             'final_em_format': final_em_format_reward_tensor,
-            'step_retrieval_format': step_retrieval_format_reward_tensor,
             'avg_step_retrieval_format': avg_step_retrieval_format_reward_tensor,
             'turn_level_reward': turn_level_reward_tensor,
         }
         
         # Process judge rewards using async batch processing if needed
-        if 'judge' in reward_type and not self.is_val:
+        if is_judge:
             print("[INFO] Processing judge rewards using async batch processing...")
-            
-            # step_retrieval_format_judge_reward_tensor = torch.zeros_like(data.batch['responses'], dtype=torch.float32)
-            # avg_step_retrieval_format_judge_reward_tensor = torch.zeros_like(data.batch['responses'], dtype=torch.float32)
-            # mixed_judge_reward_tensor = torch.zeros_like(data.batch['responses'], dtype=torch.float32)
 
             judge_outcome_reward_tensor = torch.zeros_like(data.batch['responses'], dtype=torch.float32)
             judge_turn_reward_tensor = torch.zeros_like(data.batch['responses'], dtype=torch.float32)
 
-            # Collect all data items for batch processing
-            batch_mid_turns = []
-            batch_final_turns = []
-            batch_solutions = []
-            batch_ground_truths = []
-            batch_indices = []
-            
-            for i in range(len(data)):
-                data_item = data[i]
-                decoded_full_texts = data_item.meta_info['decoded_full_texts'][i]
-                decoded_turn_texts = data_item.meta_info['decoded_turn_texts'][i]
-                ground_truth = data_item.non_tensor_batch['reward_model']['ground_truth']
-                
-                batch_mid_turns.append(decoded_turn_texts[:-1])
-                batch_final_turns.append(decoded_turn_texts[-1])
-                batch_solutions.append(decoded_full_texts)
-                batch_ground_truths.append(ground_truth)
-                batch_indices.append(i)
-            
             # Get the first data source (assuming all items have the same data source for batch processing)
             first_data_source = data[0].non_tensor_batch['data_source']
             

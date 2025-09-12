@@ -946,9 +946,14 @@ class RayPPOTrainer(object):
                         # Handle special case for mixed_judge_reward
                         if 'judge' in reward_type:
                             judge_outcome_reward_tensor = reward_dict['judge_outcome_reward']
-                            judge_turn_reward_tensor = reward_dict['judge_turn_reward']
-                            reward_mapping['judge_outcome_reward'] = judge_outcome_reward_tensor
-                            reward_mapping['judge_turn_reward'] = judge_turn_reward_tensor
+                            reward_mapping.update({
+                                'judge_outcome_reward': judge_outcome_reward_tensor,
+                            })
+                            if reward_type == 'judge_turn_reward':
+                                judge_turn_reward_tensor = reward_dict['judge_turn_reward']
+                                reward_mapping.update({
+                                    'judge_turn_reward': judge_turn_reward_tensor,
+                                })
                         
                         # Set token_level_scores based on reward_type
                         if reward_type in reward_mapping:
