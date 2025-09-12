@@ -3,11 +3,11 @@ export RETRIEVAL_CUDA_VISIBLE_DEVICES=0,1,2,3
 export RETRIEVAL_PORT=8001
 export DATA_DIR='./data/nq_search'
 
-source activate /opt/conda/envs/retriever
+source activate retriever
 # # Pass GPU devices and port to retrieval script
 bash retrieval_launch.sh "$RETRIEVAL_CUDA_VISIBLE_DEVICES" "$RETRIEVAL_PORT"
 sleep 60
-conda activate /opt/conda/envs/searchr1-test
+conda activate searchr1
 
 export WANDB_API_KEY="810f91e58aa0fd1d03b11c60b0d1cffbb1d941f4"
 export WANDB_ENTITY="rl_agent"
@@ -16,7 +16,7 @@ WAND_PROJECT='Search-R1'
 
 
 export BASE_MODEL='Qwen/Qwen2.5-7B'
-export EXPERIMENT_NAME=H100-search-r1-ppo-qwen2.5-7b-em-gae-token-IS-update-epoch-1-Minibatch128-seed2
+export EXPERIMENT_NAME=H100-search-r1-ppo-qwen2.5-7b-em-gae-token-IS-update-epoch-1-Minibatch128-variance_reduction-seed3
 # export BASE_MODEL='Qwen/Qwen2.5-1.5B-Instruct'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-1.5b-it-em
 # export BASE_MODEL='Qwen/Qwen2.5-3B'
@@ -67,6 +67,7 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     actor_rollout_ref.rollout.temperature=1 \
     actor_rollout_ref.actor.state_masking=True \
     +actor_rollout_ref.actor.importance_sampling_level=token \
+    +actor_rollout_ref.actor.detach_ratio=variance_reduction \
     critic.optim.lr=1e-5 \
     critic.model.use_remove_padding=True \
     critic.optim.lr_warmup_steps_ratio=0.015 \
