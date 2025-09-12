@@ -119,7 +119,6 @@ class RewardManager():
             compute_retrieval_score = _select_rm_score_fn(data_source, reward_type='retrieval_correctness')
             compute_mixed_outcome_score = _select_rm_score_fn(data_source, reward_type='mixed_outcome_reward')
             compute_final_em_format_score = _select_rm_score_fn(data_source, reward_type='final_em_format')
-            compute_step_retrieval_format_score = _select_rm_score_fn(data_source, reward_type='step_retrieval_format')
 
             answer_score = compute_answer_score(solution_str=sequences_str, ground_truth=ground_truth)
             answer_sub_em_score = compute_answer_sub_em_score(solution_str=sequences_str, ground_truth=ground_truth)
@@ -137,6 +136,7 @@ class RewardManager():
             mixed_outcome_reward_tensor[i, valid_response_length - 1] = mixed_outcome_score
             final_em_format_reward_tensor[i, valid_response_length - 1] = final_em_format_score
 
+            compute_step_retrieval_format_score = _select_rm_score_fn(data_source, reward_type='step_retrieval_format')
             step_retrieval_format_score = compute_step_retrieval_format_score(mid_turn_str=decoded_turn_texts[:-1], ground_truth=ground_truth)
             for j in range(data.meta_info['num_turns'][i] - 1):
                 step_retrieval_format_reward_tensor[i, data.meta_info['turn_indices'][i][j][1]] = step_retrieval_format_score[j]
@@ -148,7 +148,19 @@ class RewardManager():
             else:
                 avg_step_retrieval_format_reward_tensor[i, valid_response_length - 1] = step_retrieval_format_reward_tensor[i, :].sum(dim=-1) / (data.meta_info['num_turns'][i] - 1)
             
-        
+        # Build reward dictionary with all standard rewards
+        reward_dict = {
+            'answer_correctness': answer_reward_tensor,
+            'answer_sub_em': answer_sub_em_reward_tensor,
+            'f1_score': f1_score_reward_tensor,
+            'format_correctness': format_reward_tensor,
+            'retrieval_correctness': retrieval_reward_tensor,
+            'mixed_outcome_reward': mixed_outcome_reward_tensor,
+            'final_em_format': final_em_format_reward_tensor,
+            'step_retrieval_format': step_retrieval_format_reward_tensor,
+            'avg_step_retrieval_format': avg_step_retrieval_format_reward_tensor,
+            'turn_level_reward': turn_level_reward_tensor,
+        }
         
         # Process judge rewards using async batch processing if needed
         if 'judge' in reward_type and not self.is_val:
@@ -203,6 +215,9 @@ class RewardManager():
                 valid_response_length = data_item.batch['attention_mask'][data_item.batch['prompts'].shape[-1]:].sum()    
                 judge_outcome_reward_tensor[i, valid_response_length - 1] = judge_outcome_score
             
+            reward_dict.update({
+                'judge_outcome_reward': judge_outcome_reward_tensor,
+            })
             
             if reward_type == 'judge_turn_reward':
                 compute_judge_turn_level_score = _select_rm_score_fn(first_data_source, reward_type='judge_turn_reward')
@@ -224,35 +239,11 @@ class RewardManager():
                     for j in range(data.meta_info['num_turns'][i]):
                         judge_turn_reward_tensor[i, data.meta_info['turn_indices'][i][j][1]] = judge_turn_level_score[j]
 
+                reward_dict.update({
+                    'judge_turn_reward': judge_turn_reward_tensor,
+                })
 
-        if 'judge' in reward_type and not self.is_val:
-            return {
-                'answer_correctness': answer_reward_tensor,
-                'answer_sub_em': answer_sub_em_reward_tensor,
-                'f1_score': f1_score_reward_tensor,
-                'format_correctness': format_reward_tensor,
-                'retrieval_correctness': retrieval_reward_tensor,
-                'mixed_outcome_reward': mixed_outcome_reward_tensor,
-                'final_em_format': final_em_format_reward_tensor,
-                'step_retrieval_format': step_retrieval_format_reward_tensor,
-                'avg_step_retrieval_format': avg_step_retrieval_format_reward_tensor,
-                'turn_level_reward': turn_level_reward_tensor,
-                'judge_outcome_reward': judge_outcome_reward_tensor,
-                'judge_turn_reward': judge_turn_reward_tensor,
-            }
-        else:
-            return {
-                'answer_correctness': answer_reward_tensor,
-                'answer_sub_em': answer_sub_em_reward_tensor,
-                'f1_score': f1_score_reward_tensor,
-                'format_correctness': format_reward_tensor,
-                'retrieval_correctness': retrieval_reward_tensor,
-                'mixed_outcome_reward': mixed_outcome_reward_tensor,
-                'final_em_format': final_em_format_reward_tensor,
-                'step_retrieval_format': step_retrieval_format_reward_tensor,
-                'avg_step_retrieval_format': avg_step_retrieval_format_reward_tensor,
-                'turn_level_reward': turn_level_reward_tensor,
-            }
+        return reward_dict
 
 import ray
 import hydra

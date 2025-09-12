@@ -929,7 +929,6 @@ class RayPPOTrainer(object):
                         retrieval_reward_tensor = reward_dict['retrieval_correctness']
                         mixed_outcome_reward_tensor = reward_dict['mixed_outcome_reward']
                         final_em_format_reward_tensor = reward_dict['final_em_format']
-                        step_retrieval_format_reward_tensor = reward_dict['step_retrieval_format']
                         avg_step_retrieval_format_reward_tensor = reward_dict['avg_step_retrieval_format']
                         turn_level_reward_tensor = reward_dict['turn_level_reward']
 
