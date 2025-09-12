@@ -161,7 +161,7 @@ class RewardManager():
             # mixed_judge_reward_tensor = torch.zeros_like(data.batch['responses'], dtype=torch.float32)
 
             judge_outcome_reward_tensor = torch.zeros_like(data.batch['responses'], dtype=torch.float32)
-            judge_turn_level_reward_tensor = torch.zeros_like(data.batch['responses'], dtype=torch.float32)
+            judge_turn_reward_tensor = torch.zeros_like(data.batch['responses'], dtype=torch.float32)
 
             # Collect all data items for batch processing
             batch_mid_turns = []
@@ -200,10 +200,10 @@ class RewardManager():
             )
             
             # Assign batch results to tensors
-            for i, judge_outcome_scores in zip(batch_indices, batch_judge_outcome_scores):
+            for i, judge_outcome_score in zip(batch_indices, batch_judge_outcome_scores):
                 data_item = data[i]
                 valid_response_length = data_item.batch['attention_mask'][data_item.batch['prompts'].shape[-1]:].sum()    
-                judge_outcome_reward_tensor[i, valid_response_length - 1] = judge_outcome_scores
+                judge_outcome_reward_tensor[i, valid_response_length - 1] = judge_outcome_score
             
             
             if reward_type == 'judge_turn_reward':
@@ -224,7 +224,7 @@ class RewardManager():
                 # Assign batch results to tensors
                 for i, judge_turn_level_score in zip(batch_indices, batch_judge_turn_level_scores):
                     for j in range(data.meta_info['num_turns'][i]):
-                        judge_turn_level_reward_tensor[i, data.meta_info['turn_indices'][i][j][1]] = judge_turn_level_score[j]
+                        judge_turn_reward_tensor[i, data.meta_info['turn_indices'][i][j][1]] = judge_turn_level_score[j]
 
 
         if 'judge' in reward_type and not self.is_val:
@@ -240,7 +240,7 @@ class RewardManager():
                 'avg_step_retrieval_format': avg_step_retrieval_format_reward_tensor,
                 'turn_level_reward': turn_level_reward_tensor,
                 'judge_outcome_reward': judge_outcome_reward_tensor,
-                'judge_turn_reward': judge_turn_level_reward_tensor,
+                'judge_turn_reward': judge_turn_reward_tensor,
             }
         else:
             return {
