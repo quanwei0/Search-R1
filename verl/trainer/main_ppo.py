@@ -42,8 +42,6 @@ def _select_rm_score_fn(data_source, reward_type='answer_correctness'):
             return qa_em_new.compute_score_final_em_format
         elif reward_type == 'step_retrieval_format':
             return qa_em_new.compute_score_step_retrieval_format
-        elif reward_type == 'step_retrieval_format_judge':
-            return qa_em_judge.compute_score_step_retrieval_format_judge
         elif reward_type == 'judge_outcome_reward':
             return qa_em_judge.compute_score_judge_outcome
         elif reward_type == 'judge_turn_reward':
