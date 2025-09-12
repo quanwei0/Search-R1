@@ -29,7 +29,6 @@ class AsyncVLLMClient:
         self.model = model
         self.client = AsyncOpenAI(api_key="EMPTY", base_url=self.base_url)
         self.log = logging.getLogger(self.__class__.__name__)
-        self._closed = False
 
     async def generate_text(self, prompt: str, max_tokens: int = 2048) -> Optional[str]:
         try:
@@ -42,24 +41,6 @@ class AsyncVLLMClient:
         except Exception as e:
             self.log.error(f"Chat error: {e}")
             return None
-    
-    async def aclose(self):
-        """Gracefully close the async client."""
-        if not self._closed:
-            try:
-                await self.client.aclose()
-            except (RuntimeError, Exception) as e:
-                # Ignore cleanup errors - connection may already be closed
-                self.log.debug(f"Client cleanup warning (safe to ignore): {e}")
-            finally:
-                self._closed = True
-    
-    async def __aenter__(self):
-        return self
-    
-    async def __aexit__(self, exc_type, exc_val, exc_tb):
-        await self.aclose()
-
 
 # ============================================================================
 # Async Batch Processing Functions  
@@ -90,7 +71,7 @@ async def run_batch(
             except Exception:
                 if attempt >= max_retries:
                     return idx, None
-                await asyncio.sleep(0.5 * (1 + random.random()) * (attempt + 1))
+                await asyncio.sleep(0.1)
 
     tasks = [asyncio.create_task(one_job(i, s)) for i, s in enumerate(samples)]
     
@@ -121,11 +102,11 @@ def parse_args():
                        help="Path to data file")
     parser.add_argument("--num_samples", type=int, default=256,
                        help="Number of samples to process")
-    parser.add_argument("--concurrency", type=int, default=256,
+    parser.add_argument("--concurrency", type=int, default=64,
                        help="Number of concurrent requests")
     parser.add_argument("--max_tokens", type=int, default=2048,
                        help="Maximum tokens per generation")
-    parser.add_argument("--max_retries", type=int, default=2,
+    parser.add_argument("--max_retries", type=int, default=1,
                        help="Maximum number of retries")
     parser.add_argument("--judge-mode", type=str, default="outcome",
                        choices=["turn", "outcome"],
@@ -141,10 +122,11 @@ async def amain(args):
     samples = DataProcessor.get_sample_data(json_file=args.data_path, num_samples=args.num_samples)
     print(f"Loaded {len(samples)} samples from {args.data_path}")
     
-    # Use async context manager for proper cleanup
-    async with AsyncVLLMClient(host=args.host, port=args.port, model=args.model) as client:
-        print(f"Initialized client for {args.host}:{args.port} with model {args.model}")
+    # Create client
+    client = AsyncVLLMClient(host=args.host, port=args.port, model=args.model)
+    print(f"Initialized client for {args.host}:{args.port} with model {args.model}")
 
+    try:
         # Run batch processing
         judge_texts = await run_batch(
             samples,
@@ -154,25 +136,42 @@ async def amain(args):
             max_retries=args.max_retries,
             judge_mode=args.judge_mode,
         )
+        print(f"Completed batch processing: {len(judge_texts)} results")
 
-        # Process results
-        print(f"\nProcessing {len(judge_texts)} results...")
-        for i, ((_prompt, turns, _ground_truth), judge_text) in enumerate(zip(samples, judge_texts), 1):
-            print(f"\nSAMPLE {i}:")
-            print("-" * 80)
-            print(f"Num of Turns: {len(turns)}")
+        # # Process results
+        # print(f"\nProcessing {len(judge_texts)} results...")
+        # for i, ((_, turns, _), judge_text) in enumerate(zip(samples, judge_texts), 1):
+        #     print(f"\nSAMPLE {i}:")
+        #     print("-" * 80)
+        #     print(f"Num of Turns: {len(turns)}")
             
-            if args.judge_mode == "outcome":
-                score = JudgeEvaluator.extract_outcome_score_from_judge_response(judge_text or "")
-                print(f"Outcome Score: {score}")
-            else:  # turn mode
-                scores = JudgeEvaluator.extract_turn_scores_from_judge_response(judge_text or "", len(turns))
-                print(f"Turn Scores: {scores}")
+        #     if args.judge_mode == "outcome":
+        #         score = JudgeEvaluator.extract_outcome_score_from_judge_response(judge_text or "")
+        #         print(f"Outcome Score: {score}")
+        #     else:  # turn mode
+        #         scores = JudgeEvaluator.extract_turn_scores_from_judge_response(judge_text or "", len(turns))
+        #         print(f"Turn Scores: {scores}")
+    finally:
+        # Essential cleanup to prevent connection buildup
+        if hasattr(client, 'client'):
+            try:
+                await client.client.aclose()
+            except:
+                pass
 
 
 # ============================================================================
 # Main Entry Point
 # ============================================================================
+
+async def run_iterations():
+    """Run multiple iterations in a single event loop."""
+    args = parse_args()
+    for iteration in range(3):
+        print(f"\n{'='*50} ITERATION {iteration + 1} {'='*50}")
+        await amain(args)
+        print(f"{'='*50} END ITERATION {iteration + 1} {'='*50}\n")
+
 
 def main():
     """Main entry point."""
@@ -181,4 +180,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(run_iterations())
