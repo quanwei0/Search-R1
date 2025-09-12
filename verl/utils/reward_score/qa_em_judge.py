@@ -27,60 +27,69 @@ async def _compute_async_batch_scores(
     judge_evaluator = JudgeEvaluator()
     data_processor = DataProcessor()
 
-    # Prepare samples for async batch processing
-    batch_samples = []
-    batch_num_turns = []
-    for mid_turns, final_turn, solution, ground_truth in zip(
-        batch_mid_turns, batch_final_turns, batch_solutions, batch_ground_truths
-    ):
-        prompt = data_processor.extract_prompt_from_chat_format(solution)
+    try:
+        # Prepare samples for async batch processing
+        batch_samples = []
+        batch_num_turns = []
+        for mid_turns, final_turn, solution, ground_truth in zip(
+            batch_mid_turns, batch_final_turns, batch_solutions, batch_ground_truths
+        ):
+            prompt = data_processor.extract_prompt_from_chat_format(solution)
 
-        # Prepare turns list for this item
-        if isinstance(mid_turns, str):
-            turns = [mid_turns, final_turn]
-        else:
-            turns = list(mid_turns) + [final_turn]
-
-        # Extract ground truth target and convert to list then string
-        ground_truths_list = list(ground_truth['target'])
-        ground_truth_str = ", ".join(str(item) for item in ground_truths_list) if len(ground_truths_list) > 0 else ""
-            
-        batch_samples.append((prompt, turns, ground_truth_str))
-        batch_num_turns.append(len(turns))  # Store the actual number of turns
-
-    # Use async batch processing
-    batch_judge_texts = await run_batch(
-        batch_samples,
-        client=client,
-        concurrency=min(64, len(batch_samples)),  # Limit concurrency
-        max_tokens=2048,
-        max_retries=2,
-        judge_mode=judge_mode,
-    )
-
-    # Extract scores for each item in the batch
-    batch_scores = []
-    for judge_text, num_turns in zip(batch_judge_texts, batch_num_turns):
-        if judge_mode == 'outcome':
-            # For outcome mode, return single score per item
-            if judge_text:
-                score = judge_evaluator.extract_outcome_score_from_judge_response(judge_text)
-                batch_scores.append(score)
+            # Prepare turns list for this item
+            if isinstance(mid_turns, str):
+                turns = [mid_turns, final_turn]
             else:
-                batch_scores.append(0.0)
-        else:
-            # For turn mode, return scores for all turns
-            if judge_text:
-                turn_scores = judge_evaluator.extract_turn_scores_from_judge_response(
-                    judge_text, num_turns
-                )
+                turns = list(mid_turns) + [final_turn]
+
+            # Extract ground truth target and convert to list then string
+            ground_truths_list = list(ground_truth['target'])
+            ground_truth_str = ", ".join(str(item) for item in ground_truths_list) if len(ground_truths_list) > 0 else ""
+                
+            batch_samples.append((prompt, turns, ground_truth_str))
+            batch_num_turns.append(len(turns))  # Store the actual number of turns
+
+        # Use async batch processing
+        batch_judge_texts = await run_batch(
+            batch_samples,
+            client=client,
+            concurrency=min(64, len(batch_samples)),  # Limit concurrency
+            max_tokens=2048,
+            max_retries=2,
+            judge_mode=judge_mode,
+        )
+
+        # Extract scores for each item in the batch
+        batch_scores = []
+        for judge_text, num_turns in zip(batch_judge_texts, batch_num_turns):
+            if judge_mode == 'outcome':
+                # For outcome mode, return single score per item
+                if judge_text:
+                    score = judge_evaluator.extract_outcome_score_from_judge_response(judge_text)
+                    batch_scores.append(score)
+                else:
+                    batch_scores.append(0.0)
             else:
-                turn_scores = [0.0] * num_turns
+                # For turn mode, return scores for all turns
+                if judge_text:
+                    turn_scores = judge_evaluator.extract_turn_scores_from_judge_response(
+                        judge_text, num_turns
+                    )
+                else:
+                    turn_scores = [0.0] * num_turns
 
-            batch_scores.append(turn_scores)
+                batch_scores.append(turn_scores)
 
-    print(f"Async batch processing completed. Results: {len(batch_scores)} items")
-    return batch_scores
+        print(f"Async batch processing completed. Results: {len(batch_scores)} items")
+        return batch_scores
+        
+    finally:
+        # Essential cleanup to prevent connection buildup
+        if hasattr(client, 'client'):
+            try:
+                await client.client.aclose()
+            except:
+                pass
 
 
 def _compute_sync_batch_scores(

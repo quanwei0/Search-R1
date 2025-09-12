@@ -236,11 +236,11 @@ Determine if the multi-turn response contains a correct final answer that fully 
 ## SCORING CRITERIA
 
 **Score 1.0 (Correct):**
-• Response contains `<answer>` tag with correct and complete content that addresses the prompt
+• **The answer within `<answer></answer>` tags** is correct and complete, fully addressing the question in the prompt
 
 **Score 0.0 (Incorrect):**
-• No `<answer>` tag found, OR
-• Answer is factually incorrect or incomplete
+• No `<answer></answer>` tags found, OR
+• **The answer within `<answer></answer>` tags** is factually incorrect or incomplete
 
 ## OUTPUT FORMAT
 
