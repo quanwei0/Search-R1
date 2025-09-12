@@ -945,11 +945,11 @@ class RayPPOTrainer(object):
                         }
                         
                         # Handle special case for mixed_judge_reward
-                        if reward_type == 'mixed_judge_reward':
-                            step_retrieval_format_judge_reward_tensor = reward_dict['step_retrieval_format_judge']
-                            avg_step_retrieval_format_judge_reward_tensor = reward_dict['avg_step_retrieval_format_judge']
-                            mixed_judge_reward_tensor = reward_dict['mixed_judge_reward']
-                            reward_mapping['mixed_judge_reward'] = mixed_judge_reward_tensor
+                        if 'judge' in reward_type:
+                            judge_outcome_reward_tensor = reward_dict['judge_outcome_reward']
+                            judge_turn_level_reward_tensor = reward_dict['judge_turn_level_reward']
+                            reward_mapping['judge_outcome_reward'] = judge_outcome_reward_tensor
+                            reward_mapping['judge_turn_level_reward'] = judge_turn_level_reward_tensor
                         
                         # Set token_level_scores based on reward_type
                         if reward_type in reward_mapping:
@@ -974,8 +974,8 @@ class RayPPOTrainer(object):
                         train_metric_dict.update(self._track_reward_metrics(mixed_outcome_reward_tensor, train_data_sources, prefix="train/mixed_outcome_reward"))
                         train_metric_dict.update(self._track_reward_metrics(final_em_format_reward_tensor, train_data_sources, prefix="train/final_em_format_reward"))
                         train_metric_dict.update(self._track_reward_metrics(avg_step_retrieval_format_reward_tensor, train_data_sources, prefix="train/avg_step_retrieval_format_reward"))
-                        if reward_type == 'mixed_judge_reward':
-                            train_metric_dict.update(self._track_reward_metrics(avg_step_retrieval_format_judge_reward_tensor, train_data_sources, prefix="train/avg_step_retrieval_format_judge_reward"))
+                        if 'judge' in reward_type:
+                            train_metric_dict.update(self._track_reward_metrics(judge_outcome_reward_tensor, train_data_sources, prefix="train/judge_outcome_reward"))
 
                         metrics.update(train_metric_dict)
                         logger.log(data=train_metric_dict, step=self.global_steps)

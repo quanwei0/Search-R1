@@ -53,12 +53,17 @@ async def run_batch(
     concurrency: int = 16,
     max_tokens: int = 2048,
     max_retries: int = 2,
+    judge_mode: str = "turn",
 ):
     sem = asyncio.Semaphore(concurrency)
 
     async def one_job(idx: int, sample):
         prompt, turns, ground_truth = sample
-        judge_prompt = JudgeEvaluator.create_judge_prompt(prompt, turns, ground_truth)
+        
+        if judge_mode == "outcome":
+            judge_prompt = JudgeEvaluator.create_outcome_judge_prompt(prompt, turns, ground_truth)
+        else:  # default to "turn"
+            judge_prompt = JudgeEvaluator.create_turn_judge_prompt(prompt, turns, ground_truth)
         for attempt in range(max_retries + 1):
             try:
                 async with sem:
@@ -104,6 +109,9 @@ def parse_args():
                        help="Maximum tokens per generation")
     parser.add_argument("--max_retries", type=int, default=2,
                        help="Maximum number of retries")
+    parser.add_argument("--judge-mode", type=str, default="outcome",
+                       choices=["turn", "outcome"],
+                       help="Judge evaluation mode: turn (evaluate each turn), outcome (evaluate final result)")
     return parser.parse_args()
 
 
@@ -126,16 +134,22 @@ async def amain(args):
         concurrency=args.concurrency,
         max_tokens=args.max_tokens,
         max_retries=args.max_retries,
+        judge_mode=args.judge_mode,
     )
 
     # Process results
     print(f"\nProcessing {len(judge_texts)} results...")
     for i, ((_prompt, turns, _ground_truth), judge_text) in enumerate(zip(samples, judge_texts), 1):
-        scores = JudgeEvaluator.extract_turn_scores_from_judge_response(judge_text or "", len(turns))
         print(f"\nSAMPLE {i}:")
         print("-" * 80)
         print(f"Num of Turns: {len(turns)}")
-        print(f"Scores: {scores}")
+        
+        if args.judge_mode == "outcome":
+            score = JudgeEvaluator.extract_outcome_score_from_judge_response(judge_text or "")
+            print(f"Outcome Score: {score}")
+        else:  # turn mode
+            scores = JudgeEvaluator.extract_turn_scores_from_judge_response(judge_text or "", len(turns))
+            print(f"Turn Scores: {scores}")
 
 
 # ============================================================================

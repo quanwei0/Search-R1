@@ -44,6 +44,10 @@ def _select_rm_score_fn(data_source, reward_type='answer_correctness'):
             return qa_em_new.compute_score_step_retrieval_format
         elif reward_type == 'step_retrieval_format_judge':
             return qa_em_judge.compute_score_step_retrieval_format_judge
+        elif reward_type == 'judge_outcome_reward':
+            return qa_em_judge.compute_score_judge_outcome
+        elif reward_type == 'judge_turn_level_reward':
+            return qa_em_judge.compute_score_judge_turn_level
         else:
             raise NotImplementedError(f"Unsupported reward type: {reward_type} for data source: {data_source}")
         
@@ -80,12 +84,8 @@ class RewardManager():
         final_em_format_reward_tensor = torch.zeros_like(data.batch['responses'], dtype=torch.float32)  
         step_retrieval_format_reward_tensor = torch.zeros_like(data.batch['responses'], dtype=torch.float32)
         avg_step_retrieval_format_reward_tensor = torch.zeros_like(data.batch['responses'], dtype=torch.float32)
-        mixed_reward_tensor = torch.zeros_like(data.batch['responses'], dtype=torch.float32)
+        turn_level_reward_tensor = torch.zeros_like(data.batch['responses'], dtype=torch.float32)
         
-        step_retrieval_format_judge_reward_tensor = torch.zeros_like(data.batch['responses'], dtype=torch.float32)
-        avg_step_retrieval_format_judge_reward_tensor = torch.zeros_like(data.batch['responses'], dtype=torch.float32)
-        mixed_judge_reward_tensor = torch.zeros_like(data.batch['responses'], dtype=torch.float32)
-
         # all_scores = []
 
         already_print_data_sources = {}
@@ -112,7 +112,6 @@ class RewardManager():
             # decoded_full_texts = data_item.meta_info['decoded_full_texts'][i]
             decoded_turn_texts = data_item.meta_info['decoded_turn_texts'][i]
 
-            
             # select rm_score
             data_source = data_item.non_tensor_batch['data_source']
             compute_answer_score = _select_rm_score_fn(data_source, reward_type='answer_correctness')
@@ -131,7 +130,6 @@ class RewardManager():
             retrieval_score = compute_retrieval_score(solution_str=sequences_str, ground_truth=ground_truth)
             mixed_outcome_score = compute_mixed_outcome_score(solution_str=sequences_str, ground_truth=ground_truth)
             final_em_format_score = compute_final_em_format_score(final_turn_str=decoded_turn_texts[-1], ground_truth=ground_truth)
-            step_retrieval_format_score = compute_step_retrieval_format_score(mid_turn_str=decoded_turn_texts[:-1], ground_truth=ground_truth)
 
             answer_reward_tensor[i, valid_response_length - 1] = answer_score
             answer_sub_em_reward_tensor[i, valid_response_length - 1] = answer_sub_em_score
@@ -141,10 +139,11 @@ class RewardManager():
             mixed_outcome_reward_tensor[i, valid_response_length - 1] = mixed_outcome_score
             final_em_format_reward_tensor[i, valid_response_length - 1] = final_em_format_score
 
+            step_retrieval_format_score = compute_step_retrieval_format_score(mid_turn_str=decoded_turn_texts[:-1], ground_truth=ground_truth)
             for j in range(data.meta_info['num_turns'][i] - 1):
                 step_retrieval_format_reward_tensor[i, data.meta_info['turn_indices'][i][j][1]] = step_retrieval_format_score[j]
                 
-            mixed_reward_tensor = final_em_format_reward_tensor + step_retrieval_format_reward_tensor
+            turn_level_reward_tensor = final_em_format_reward_tensor + step_retrieval_format_reward_tensor
             
             if data.meta_info['num_turns'][i] - 1 == 0:
                 avg_step_retrieval_format_reward_tensor[i, valid_response_length - 1] = 0
@@ -154,9 +153,16 @@ class RewardManager():
         
         
         # Process judge rewards using async batch processing if needed
-        if reward_type == 'mixed_judge_reward' and not self.is_val:
+        if 'judge' in reward_type and not self.is_val:
             print("[INFO] Processing judge rewards using async batch processing...")
             
+            # step_retrieval_format_judge_reward_tensor = torch.zeros_like(data.batch['responses'], dtype=torch.float32)
+            # avg_step_retrieval_format_judge_reward_tensor = torch.zeros_like(data.batch['responses'], dtype=torch.float32)
+            # mixed_judge_reward_tensor = torch.zeros_like(data.batch['responses'], dtype=torch.float32)
+
+            judge_outcome_reward_tensor = torch.zeros_like(data.batch['responses'], dtype=torch.float32)
+            judge_turn_level_reward_tensor = torch.zeros_like(data.batch['responses'], dtype=torch.float32)
+
             # Collect all data items for batch processing
             batch_mid_turns = []
             batch_final_turns = []
@@ -178,37 +184,50 @@ class RewardManager():
             
             # Get the first data source (assuming all items have the same data source for batch processing)
             first_data_source = data[0].non_tensor_batch['data_source']
-            compute_step_retrieval_format_judge_score = _select_rm_score_fn(first_data_source, reward_type='step_retrieval_format_judge')
+            
+            compute_judge_outcome_score = _select_rm_score_fn(first_data_source, reward_type='judge_outcome_reward')
             
             # Use async batch processing
-            batch_judge_scores = compute_step_retrieval_format_judge_score(
-                batch_mid_turns=batch_mid_turns, 
-                batch_final_turns=batch_final_turns, 
-                batch_solutions=batch_solutions, 
+            batch_judge_outcome_scores = compute_judge_outcome_score(
+                batch_mid_turns=batch_mid_turns,
+                batch_final_turns=batch_final_turns,
+                batch_solutions=batch_solutions,
                 batch_ground_truths=batch_ground_truths,
                 host=self.config.get('judge_host', 'slurm-h100-206-129'), 
                 port=self.config.get('judge_port', 8002),
-                judge_model_name=self.config.get('judge_model_name', 'Qwen/Qwen2.5-32B-Instruct'),
+                judge_model_name=self.config.get('judge_model_name', 'Qwen/Qwen2.5-72B-Instruct'),
                 use_async=True
             )
             
             # Assign batch results to tensors
-            for i, judge_scores in zip(batch_indices, batch_judge_scores):
+            for i, judge_outcome_scores in zip(batch_indices, batch_judge_outcome_scores):
                 data_item = data[i]
-                valid_response_length = data_item.batch['attention_mask'][data_item.batch['prompts'].shape[-1]:].sum()
-                
-                for j in range(data.meta_info['num_turns'][i] - 1):
-                    step_retrieval_format_judge_reward_tensor[i, data.meta_info['turn_indices'][i][j][1]] = judge_scores[j]
-                
-                if data.meta_info['num_turns'][i] - 1 == 0:
-                    avg_step_retrieval_format_judge_reward_tensor[i, valid_response_length - 1] = 0
-                else:
-                    avg_step_retrieval_format_judge_reward_tensor[i, valid_response_length - 1] = step_retrieval_format_judge_reward_tensor[i, :].sum(dim=-1) / (data.meta_info['num_turns'][i] - 1)
+                valid_response_length = data_item.batch['attention_mask'][data_item.batch['prompts'].shape[-1]:].sum()    
+                judge_outcome_reward_tensor[i, valid_response_length - 1] = judge_outcome_scores
             
-            mixed_judge_reward_tensor = final_em_format_reward_tensor + step_retrieval_format_judge_reward_tensor
+            
+            if reward_type == 'judge_turn_level_reward':
+                compute_judge_turn_level_score = _select_rm_score_fn(first_data_source, reward_type='judge_turn_level_reward')
+                
+                # Use async batch processing
+                batch_judge_turn_level_scores = compute_judge_turn_level_score(
+                    batch_mid_turns=batch_mid_turns,
+                    batch_final_turns=batch_final_turns,
+                    batch_solutions=batch_solutions,
+                    batch_ground_truths=batch_ground_truths,
+                    host=self.config.get('judge_host', 'slurm-h100-206-129'), 
+                    port=self.config.get('judge_port', 8002),
+                    judge_model_name=self.config.get('judge_model_name', 'Qwen/Qwen2.5-72B-Instruct'),
+                    use_async=True
+                )
+                
+                # Assign batch results to tensors
+                for i, judge_turn_level_score in zip(batch_indices, batch_judge_turn_level_scores):
+                    for j in range(data.meta_info['num_turns'][i]):
+                        judge_turn_level_reward_tensor[i, data.meta_info['turn_indices'][i][j][1]] = judge_turn_level_score[j]
 
 
-        if reward_type == 'mixed_judge_reward' and not self.is_val:
+        if 'judge' in reward_type and not self.is_val:
             return {
                 'answer_correctness': answer_reward_tensor,
                 'answer_sub_em': answer_sub_em_reward_tensor,
@@ -219,10 +238,9 @@ class RewardManager():
                 'final_em_format': final_em_format_reward_tensor,
                 'step_retrieval_format': step_retrieval_format_reward_tensor,
                 'avg_step_retrieval_format': avg_step_retrieval_format_reward_tensor,
-                'mixed_reward': mixed_reward_tensor,
-                'step_retrieval_format_judge': step_retrieval_format_judge_reward_tensor,
-                'avg_step_retrieval_format_judge': avg_step_retrieval_format_judge_reward_tensor,
-                'mixed_judge_reward': mixed_judge_reward_tensor,
+                'turn_level_reward': turn_level_reward_tensor,
+                'judge_outcome_reward': judge_outcome_reward_tensor,
+                'judge_turn_level_reward': judge_turn_level_reward_tensor,
             }
         else:
             return {
@@ -235,7 +253,7 @@ class RewardManager():
                 'final_em_format': final_em_format_reward_tensor,
                 'step_retrieval_format': step_retrieval_format_reward_tensor,
                 'avg_step_retrieval_format': avg_step_retrieval_format_reward_tensor,
-                'mixed_reward': mixed_reward_tensor,
+                'turn_level_reward': turn_level_reward_tensor,
             }
 
 import ray

@@ -17,7 +17,8 @@ async def _compute_async_batch_scores(
     host: str,
     port: int,
     judge_model_name: str,
-) -> List[List[float]]:
+    judge_mode: str = 'outcome',
+) -> Union[List[List[float]], List[float]]:
     """Compute scores for batch of items using async client for better performance."""
     print(f"Processing batch of {len(batch_solutions)} items with async client...")
 
@@ -27,7 +28,8 @@ async def _compute_async_batch_scores(
     data_processor = DataProcessor()
 
     # Prepare samples for async batch processing
-    samples = []
+    batch_samples = []
+    batch_num_turns = []
     for mid_turns, final_turn, solution, ground_truth in zip(
         batch_mid_turns, batch_final_turns, batch_solutions, batch_ground_truths
     ):
@@ -43,42 +45,42 @@ async def _compute_async_batch_scores(
         ground_truths_list = list(ground_truth['target'])
         ground_truth_str = ", ".join(str(item) for item in ground_truths_list) if len(ground_truths_list) > 0 else ""
             
-        samples.append((prompt, turns, ground_truth_str))
+        batch_samples.append((prompt, turns, ground_truth_str))
+        batch_num_turns.append(len(turns))  # Store the actual number of turns
 
     # Use async batch processing
-    judge_texts = await run_batch(
-        samples,
+    batch_judge_texts = await run_batch(
+        batch_samples,
         client=client,
-        concurrency=min(64, len(samples)),  # Limit concurrency
+        concurrency=min(64, len(batch_samples)),  # Limit concurrency
         max_tokens=2048,
         max_retries=2,
+        judge_mode=judge_mode,
     )
 
     # Extract scores for each item in the batch
-    batch_mid_scores = []
-    for judge_text, mid_turns in zip(judge_texts, batch_mid_turns):
-        num_turns = (
-            len(mid_turns) + 1 if isinstance(mid_turns, list) else 2
-        )  # +1 for final turn
-
-        if judge_text:
-            all_scores = judge_evaluator.extract_turn_scores_from_judge_response(
-                judge_text, num_turns
-            )
-            num_turns_minus_1 = len(mid_turns) if isinstance(mid_turns, list) else 1
-            mid_scores = (
-                all_scores[:num_turns_minus_1]
-                if len(all_scores) >= num_turns_minus_1
-                else [0.0] * num_turns_minus_1
-            )
+    batch_scores = []
+    for judge_text, num_turns in zip(batch_judge_texts, batch_num_turns):
+        if judge_mode == 'outcome':
+            # For outcome mode, return single score per item
+            if judge_text:
+                score = judge_evaluator.extract_outcome_score_from_judge_response(judge_text)
+                batch_scores.append(score)
+            else:
+                batch_scores.append(0.0)
         else:
-            num_turns_minus_1 = len(mid_turns) if isinstance(mid_turns, list) else 1
-            mid_scores = [0.0] * num_turns_minus_1
+            # For turn mode, return scores for all turns
+            if judge_text:
+                turn_scores = judge_evaluator.extract_turn_scores_from_judge_response(
+                    judge_text, num_turns
+                )
+            else:
+                turn_scores = [0.0] * num_turns
 
-        batch_mid_scores.append(mid_scores)
+            batch_scores.append(turn_scores)
 
-    print(f"Async batch processing completed. Results: {len(batch_mid_scores)} items")
-    return batch_mid_scores
+    print(f"Async batch processing completed. Results: {len(batch_scores)} items")
+    return batch_scores
 
 
 def _compute_sync_batch_scores(
@@ -89,7 +91,8 @@ def _compute_sync_batch_scores(
     host: str,
     port: int,
     judge_model_name: str,
-) -> List[List[float]]:
+    judge_mode: str = 'outcome',
+) -> Union[List[List[float]], List[float]]:
     """Compute scores for batch of items using sync client."""
     print(f"Processing batch of {len(batch_solutions)} items with sync client...")
 
@@ -102,6 +105,7 @@ def _compute_sync_batch_scores(
     prompts = []
     turns_list = []
     ground_truths = []
+    batch_num_turns = []
 
     for mid_turns, final_turn, solution, ground_truth in zip(
         batch_mid_turns, batch_final_turns, batch_solutions, batch_ground_truths
@@ -121,45 +125,90 @@ def _compute_sync_batch_scores(
             turns = list(mid_turns) + [final_turn]
 
         turns_list.append(turns)
+        batch_num_turns.append(len(turns))  # Store the actual number of turns
 
     # Process each item individually since batch methods don't exist
     results = []
     for prompt, turns, ground_truth in zip(prompts, turns_list, ground_truths):
-        judge_prompt = judge_evaluator.create_judge_prompt(prompt, turns, ground_truth)
+        if judge_mode == 'outcome':
+            judge_prompt = judge_evaluator.create_outcome_judge_prompt(prompt, turns, ground_truth)
+        else:  # turn_level or step_retrieval_format
+            judge_prompt = judge_evaluator.create_turn_judge_prompt(prompt, turns, ground_truth)
         result = client.generate_text(judge_prompt)
         results.append(result)
 
     # Extract scores for each item in the batch
-    batch_mid_scores = []
-    for result, mid_turns in zip(results, batch_mid_turns):
-        num_turns = len(mid_turns) + 1 if isinstance(mid_turns, list) else 2
-
-        if result:
-            all_scores = judge_evaluator.extract_turn_scores_from_judge_response(
-                result, num_turns
-            )
-            num_turns_minus_1 = len(mid_turns) if isinstance(mid_turns, list) else 1
-            mid_scores = (
-                all_scores[:num_turns_minus_1]
-                if len(all_scores) >= num_turns_minus_1
-                else [0.0] * num_turns_minus_1
-            )
+    batch_scores = []
+    for result, num_turns in zip(results, batch_num_turns):
+        if judge_mode == 'outcome':
+            # For outcome mode, return single score per item
+            if result:
+                score = judge_evaluator.extract_outcome_score_from_judge_response(result)
+                batch_scores.append(score)
+            else:
+                batch_scores.append(0.0)
         else:
-            num_turns_minus_1 = len(mid_turns) if isinstance(mid_turns, list) else 1
-            mid_scores = [0.0] * num_turns_minus_1
+            # For turn mode, return scores for all turns
+            if result:
+                turn_scores = judge_evaluator.extract_turn_scores_from_judge_response(
+                    result, num_turns
+                )
+            else:
+                turn_scores = [0.0] * num_turns
 
-        batch_mid_scores.append(mid_scores)
+            batch_scores.append(turn_scores)
 
-    print(f"Sync batch processing completed. Results: {len(batch_mid_scores)} items")
-    return batch_mid_scores
+    print(f"Sync batch processing completed. Results: {len(batch_scores)} items")
+    return batch_scores
 
 
 # ============================================================================
 # Main Scoring Function  
 # ============================================================================
 
+def compute_score_judge(
+    batch_mid_turns: List[List[str]],
+    batch_final_turns: List[str],
+    batch_solutions: List[str],
+    batch_ground_truths: List[Dict[str, Union[str, List[str], Any]]],
+    host: str,
+    port: int,
+    judge_model_name: str,
+    judge_mode: str = 'outcome',
+    use_async: bool = False,
+) -> Union[List[float], List[List[float]]]:
+    """Compute judge scores for a batch of solutions.
+    
+    Args:
+        judge_mode: 'outcome' for single scores, 'turn' for turn-level scores
+    """
+    args = (batch_mid_turns, batch_final_turns, batch_solutions, batch_ground_truths, host, port, judge_model_name)
+    
+    if use_async:
+        return asyncio.run(_compute_async_batch_scores(*args, judge_mode=judge_mode))
+    else:
+        return _compute_sync_batch_scores(*args, judge_mode=judge_mode)
 
-def compute_score_step_retrieval_format_judge(
+
+# Backward compatibility aliases
+def compute_score_judge_outcome(
+    batch_mid_turns: List[List[str]],
+    batch_final_turns: List[str],
+    batch_solutions: List[str],
+    batch_ground_truths: List[Dict[str, Union[str, List[str], Any]]],
+    host: str,
+    port: int,
+    judge_model_name: str,
+    use_async: bool = False,
+) -> List[float]:
+    """Compute judge outcome scores for a batch of solutions."""
+    return compute_score_judge(
+        batch_mid_turns, batch_final_turns, batch_solutions, batch_ground_truths,
+        host, port, judge_model_name, judge_mode='outcome', use_async=use_async
+    )
+
+
+def compute_score_judge_turn_level(
     batch_mid_turns: List[List[str]],
     batch_final_turns: List[str],
     batch_solutions: List[str],
@@ -169,44 +218,8 @@ def compute_score_step_retrieval_format_judge(
     judge_model_name: str,
     use_async: bool = False,
 ) -> List[List[float]]:
-    """Compute step retrieval format judge scores for turns.
-
-    Args:
-        batch_mid_turns: List of middle turn texts for each item
-        batch_final_turns: List of final turn texts
-        batch_solutions: List of complete solution strings
-        batch_ground_truths: List of ground truth dicts with 'target' key
-        host: VLLM server host
-        port: VLLM server port
-        judge_model_name: Model name for the judge
-        use_async: Whether to use async batch processing (recommended for batches)
-
-    Returns:
-        List of lists of scores for each item's turns (excluding final turn)
-    """
-
-    # Always batch processing - choose sync or async
-    if use_async:
-        # Use async batch processing for better performance
-        return asyncio.run(
-            _compute_async_batch_scores(
-                batch_mid_turns,
-                batch_final_turns,
-                batch_solutions,
-                batch_ground_truths,
-                host,
-                port,
-                judge_model_name,
-            )
-        )
-    else:
-        # Use sync batch processing
-        return _compute_sync_batch_scores(
-            batch_mid_turns,
-            batch_final_turns,
-            batch_solutions,
-            batch_ground_truths,
-            host,
-            port,
-            judge_model_name,
-        )
+    """Compute judge turn-level scores for a batch of multi-turn solutions."""
+    return compute_score_judge(
+        batch_mid_turns, batch_final_turns, batch_solutions, batch_ground_truths,
+        host, port, judge_model_name, judge_mode='turn', use_async=use_async
+    )
