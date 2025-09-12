@@ -91,61 +91,69 @@ class JudgeEvaluator:
         ground_truth_text = f"GROUND TRUTH:\n{ground_truth}\n"
         
         judge_prompt = f"""
-You are an expert evaluator for multi-turn search-augmented reasoning systems. Given a prompt and a generated response turn-by-turn, you need to evaluate each turn's effectiveness in addressing the prompt by following the instructions below.
+You are an expert evaluator for multi-turn search-augmented reasoning systems. Given a prompt and a generated response turn-by-turn, you need to evaluate each turn's effectiveness in addressing the prompt.
 
-## EVALUATION INSTRUCTIONS
+## EVALUATION TASK
 
-### 1. OUTPUT FORMAT (CRITICAL)
-Your response must use ONLY these XML tags:
+Assess each turn's format compliance, content quality, and contribution to answering the prompt.
+
+## SCORING CRITERIA
+
+### FINAL TURN (Last Turn) - Score Range: [-1.0 to 1.0]
+
+**Format Compliance:**
+• Required: `<think>...</think><answer>...</answer>` (tags only, once each, in order)
+• Correct format: +0.2
+• Incorrect format: -1.0
+
+**Answer Correctness:**
+• Correct and complete answer in `<answer>` tag that addresses the prompt: +0.8
+• Poor or incomplete answer in `<answer>` tag: +0.0
+
+**Final Turn Score = Format Compliance + Answer Correctness**
+
+### INTERMEDIATE TURNS - Score Range: [-1.0 to 1.0]
+
+**Format Compliance:**
+• Required: `<think>...</think><search>...</search><information>...</information>` (tags only, once each, in order)
+• Correct format: +0.1
+• Incorrect format: -0.2
+
+**Information Quality:**
+• Relevant information in `<information>` tag that helps address the prompt: +0.3
+• Irrelevant or unhelpful information in `<information>` tag: +0.0
+
+**Search Efficiency Penalty:**
+• Total `<search>` tags from Turn 1 to current turn × (-0.1)
+• Encourages finding answers with fewer searches
+
+**Intermediate Turn Score = Format Compliance + Information Quality + Search Penalty**
+
+## OUTPUT FORMAT
+
+Provide your evaluation using ONLY these XML tags:
 
 <reasoning>
-Systematic evaluation of each turn step by step
-...
+[Systematically evaluate each turn: check format compliance, assess content quality, calculate scores with clear explanations]
 </reasoning>
 
 <score>
-Turn1: X.X
-Turn2: X.X
-Turn3: X.X
+Turn1: [X.X]
+Turn2: [X.X]
+Turn3: [X.X]
 ...
 </score>
 
 ⚠️ REQUIREMENTS:
-- Number of scores MUST exactly match the number of provided turns
-- Use NO other XML tags in your response
-- Use decimal format (e.g., 0.5, -0.3)
+• Number of scores MUST exactly match the number of turns ({len(turns)} turns)
+• Use decimal format (e.g., 0.5, -0.3, 1.0)
+• No additional XML tags or explanatory text allowed
 
-### 2. FINAL TURN EVALUATION [-1.0 to 1.0]
-
-**Format Compliance:**
-- Correct format (`<think>...</think><answer>...</answer>` only): +0.2
-- Wrong format (missing tags, extra tags, wrong order): -1.0
-
-**Answer Quality:**
-- Well-reasoned answer in `<answer>` tag that addresses the prompt: +0.8
-- Poor or incomplete answer: +0.0
-
-**Final Score = Format Compliance + Answer Correctness**
-
-### 3. INTERMEDIATE TURN EVALUATION
-
-**Format Compliance:**
-- Correct format (`<think>...</think><search>...</search><information>...</information>` only): +0.1
-- Wrong format (missing tags, extra tags, wrong order): -0.2
-
-**Search Quality:**
-- If relevant information is found in `<information>` tag that helps address the prompt: +0.3
-- If information is not relevant or helpful: +0.0
-
-**Search Penalty:**
-- Count total number of `<search>` tags from Turn 1 up to current turn
-- Apply penalty: -0.1 × total_search_count
-
-**Final Score = Format Compliance + Search Quality + Search Penalty**
+## EVALUATION DATA
 
 {prompt_text}
 {turns_text}
-**Number of turns to evaluate: {len(turns)}**
+**TURNS TO EVALUATE: {len(turns)}**
 
 """
 
@@ -219,13 +227,43 @@ Turn3: X.X
         ground_truth_text = f"GROUND TRUTH:\n{ground_truth}\n"
         
         judge_prompt = f"""
-You are an expert evaluator for multi-turn search-augmented reasoning systems. Given a prompt and a generated response turn-by-turn, you need to evaluate the quality of the final answer in the <answer> tag.
+You are an expert evaluator for multi-turn search-augmented reasoning systems. Given a prompt and a generated response turn-by-turn, you need to determine if the final answer correctly addresses the given prompt.
 
-Give the score in <score> tag, the value is binary 0 or 1, where 1 means the final answer is good quality and 0 means the final answer is poor quality.
+## EVALUATION TASK
+
+Determine if the multi-turn response contains a correct final answer that fully addresses the prompt.
+
+## SCORING CRITERIA
+
+**Score 1.0 (Correct):**
+• Response contains `<answer>` tag with correct and complete content that addresses the prompt
+
+**Score 0.0 (Incorrect):**
+• No `<answer>` tag found, OR
+• Answer is factually incorrect or incomplete
+
+## OUTPUT FORMAT
+
+Provide your evaluation using ONLY this format:
+
+<score>
+1.0
+</score>
+
+OR
+
+<score>
+0.0
+</score>
+
+⚠️ REQUIREMENTS:
+• Use NO other text or XML tags
+• Score must be exactly 1.0 or 0.0
+
+## EVALUATION DATA
 
 {prompt_text}
 {turns_text}
-
 """
         return judge_prompt
 
