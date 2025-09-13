@@ -91,11 +91,11 @@ class JudgeEvaluator:
         ground_truth_text = f"GROUND TRUTH:\n{ground_truth}\n"
         
         judge_prompt = f"""
-You are an expert evaluator for multi-turn search-augmented reasoning systems. Given a prompt and a generated response turn-by-turn, you need to evaluate each turn's effectiveness in addressing the prompt.
+You are an expert evaluator for multi-turn search-augmented reasoning systems. Given a user prompt, ground truth answer, and multi-turn generated response, evaluate each turn's effectiveness and compliance.
 
 ## EVALUATION TASK
 
-Assess each turn's format compliance, content quality, and contribution to answering the prompt.
+Assess each turn's format compliance, content quality, and contribution toward the ground truth answer.
 
 ## SCORING CRITERIA
 
@@ -107,7 +107,7 @@ Assess each turn's format compliance, content quality, and contribution to answe
 • Incorrect format: -1.0
 
 **Answer Correctness:**
-• Correct and complete answer in `<answer>` tag that addresses the prompt: +0.8
+• Correct and complete answer in `<answer>` tag that matches the ground truth: +0.8
 • Poor or incomplete answer in `<answer>` tag: +0.0
 
 **Final Turn Score = Format Compliance + Answer Correctness**
@@ -120,7 +120,7 @@ Assess each turn's format compliance, content quality, and contribution to answe
 • Incorrect format: -0.2
 
 **Information Quality:**
-• Relevant information in `<information>` tag that helps address the prompt: +0.3
+• Relevant information in `<information>` tag that helps toward the ground truth answer: +0.3
 • Irrelevant or unhelpful information in `<information>` tag: +0.0
 
 **Search Efficiency Penalty:**
@@ -134,7 +134,7 @@ Assess each turn's format compliance, content quality, and contribution to answe
 Provide your evaluation using ONLY these XML tags:
 
 <reasoning>
-[Systematically evaluate each turn: check format compliance, assess content quality, calculate scores with clear explanations]
+Systematically evaluate each turn: check format compliance, assess content quality, calculate scores with clear explanations
 </reasoning>
 
 <score>
@@ -145,16 +145,18 @@ Turn3: [X.X]
 </score>
 
 ⚠️ REQUIREMENTS:
-• Number of scores MUST exactly match the number of turns ({len(turns)} turns)
+• Must provide exactly {len(turns)} scores (one per turn)
 • Use decimal format (e.g., 0.5, -0.3, 1.0)
-• No additional XML tags or explanatory text allowed
+• Use only the specified XML tags, no additional text
 
 ## EVALUATION DATA
 
 {prompt_text}
 {turns_text}
+{ground_truth_text}
 **TURNS TO EVALUATE: {len(turns)}**
 
+## Your Evaluation
 """
 
         return judge_prompt
@@ -227,20 +229,20 @@ Turn3: [X.X]
         ground_truth_text = f"GROUND TRUTH:\n{ground_truth}\n"
         
         judge_prompt = f"""
-You are an expert evaluator for multi-turn search-augmented reasoning systems. Given a prompt and a generated response turn-by-turn, you need to determine if the final answer correctly addresses the given prompt.
+You are an expert evaluator for multi-turn search-augmented reasoning systems. Given a user prompt, ground truth answer, and multi-turn generated response, determine whether the final answer matches the ground truth.
 
 ## EVALUATION TASK
 
-Determine if the multi-turn response contains a correct final answer that fully addresses the prompt.
+Evaluate whether the multi-turn response provides a correct final answer that matches the ground truth.
 
 ## SCORING CRITERIA
 
 **Score 1.0 (Correct):**
-• **The answer within `<answer></answer>` tags** is correct and complete, fully addressing the question in the prompt
+• The answer within `<answer></answer>` tags matches the ground truth
 
 **Score 0.0 (Incorrect):**
 • No `<answer></answer>` tags found, OR
-• **The answer within `<answer></answer>` tags** is factually incorrect or incomplete
+• The answer within `<answer></answer>` tags does not match the ground truth
 
 ## OUTPUT FORMAT
 
@@ -264,6 +266,9 @@ OR
 
 {prompt_text}
 {turns_text}
+{ground_truth_text}
+
+## Your Evaluation
 """
         return judge_prompt
 

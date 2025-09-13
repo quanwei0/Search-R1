@@ -101,9 +101,9 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     trainer.default_hdfs_dir=null \
     trainer.default_local_dir=verl_checkpoints/$EXPERIMENT_NAME \
     max_turns=3 \
-    +judge_host="slurm-h100-206-091" \
+    +judge_host="slurm-h100-206-175" \
     +judge_port=8002 \
-    +judge_model_name="Qwen/Qwen2.5-32B-Instruct" \
+    +judge_model_name="Qwen/Qwen2.5-72B-Instruct" \
     retriever.url="http://127.0.0.1:$RETRIEVAL_PORT/retrieve" \
     retriever.topk=3 \
     2>&1 | tee ./outputs/log/$EXPERIMENT_NAME.log

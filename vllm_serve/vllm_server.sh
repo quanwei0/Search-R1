@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Configuration parameters
-CUDA_DEVICES=${1:-"2,3"}
+CUDA_DEVICES=${1:-"0,1,2,3"}
 export CUDA_VISIBLE_DEVICES=$CUDA_DEVICES
 TENSOR_PARALLEL_SIZE=$(echo $CUDA_VISIBLE_DEVICES | tr ',' '\n' | wc -l)
 HOST=${2:-"0.0.0.0"}
