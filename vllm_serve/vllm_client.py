@@ -109,6 +109,7 @@ Assess each turn's format compliance, content quality, and contribution toward t
 **Answer Correctness:**
 • Correct and complete answer in `<answer>` tag that matches the ground truth: +0.8
 • Poor or incomplete answer in `<answer>` tag: +0.0
+• Answer in `<answer>` tag exceeds 5 tokens: -1.0
 
 **Final Turn Score = Format Compliance + Answer Correctness**
 
@@ -138,9 +139,9 @@ Systematically evaluate each turn: check format compliance, assess content quali
 </reasoning>
 
 <score>
-Turn1: [X.X]
-Turn2: [X.X]
-Turn3: [X.X]
+Turn1: X.X
+Turn2: X.X
+Turn3: X.X
 ...
 </score>
 
@@ -242,24 +243,23 @@ Evaluate whether the multi-turn response provides a correct final answer that ma
 
 **Score 0.0 (Incorrect):**
 • No `<answer></answer>` tags found, OR
-• The answer within `<answer></answer>` tags does not match the ground truth
+• The answer within `<answer></answer>` tags does not match the ground truth, OR
+• The answer in `<answer>` tag exceeds 5 tokens
 
 ## OUTPUT FORMAT
 
-Provide your evaluation using ONLY this format:
+Provide your evaluation using this format:
+
+<reasoning>
+[Your step-by-step reasoning about whether the answer matches the ground truth]
+</reasoning>
 
 <score>
-1.0
-</score>
-
-OR
-
-<score>
-0.0
+1.0 or 0.0
 </score>
 
 ⚠️ REQUIREMENTS:
-• Use NO other text or XML tags
+• First provide reasoning, then the score
 • Score must be exactly 1.0 or 0.0
 
 ## EVALUATION DATA

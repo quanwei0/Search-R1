@@ -61,7 +61,15 @@ async def _compute_async_batch_scores(
 
         # Extract scores for each item in the batch
         batch_scores = []
-        for judge_text, num_turns in zip(batch_judge_texts, batch_num_turns):
+        for i, (judge_text, num_turns) in enumerate(zip(batch_judge_texts, batch_num_turns)):
+            if i < 2:
+                prompt, turns, ground_truth_str = batch_samples[i]
+                print(f"Sample {i+1}:")
+                print(f"Prompt: {prompt}")
+                print(f"Response: {turns}")
+                print(f"Ground Truth: {ground_truth_str}")
+                print(f"Judge text:\n{judge_text}")
+                print("-" * 50)
             if judge_mode == 'outcome':
                 # For outcome mode, return single score per item
                 if judge_text:
