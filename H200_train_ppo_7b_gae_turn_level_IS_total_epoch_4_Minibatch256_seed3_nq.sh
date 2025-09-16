@@ -1,7 +1,7 @@
 # Set shared configuration parameters
 export CUDA_VISIBLE_DEVICES=0,1,2,3
 export RETRIEVAL_PORT=8001
-export DATA_DIR='./data/nq_search'
+export DATA_DIR='./data/nq_hotpotqa_train'
 
 # source activate retriever
 # # Pass GPU devices and port to retrieval script
@@ -69,7 +69,7 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     actor_rollout_ref.rollout.n_agent=1 \
     actor_rollout_ref.rollout.temperature=1 \
     actor_rollout_ref.actor.state_masking=True \
-    +actor_rollout_ref.actor.importance_sampling_level=turn \
+    +actor_rollout_ref.actor.importance_sampling_level=token \
     +actor_rollout_ref.actor.detach_ratio=variance_reduction \
     critic.optim.lr=1e-5 \
     critic.model.use_remove_padding=True \
@@ -97,7 +97,7 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     trainer.total_epochs=4 \
     trainer.total_training_steps=2000 \
     trainer.default_hdfs_dir=null \
-    trainer.default_local_dir=verl_checkpoints/$EXPERIMENT_NAME \
+    trainer.default_local_dir=/mnt/data1/li003968/verl_checkpoints/$EXPERIMENT_NAME \
     max_turns=3 \
     retriever.url="http://127.0.0.1:$RETRIEVAL_PORT/retrieve" \
     retriever.topk=3 \
