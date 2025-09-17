@@ -1,14 +1,27 @@
-# Set shared configuration parameters
-export CUDA_VISIBLE_DEVICES=0,1,2,3
-export RETRIEVAL_PORT=8001
-export DATA_DIR='./data/nq_hotpotqa_train'
+#!/bin/bash
 
-# source activate retriever
+# Parse command line arguments
+CUDA_DEVICES=${1:-"0,1,2,3"}
+RETRIEVAL_PORT=${2:-8001}
+
+echo "Using CUDA devices: $CUDA_DEVICES"
+echo "Using retrieval port: $RETRIEVAL_PORT"
+
+# source /mnt/data1/wei00355/miniconda/bin/activate
+# conda init
+
+# Set shared configuration parameters
+export CUDA_VISIBLE_DEVICES=$CUDA_DEVICES
+export RETRIEVAL_PORT=$RETRIEVAL_PORT
+
+# conda activate retriever
 # # Pass GPU devices and port to retrieval script
-# bash retrieval_launch.sh "$CUDA_VISIBLE_DEVICES" "$RETRIEVAL_PORT"
+# bash retrieval_launch.sh "$CUDA_VISIBLE_DEVICES" "$RETRIEVAL_PORT" &
 # sleep 60
 
-source activate searchr1
+# conda activate searchr1
+
+export DATA_DIR='./data/nq_hotpotqa_train'
 
 export WANDB_API_KEY="810f91e58aa0fd1d03b11c60b0d1cffbb1d941f4"
 export WANDB_ENTITY="rl_agent"
@@ -16,16 +29,18 @@ export WANDB_ENTITY="rl_agent"
 WAND_PROJECT='Search-R1'
 
 
-export BASE_MODEL='Qwen/Qwen2.5-7B'
-export EXPERIMENT_NAME=H200-search-r1-ppo-qwen2.5-7b-em-gae-turn-IS-total-epoch-4-Minibatch256-seed3
+# export BASE_MODEL='Qwen/Qwen2.5-1.5B'
+# export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-1.5b-em-gae
 # export BASE_MODEL='Qwen/Qwen2.5-1.5B-Instruct'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-1.5b-it-em
 # export BASE_MODEL='Qwen/Qwen2.5-3B'
-# export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-3b-em
+# export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-3b-em-gae
 # export BASE_MODEL='Qwen/Qwen2.5-3B-Instruct'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-3b-it-em
-# export BASE_MODEL='Qwen/Qwen2.5-7B'
-# export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-7b-em
+# export BASE_MODEL='PeterJinGo/SearchR1-nq_hotpotqa_train-qwen2.5-7b-em-ppo'
+export BASE_MODEL='/mnt/data1/li003968/verl_checkpoints/H200-search-r1-ppo-qwen2.5-7b-em-gae-turn-IS-total-epoch-4-Minibatch256-seed3/actor/global_step_475'
+EXPERIMENT_NAME=val-S-ppo-qwen2.5-7b-em-gae-pass1
+export EXPERIMENT_NAME=qw-$EXPERIMENT_NAME-$(date +%Y%m%d-%H%M%S)
 # export BASE_MODEL='Qwen/Qwen2.5-7B-Instruct'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-7b-it-em
 
@@ -40,16 +55,15 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     data.train_data_num=null \
     data.val_data_num=null \
     data.train_batch_size=512 \
-    data.val_batch_size=256 \
-    data.max_prompt_length=4096 \
+    data.val_batch_size=1024 \
+    data.max_prompt_length=8192 \
     data.max_response_length=500 \
     data.max_start_length=2048 \
     data.max_obs_length=500 \
     data.shuffle_train_dataloader=True \
-    algorithm.adv_estimator=gae \
+    algorithm.adv_estimator=grpo \
     algorithm.gamma=1 \
     algorithm.lam=1 \
-    +algorithm.use_mixed_outcome_reward=False \
     actor_rollout_ref.model.path=$BASE_MODEL \
     actor_rollout_ref.actor.optim.lr=1e-6 \
     actor_rollout_ref.model.enable_gradient_checkpointing=True \
@@ -63,42 +77,31 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     actor_rollout_ref.rollout.log_prob_micro_batch_size=128 \
     actor_rollout_ref.rollout.tensor_model_parallel_size=4 \
     actor_rollout_ref.rollout.name=vllm \
-    actor_rollout_ref.rollout.gpu_memory_utilization=0.6 \
+    actor_rollout_ref.rollout.gpu_memory_utilization=0.9 \
     actor_rollout_ref.ref.log_prob_micro_batch_size=128 \
     actor_rollout_ref.ref.fsdp_config.param_offload=True \
     actor_rollout_ref.rollout.n_agent=1 \
     actor_rollout_ref.rollout.temperature=1 \
     actor_rollout_ref.actor.state_masking=True \
-    +actor_rollout_ref.actor.importance_sampling_level=token \
-    +actor_rollout_ref.actor.detach_ratio=variance_reduction \
-    critic.optim.lr=1e-5 \
-    critic.model.use_remove_padding=True \
-    critic.optim.lr_warmup_steps_ratio=0.015 \
-    critic.model.path=$BASE_MODEL \
-    critic.model.enable_gradient_checkpointing=True \
-    critic.ppo_micro_batch_size=8 \
-    critic.model.fsdp_config.param_offload=True \
-    critic.model.fsdp_config.grad_offload=True \
-    critic.model.fsdp_config.optimizer_offload=True \
-    +critic.is_critic_masking=False \
     algorithm.kl_ctrl.kl_coef=0.001 \
     algorithm.no_think_rl=False \
-    trainer.critic_warmup=0 \
-    trainer.logger=['console','wandb'] \
-    +trainer.val_only=False \
-    +trainer.val_before_train=False \
+    trainer.logger=['console'] \
+    +trainer.val_only=True \
+    +trainer.val_before_train=True \
     trainer.default_hdfs_dir=null \
     trainer.n_gpus_per_node=4 \
     trainer.nnodes=1 \
-    trainer.save_freq=25 \
+    trainer.save_freq=-1 \
     trainer.test_freq=-1 \
     trainer.project_name=$WAND_PROJECT \
     trainer.experiment_name=$EXPERIMENT_NAME \
-    trainer.total_epochs=4 \
+    trainer.total_epochs=20 \
     trainer.total_training_steps=2000 \
     trainer.default_hdfs_dir=null \
-    trainer.default_local_dir=/mnt/data1/li003968/verl_checkpoints/$EXPERIMENT_NAME \
+    trainer.default_local_dir=verl_checkpoints/$EXPERIMENT_NAME \
+    +trainer.is_save_train_traj=True \
+    +trainer.is_save_val_traj=True \
     max_turns=3 \
-    retriever.url="http://127.0.0.1:$RETRIEVAL_PORT/retrieve" \
+    retriever.url="http://127.0.0.1:8001/retrieve" \
     retriever.topk=3 \
-    2>&1 | tee $EXPERIMENT_NAME.log
+    2>&1 | tee ./outputs/log/$EXPERIMENT_NAME.log
