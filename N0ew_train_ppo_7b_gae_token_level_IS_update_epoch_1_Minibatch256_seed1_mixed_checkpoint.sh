@@ -1,14 +1,13 @@
 # Set shared configuration parameters
-export CUDA_VISIBLE_DEVICES=0,1,2,3
+export RETRIEVAL_CUDA_VISIBLE_DEVICES=0,1,2,3
 export RETRIEVAL_PORT=8001
 export DATA_DIR='./data/nq_hotpotqa_train'
 
-# source activate retriever
+source activate /opt/conda/envs/retriever
 # # Pass GPU devices and port to retrieval script
-# bash retrieval_launch.sh "$CUDA_VISIBLE_DEVICES" "$RETRIEVAL_PORT"
-# sleep 60
-
-source activate searchr1
+bash retrieval_launch.sh "$RETRIEVAL_CUDA_VISIBLE_DEVICES" "$RETRIEVAL_PORT"
+sleep 60
+conda activate /opt/conda/envs/searchr1-test
 
 export WANDB_API_KEY="810f91e58aa0fd1d03b11c60b0d1cffbb1d941f4"
 export WANDB_ENTITY="rl_agent"
@@ -17,7 +16,7 @@ WAND_PROJECT='Search-R1'
 
 
 export BASE_MODEL='Qwen/Qwen2.5-7B'
-export EXPERIMENT_NAME=H200-search-r1-ppo-qwen2.5-7b-em-gae-turn-IS-total-epoch-4-Minibatch256-saved-checkpoint-seed2
+export EXPERIMENT_NAME=H100-search-r1-ppo-qwen2.5-7b-em-gae-turn-IS-update-epoch-1-Minibatch256-seed1
 # export BASE_MODEL='Qwen/Qwen2.5-1.5B-Instruct'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-1.5b-it-em
 # export BASE_MODEL='Qwen/Qwen2.5-3B'
@@ -28,11 +27,8 @@ export EXPERIMENT_NAME=H200-search-r1-ppo-qwen2.5-7b-em-gae-turn-IS-total-epoch-
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-7b-em
 # export BASE_MODEL='Qwen/Qwen2.5-7B-Instruct'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-7b-it-em
-
 # set -x
 export VLLM_ATTENTION_BACKEND=XFORMERS # vllm + qwen2-7b with flash_attn has some issues
-
-# max_prompt_length = (config['training']['max_start_length'] + config['training']['max_response_length'] * (config['training']['max_turns'] - 1) + config['training']['max_obs_length'] * config['training']['max_turns'])
 
 PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     data.train_files=$DATA_DIR/train.parquet \
@@ -57,6 +53,7 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     actor_rollout_ref.actor.optim.lr_warmup_steps_ratio=0.285 \
     actor_rollout_ref.actor.ppo_mini_batch_size=256 \
     actor_rollout_ref.actor.ppo_micro_batch_size=64 \
+    +actor_rollout_ref.actor.update_epochs=1 \
     actor_rollout_ref.actor.fsdp_config.param_offload=True \
     actor_rollout_ref.actor.fsdp_config.grad_offload=True \
     actor_rollout_ref.actor.fsdp_config.optimizer_offload=True \
@@ -70,7 +67,6 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     actor_rollout_ref.rollout.temperature=1 \
     actor_rollout_ref.actor.state_masking=True \
     +actor_rollout_ref.actor.importance_sampling_level=token \
-    +actor_rollout_ref.actor.detach_ratio=variance_reduction \
     critic.optim.lr=1e-5 \
     critic.model.use_remove_padding=True \
     critic.optim.lr_warmup_steps_ratio=0.015 \
@@ -88,7 +84,7 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     +trainer.val_only=False \
     +trainer.val_before_train=False \
     trainer.default_hdfs_dir=null \
-    trainer.n_gpus_per_node=4 \
+    trainer.n_gpus_per_node=8 \
     trainer.nnodes=1 \
     trainer.save_freq=25 \
     trainer.test_freq=-1 \
@@ -97,8 +93,8 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     trainer.total_epochs=4 \
     trainer.total_training_steps=2000 \
     trainer.default_hdfs_dir=null \
-    trainer.default_local_dir=/mnt/data1/li003968/verl_checkpoints/$EXPERIMENT_NAME \
-    max_turns=4 \
+    trainer.default_local_dir=verl_checkpoints/$EXPERIMENT_NAME \
+    max_turns=3 \
     retriever.url="http://127.0.0.1:$RETRIEVAL_PORT/retrieve" \
     retriever.topk=3 \
     2>&1 | tee $EXPERIMENT_NAME.log
