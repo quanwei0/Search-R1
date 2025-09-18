@@ -103,15 +103,15 @@ Assess each turn's format compliance, content quality, and contribution toward t
 
 **Format Compliance:**
 • Required: `<think>...</think><answer>...</answer>` (tags only, once each, in order)
-• Correct format: +0.2
-• Incorrect format: -1.0
-• Answer in `<answer>` tag exceeds 5 tokens: -1.0
+• Answer in `<answer>` tag must not exceed 5 tokens
 
 **Answer Correctness:**
-• Correct and complete answer in `<answer>` tag that matches the ground truth: +0.8
-• Poor or incomplete answer in `<answer>` tag: +0.0
+• Correct and complete answer in `<answer>` tag that matches the ground truth
 
-**Final Turn Score = Format Compliance + Answer Correctness**
+**Scoring Rules:**
+• If format is incorrect: Final Turn Score = -0.1
+• If format is correct, answer is incorrect: Final Turn Score = 0.2
+• If format is correct, answer is correct: Final Turn Score = 1.0
 
 ### INTERMEDIATE TURNS - Score Range: [-1.0 to 1.0]
 
@@ -121,11 +121,12 @@ Assess each turn's format compliance, content quality, and contribution toward t
 • Incorrect format: -0.2
 
 **Information Quality:**
-• Relevant information in `<information>` tag that helps toward the ground truth answer: +0.2
+• Relevant information in `<information>` tag that helps toward the ground truth answer (e.g., ground truth exists in the retrieved result within `<information>` tag): +0.3
 • Irrelevant or unhelpful information in `<information>` tag: +0.0
 
 **Search Efficiency Penalty:**
-• Total `<search>` tags from Turn 1 to current turn × (-0.1)
+• Number of searches = Total count of `<search>` tags across all turns from Turn 1 up to and including the current turn
+• Search penalty = Number of searches × (-0.1)
 • Encourages finding answers with fewer searches
 
 **Intermediate Turn Score = Format Compliance + Information Quality + Search Penalty**

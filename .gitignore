@@ -123,3 +123,5 @@ log/
 
 /plot
 /verl_checkpoints
+*.err
+*.out
