@@ -105,11 +105,11 @@ Assess each turn's format compliance, content quality, and contribution toward t
 • Required: `<think>...</think><answer>...</answer>` (tags only, once each, in order)
 • Correct format: +0.2
 • Incorrect format: -1.0
+• Answer in `<answer>` tag exceeds 5 tokens: -1.0
 
 **Answer Correctness:**
 • Correct and complete answer in `<answer>` tag that matches the ground truth: +0.8
 • Poor or incomplete answer in `<answer>` tag: +0.0
-• Answer in `<answer>` tag exceeds 5 tokens: -1.0
 
 **Final Turn Score = Format Compliance + Answer Correctness**
 
@@ -121,7 +121,7 @@ Assess each turn's format compliance, content quality, and contribution toward t
 • Incorrect format: -0.2
 
 **Information Quality:**
-• Relevant information in `<information>` tag that helps toward the ground truth answer: +0.3
+• Relevant information in `<information>` tag that helps toward the ground truth answer: +0.2
 • Irrelevant or unhelpful information in `<information>` tag: +0.0
 
 **Search Efficiency Penalty:**
