@@ -109,7 +109,7 @@ Assess each turn's format compliance, content quality, and contribution toward t
 • Correct and complete answer in `<answer>` tag that matches the ground truth
 
 **Scoring Rules:**
-• If format is incorrect: Final Turn Score = -0.1
+• If format is incorrect: Final Turn Score = -1.0
 • If format is correct, answer is incorrect: Final Turn Score = 0.2
 • If format is correct, answer is correct: Final Turn Score = 1.0
 
