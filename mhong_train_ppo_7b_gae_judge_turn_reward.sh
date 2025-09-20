@@ -23,8 +23,8 @@ conda activate search
 
 judge_host="127.0.0.1"
 judge_port=8002
-# huggingface-cli download Qwen/Qwen2.5-72B-Instruct --local-dir /data/hongpaul-sandbox/qwen_models/qwen-72b-it
-judge_model_name="/data/hongpaul-sandbox/qwen_models/qwen-72b-it"
+# huggingface-cli download openai/gpt-oss-120b --local-dir /data/hongpaul-sandbox/gpt_models/gpt-oss-120b
+judge_model_name="/data/hongpaul-sandbox/gpt_models/gpt-oss-120b"
 bash vllm_serve/vllm_server.sh "4,5,6,7" $judge_host $judge_port $judge_model_name &
 sleep 60
 
