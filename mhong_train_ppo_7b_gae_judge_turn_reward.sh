@@ -39,7 +39,7 @@ WAND_PROJECT='Search-R1'
 
 
 export BASE_MODEL="/code/hongpaul-sandbox/temp/Search-R1/qwen_models/qwen-7b"
-EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-7b-em-gae-judge-turn-reward
+EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-7b-em-gae-judge-turn-reward-5
 export EXPERIMENT_NAME=qw-mhong-$EXPERIMENT_NAME-$(date +%Y%m%d-%H%M%S)
 # export BASE_MODEL='Qwen/Qwen2.5-1.5B-Instruct'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-1.5b-it-em
