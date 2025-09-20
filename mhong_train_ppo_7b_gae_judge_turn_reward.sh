@@ -19,7 +19,7 @@ conda activate retriever
 bash retrieval_launch.sh "$CUDA_VISIBLE_DEVICES" "$RETRIEVAL_PORT" &
 sleep 60
 
-conda activate search
+conda activate vllm
 
 judge_host="127.0.0.1"
 judge_port=8002
@@ -27,6 +27,8 @@ judge_port=8002
 judge_model_name="/data/hongpaul-sandbox/gpt_models/gpt-oss-120b"
 bash vllm_serve/vllm_server.sh "4,5,6,7" $judge_host $judge_port $judge_model_name &
 sleep 60
+
+conda activate search
 
 export DATA_DIR='./data/nq_search'
 
