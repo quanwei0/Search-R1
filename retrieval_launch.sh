@@ -1,9 +1,9 @@
 # Accept parameters from calling script, use defaults if not provided
 CUDA_DEVICES=${1:-"0,1,2,3"}
 RETRIEVAL_PORT=${2:-"8001"}
+file_path=${3:-"./data"}
 
 export CUDA_VISIBLE_DEVICES=$CUDA_DEVICES
-file_path=./data
 index_file=$file_path/e5_Flat.index
 corpus_file=$file_path/wiki-18.jsonl
 retriever_name=e5

@@ -16,12 +16,12 @@ export RETRIEVAL_PORT=$RETRIEVAL_PORT
 
 conda activate retriever
 # Pass GPU devices and port to retrieval script
-bash retrieval_launch.sh "$CUDA_VISIBLE_DEVICES" "$RETRIEVAL_PORT" &
+bash retrieval_launch.sh "$CUDA_VISIBLE_DEVICES" "$RETRIEVAL_PORT" "/data/Search-R1/data" &
 sleep 60
 
 conda activate searchr1
 
-export DATA_DIR='./data/nq_hotpotqa_train'
+export DATA_DIR='/data/Search-R1/data/nq_hotpotqa_train'
 
 export WANDB_API_KEY="810f91e58aa0fd1d03b11c60b0d1cffbb1d941f4"
 export WANDB_ENTITY="rl_agent"
@@ -37,8 +37,8 @@ WAND_PROJECT='Search-R1'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-3b-em-gae
 # export BASE_MODEL='Qwen/Qwen2.5-3B-Instruct'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-3b-it-em
-export BASE_MODEL='PeterJinGo/SearchR1-nq_hotpotqa_train-qwen2.5-7b-em-ppo'
-EXPERIMENT_NAME=val-search-r1-ppo-qwen2.5-7b-em-gae-pass1
+export BASE_MODEL='Qwen/Qwen2.5-7B-Instruct'
+EXPERIMENT_NAME=val-qwen2.5-7b-it-maxturn4
 export EXPERIMENT_NAME=qw-$EXPERIMENT_NAME-$(date +%Y%m%d-%H%M%S)
 # export BASE_MODEL='Qwen/Qwen2.5-7B-Instruct'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-7b-it-em
@@ -100,7 +100,7 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     trainer.default_local_dir=verl_checkpoints/$EXPERIMENT_NAME \
     +trainer.is_save_train_traj=True \
     +trainer.is_save_val_traj=True \
-    max_turns=3 \
+    max_turns=4 \
     retriever.url="http://127.0.0.1:8001/retrieve" \
     retriever.topk=3 \
     2>&1 | tee ./outputs/log/$EXPERIMENT_NAME.log
