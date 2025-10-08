@@ -961,8 +961,8 @@ class RayPPOTrainer(object):
                             print(f"[INFO] Using {reward_type}_tensor for token_level_scores")
                             batch.batch['token_level_scores'] = selected_tensor
                         else:
-                            print(f"[WARNING] Unknown reward_type: {reward_type}, defaulting to answer_correctness")
-                            batch.batch['token_level_scores'] = answer_reward_tensor
+                            raise ValueError(f"Unknown reward_type: {reward_type}. Valid options are: {list(reward_mapping.keys())}")
+                            
 
                         # compute training reward metrics by data source
                         train_data_sources = batch.non_tensor_batch.get(
