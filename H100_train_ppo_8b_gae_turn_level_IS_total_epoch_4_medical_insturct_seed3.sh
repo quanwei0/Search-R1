@@ -1,4 +1,3 @@
-export HUGGINGFACE_HUB_TOKEN="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"
 # Set shared configuration parameters
 export RETRIEVAL_CUDA_VISIBLE_DEVICES=0,1,2,3
 export RETRIEVAL_PORT=8001
