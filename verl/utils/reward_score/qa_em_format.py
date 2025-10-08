@@ -142,6 +142,13 @@ def extract_information_blocks(text: str) -> list[str]:
     return [match.strip() for match in matches]
 
 
+def count_search_turns(text: str) -> int:
+    """Count the number of search turns in the solution string."""
+    search_pattern = r"<search>(.*?)</search>"
+    matches = re.findall(search_pattern, text, re.DOTALL)
+    return len(matches)
+
+
 def is_retrieval_correct(text: str, golden_answers: list[str]) -> list[str]:
     seqs = extract_information_blocks(text)
     for seq in seqs:
@@ -195,3 +202,64 @@ def compute_score_em(solution_str, ground_truth, method='strict', structure_form
                 return structure_format_score # 0.2
         else:
             return final_format_score # 0.1
+
+
+def compute_score_em_with_search_penalty(
+    solution_str,
+    ground_truth,
+    method="strict",
+    structure_format_score=0.2,
+    final_format_score=0.1,
+    retrieval_score=0.1,
+    format_score=0,
+    score=1.0,
+    search_penalty=0.2,
+    min_search_turns=4,
+):
+    """The scoring function for exact match (EM) with search turn penalty.
+
+    Args:
+        solution_str: the solution text
+        ground_truth: the ground truth
+        method: the method to extract the solution, choices are 'strict' and 'flexible'
+        structure_format_score: the score for the structure format
+        final_format_score: the score for the final format
+        retrieval_score: the score for the retrieval
+        format_score: the score for the format
+        score: the score for the correct answer
+        search_penalty: penalty applied when search turns < min_search_turns
+        min_search_turns: minimum required search turns to avoid penalty
+    """
+    # Get base score using existing function
+    base_score = compute_score_em(
+        solution_str=solution_str,
+        ground_truth=ground_truth,
+        method=method,
+        structure_format_score=structure_format_score,
+        final_format_score=final_format_score,
+        retrieval_score=retrieval_score,
+        format_score=format_score,
+        score=score,
+    )
+    
+    # Count search turns and apply penalty if needed
+    search_turns = count_search_turns(solution_str)
+    
+    do_print = random.randint(1, 64) == 1
+    if do_print:
+        print(f"--------------------------------")
+        print(f"Search turns: {search_turns}")
+        print(f"Min required search turns: {min_search_turns}")
+        print(f"Base score: {base_score}")
+    
+    # Apply penalty if search turns < min_search_turns
+    if search_turns < min_search_turns:
+        final_score = base_score - search_penalty
+        if do_print:
+            print(f"Applied search penalty: -{search_penalty}")
+            print(f"Final score: {final_score}")
+        return max(0.0, final_score)  # Ensure score doesn't go below 0
+    else:
+        if do_print:
+            print(f"No penalty applied, final score: {base_score}")
+        return base_score

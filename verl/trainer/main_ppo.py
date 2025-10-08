@@ -23,20 +23,22 @@ import re
 import numpy as np
 
 def _select_rm_score_fn(data_source, reward_type='answer_correctness'):
-    if data_source in ['nq', 'triviaqa', 'popqa', 'hotpotqa', '2wikimultihopqa', 'musique', 'bamboogle']:
-        if reward_type == 'answer_correctness':
-            return qa_em_new.compute_score_em
-        elif reward_type == 'format_correctness':
-            return qa_em_new.compute_score_format
-        elif reward_type == 'retrieval_correctness':
-            return qa_em_new.compute_score_retrieval
-        elif reward_type == 'mixed_outcome_reward':
-            return qa_em_new.compute_score_em_format_retrievel
-        else:
-            raise NotImplementedError(f"Unsupported reward type: {reward_type} for data source: {data_source}")
-        
+    # if data_source in ['nq', 'triviaqa', 'popqa', 'hotpotqa', '2wikimultihopqa', 'musique', 'bamboogle']:
+    if reward_type == 'answer_correctness':
+        return qa_em_new.compute_score_em
+    elif reward_type == 'format_correctness':
+        return qa_em_new.compute_score_format
+    elif reward_type == 'retrieval_correctness':
+        return qa_em_new.compute_score_retrieval
+    elif reward_type == 'mixed_outcome_reward':
+        return qa_em_new.compute_score_em_format_retrievel
+    elif reward_type == 'mixed_outcome_reward_with_search_penalty':
+        return qa_em_new.compute_score_em_format_retrievel_with_search_penalty
     else:
-        raise NotImplementedError
+        raise NotImplementedError(f"Unsupported reward type: {reward_type} for data source: {data_source}")
+        
+    # else:
+    #     raise NotImplementedError
 
 
 class RewardManager():
@@ -59,6 +61,7 @@ class RewardManager():
         format_reward_tensor = torch.zeros_like(data.batch['responses'], dtype=torch.float32)
         retrieval_reward_tensor = torch.zeros_like(data.batch['responses'], dtype=torch.float32)
         mixed_outcome_reward_tensor = torch.zeros_like(data.batch['responses'], dtype=torch.float32)
+        mixed_outcome_reward_with_search_penalty_tensor = torch.zeros_like(data.batch['responses'], dtype=torch.float32)
 
         # all_scores = []
 
@@ -90,16 +93,24 @@ class RewardManager():
             compute_format_score = _select_rm_score_fn(data_source, reward_type='format_correctness')
             compute_retrieval_score = _select_rm_score_fn(data_source, reward_type='retrieval_correctness')
             comupte_mixed_outcome_score = _select_rm_score_fn(data_source, reward_type='mixed_outcome_reward')
+            compute_mixed_outcome_score_with_search_penalty = _select_rm_score_fn(data_source, reward_type='mixed_outcome_reward_with_search_penalty')
 
             answer_score = compute_answer_score(solution_str=sequences_str, ground_truth=ground_truth)
             format_score = compute_format_score(solution_str=sequences_str)
             retrieval_score = compute_retrieval_score(solution_str=sequences_str, ground_truth=ground_truth)
             mixed_outcome_score = comupte_mixed_outcome_score(solution_str=sequences_str, ground_truth=ground_truth)
+            mixed_outcome_score_with_search_penalty = compute_mixed_outcome_score_with_search_penalty(
+                solution_str=sequences_str, 
+                ground_truth=ground_truth,
+                search_penalty=0.1,  # 每少一个turn扣0.1分
+                min_search_turns=4
+            )
 
             answer_reward_tensor[i, valid_response_length - 1] = answer_score
             format_reward_tensor[i, valid_response_length - 1] = format_score
             retrieval_reward_tensor[i, valid_response_length - 1] = retrieval_score
             mixed_outcome_reward_tensor[i, valid_response_length - 1] = mixed_outcome_score
+            mixed_outcome_reward_with_search_penalty_tensor[i, valid_response_length - 1] = mixed_outcome_score_with_search_penalty
 
             # all_scores.append(score)
 
@@ -122,6 +133,7 @@ class RewardManager():
             'format_correctness': format_reward_tensor,
             'retrieval_correctness': retrieval_reward_tensor,
             'mixed_outcome_reward': mixed_outcome_reward_tensor,
+            'mixed_outcome_reward_with_search_penalty': mixed_outcome_reward_with_search_penalty_tensor,
         }
 
 import ray

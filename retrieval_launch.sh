@@ -3,7 +3,7 @@ CUDA_DEVICES=${1:-"0,1,2,3"}
 RETRIEVAL_PORT=${2:-"8001"}
 
 export CUDA_VISIBLE_DEVICES=$CUDA_DEVICES
-file_path=./data
+file_path=/data/Search-R1/data/
 index_file=$file_path/e5_Flat.index
 corpus_file=$file_path/wiki-18.jsonl
 retriever_name=e5

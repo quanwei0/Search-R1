@@ -259,40 +259,18 @@ def compute_data_metrics(batch, use_critic=True):
         # score
         'critic/score/mean':
             torch.mean(sequence_score).detach().item(),
-        'critic/score/max':
-            torch.max(sequence_score).detach().item(),
-        'critic/score/min':
-            torch.min(sequence_score).detach().item(),
         # reward
         'critic/rewards/mean':
             torch.mean(sequence_reward).detach().item(),
-        'critic/rewards/max':
-            torch.max(sequence_reward).detach().item(),
-        'critic/rewards/min':
-            torch.min(sequence_reward).detach().item(),
         # adv
         'critic/advantages/mean':
             torch.mean(valid_adv).detach().item(),
-        'critic/advantages/max':
-            torch.max(valid_adv).detach().item(),
-        'critic/advantages/min':
-            torch.min(valid_adv).detach().item(),
-        'critic/advantages/var':
-            torch.var(valid_adv).detach().item(),
-        'critic/advantages/std':
-            torch.std(valid_adv).detach().item(),
         # returns
         'critic/returns/mean':
             torch.mean(valid_returns).detach().item(),
-        'critic/returns/max':
-            torch.max(valid_returns).detach().item(),
-        'critic/returns/min':
-            torch.min(valid_returns).detach().item(),
         **({
             # values
             'critic/values/mean': torch.mean(valid_values).detach().item(),
-            'critic/values/max': torch.max(valid_values).detach().item(),
-            'critic/values/min': torch.min(valid_values).detach().item(),
             # vf explained var
             'critic/vf_explained_var': (1.0 - return_diff_var / (return_var + 1e-5)).detach().item(),
         } if use_critic else {}),
@@ -300,33 +278,18 @@ def compute_data_metrics(batch, use_critic=True):
         # response length
         'response_length/mean':
             torch.mean(response_length).detach().item(),
-        'response_length/max':
-            torch.max(response_length).detach().item(),
-        'response_length/min':
-            torch.min(response_length).detach().item(),
-        'response_length/clip_ratio':
-            torch.mean(torch.eq(response_length, max_response_length).float()).detach().item(),
         # prompt length
         'prompt_length/mean':
             torch.mean(prompt_length).detach().item(),
-        'prompt_length/max':
-            torch.max(prompt_length).detach().item(),
-        'prompt_length/min':
-            torch.min(prompt_length).detach().item(),
-        'prompt_length/clip_ratio':
-            torch.mean(torch.eq(prompt_length, max_prompt_length).float()).detach().item(),
     }
 
     # metrics for actions
     if 'turns_stats' in batch.meta_info:
         metrics['env/number_of_actions/mean'] = float(np.array(batch.meta_info['turns_stats'], dtype=np.int16).mean())
-        metrics['env/number_of_actions/max'] = float(np.array(batch.meta_info['turns_stats'], dtype=np.int16).max())
-        metrics['env/number_of_actions/min'] = float(np.array(batch.meta_info['turns_stats'], dtype=np.int16).min())
     if 'active_mask' in batch.meta_info:
         metrics['env/finish_ratio'] = 1 - float(np.array(batch.meta_info['active_mask'], dtype=np.int16).mean())
     if 'valid_action_stats' in batch.meta_info:
         metrics['env/number_of_valid_action'] = float(np.array(batch.meta_info['valid_action_stats'], dtype=np.int16).mean())
-        metrics['env/ratio_of_valid_action'] = float((np.array(batch.meta_info['valid_action_stats'], dtype=np.int16) / np.array(batch.meta_info['turns_stats'], dtype=np.int16)).mean())
     if 'valid_search_stats' in batch.meta_info:
         metrics['env/number_of_valid_search'] = float(np.array(batch.meta_info['valid_search_stats'], dtype=np.int16).mean())
 
@@ -588,6 +551,7 @@ class RayPPOTrainer(object):
                     format_reward_tensor = reward_dict['format_correctness']
                     retrieval_reward_tensor = reward_dict['retrieval_correctness']
                     mixed_reward_tensor = reward_dict['mixed_outcome_reward']
+                    mixed_reward_with_search_penalty_tensor = reward_dict.get('mixed_outcome_reward_with_search_penalty', mixed_reward_tensor)
                     
                     answer_reward_tensor_lst.append(answer_reward_tensor)
                     format_reward_tensor_lst.append(format_reward_tensor)
@@ -871,8 +835,11 @@ class RayPPOTrainer(object):
                         format_reward_tensor = reward_dict['format_correctness']
                         retrieval_reward_tensor = reward_dict['retrieval_correctness']
                         mixed_reward_tensor = reward_dict['mixed_outcome_reward']
+                        mixed_reward_with_search_penalty_tensor = reward_dict.get('mixed_outcome_reward_with_search_penalty', mixed_reward_tensor)
                         
-                        if self.config.algorithm.use_mixed_outcome_reward:
+                        if getattr(self.config.algorithm, 'use_mixed_outcome_reward_with_search_penalty', False):
+                            batch.batch['token_level_scores'] = mixed_reward_with_search_penalty_tensor
+                        elif self.config.algorithm.use_mixed_outcome_reward:
                             batch.batch['token_level_scores'] = mixed_reward_tensor
                         else:
                             batch.batch['token_level_scores'] = answer_reward_tensor
@@ -887,6 +854,12 @@ class RayPPOTrainer(object):
                         train_metric_dict.update(self._track_reward_metrics(format_reward_tensor, train_data_sources, prefix="train/format_reward"))
                         train_metric_dict.update(self._track_reward_metrics(retrieval_reward_tensor, train_data_sources, prefix="train/retrieval_reward"))
                         train_metric_dict.update(self._track_reward_metrics(mixed_reward_tensor, train_data_sources, prefix="train/mixed_outcome_reward"))
+                        if 'mixed_outcome_reward_with_search_penalty' in reward_dict:
+                            train_metric_dict.update(self._track_reward_metrics(mixed_reward_with_search_penalty_tensor, train_data_sources, prefix="train/mixed_outcome_reward_with_search_penalty"))
+                            
+                            # Add detailed search penalty metrics to wandb
+                            search_penalty_metrics = self._compute_search_penalty_metrics()
+                            train_metric_dict.update(search_penalty_metrics)
 
                         metrics.update(train_metric_dict)
                         logger.log(data=train_metric_dict, step=self.global_steps)
@@ -1037,6 +1010,44 @@ class RayPPOTrainer(object):
             metric_dict[f"{prefix}/{source}"] = np.mean(reward_list)
 
         return metric_dict
+    
+    def _compute_search_penalty_metrics(self):
+        """Compute detailed search penalty metrics for wandb logging."""
+        from verl.utils.reward_score.qa_em_new import compute_score_em_format_retrievel_with_search_penalty
+        
+        metrics = {}
+        
+        # Check if detailed metrics are available
+        if hasattr(compute_score_em_format_retrievel_with_search_penalty, 'detailed_metrics'):
+            detailed_metrics = compute_score_em_format_retrievel_with_search_penalty.detailed_metrics
+            
+            if detailed_metrics:
+                import numpy as np
+                
+                # Extract data
+                search_turns = [m['search_turns'] for m in detailed_metrics]
+                missing_turns = [m['missing_turns'] for m in detailed_metrics]
+                base_scores = [m['base_score'] for m in detailed_metrics]
+                final_scores = [m['final_score'] for m in detailed_metrics]
+                penalty_applied = [m['penalty_applied'] for m in detailed_metrics]
+                penalty_amounts = [m['penalty_amount'] for m in detailed_metrics]
+                answer_correct = [m['answer_correct'] for m in detailed_metrics]
+                format_valid = [m['format_valid'] for m in detailed_metrics]
+                retrieval_correct = [m['retrieval_correct'] for m in detailed_metrics]
+                
+                # Search turn statistics
+                metrics['train/search_penalty/search_turns_mean'] = np.mean(search_turns)
+                
+                # Penalty statistics
+                metrics['train/search_penalty/penalty_applied_rate'] = np.mean(penalty_applied)
+                
+                # Score impact
+                metrics['train/search_penalty/final_score_mean'] = np.mean(final_scores)
+                
+                # Clear metrics for next batch
+                compute_score_em_format_retrievel_with_search_penalty.detailed_metrics = []
+                
+        return metrics
     
     def _save_trajectories(self, batch, save_dir: Optional[str] = None) -> DataProto:
         """

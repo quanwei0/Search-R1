@@ -219,6 +219,47 @@ def extract_information_blocks(text: str) -> list[str]:
     return [match.strip() for match in matches]
 
 
+def count_search_turns(text: str) -> int:
+    """Count the number of search turns in the solution string."""
+    search_pattern = r"<search>(.*?)</search>"
+    matches = re.findall(search_pattern, text, re.DOTALL)
+    return len(matches)
+
+
+def count_valid_search_turns(text: str, golden_answers: list[str]) -> int:
+    """Count the number of valid search turns (where information contains correct answer)."""
+    # Find all search-information pairs
+    search_info_pattern = r"<search>(.*?)</search>\s*<information>(.*?)</information>"
+    matches = re.findall(search_info_pattern, text, re.DOTALL)
+    
+    valid_count = 0
+    for search_content, info_content in matches:
+        # Check if this information block contains the correct answer
+        for golden_answer in golden_answers:
+            if normalize_answer(golden_answer) in normalize_answer(info_content):
+                valid_count += 1
+                break  # Found valid answer in this search, count it once
+    
+    return valid_count
+
+
+def has_final_answer_tag(text: str) -> bool:
+    """Check if the text ends with an answer tag (final turn requirement)."""
+    # Find the last occurrence of answer tag
+    answer_pattern = r"<answer>(.*?)</answer>"
+    matches = list(re.finditer(answer_pattern, text, re.DOTALL))
+    
+    if not matches:
+        return False
+    
+    # Check if there's any content after the last answer tag (excluding whitespace)
+    last_match = matches[-1]
+    remaining_text = text[last_match.end():].strip()
+    
+    # Should not have any significant content after the last answer tag
+    return len(remaining_text) == 0
+
+
 def is_retrieval_correct(text: str, golden_answers: list[str]) -> list[str]:
     seqs = extract_information_blocks(text)
     for seq in seqs:
@@ -297,3 +338,126 @@ def compute_score_em_format_retrievel(
                 return structure_format_score # 0.2
         else:
             return final_format_score # 0.1
+
+
+def compute_score_em_format_retrievel_with_search_penalty(
+    solution_str,
+    ground_truth,
+    method="strict",
+    structure_format_score=0.2,
+    final_format_score=0.1,
+    retrieval_score=0.1,
+    format_score=0,
+    score=1.0,
+    search_penalty=0.1,
+    min_search_turns=4,
+    final_answer_penalty=0.3,
+):
+    """The scoring function for exact match (EM) with valid search turn penalty and final answer requirement.
+
+    Args:
+        solution_str: the solution text
+        ground_truth: the ground truth
+        method: the method to extract the solution, choices are 'strict' and 'flexible'
+        structure_format_score: the score for the structure format
+        final_format_score: the score for the final format
+        retrieval_score: the score for the retrieval
+        format_score: the score for the format
+        score: the score for the correct answer
+        search_penalty: penalty per missing valid search turn (default 0.1)
+        min_search_turns: minimum required valid search turns to avoid penalty (default 4)
+        final_answer_penalty: penalty for not ending with answer tag (default 0.3)
+    """
+    # Get base score using existing function
+    base_score = compute_score_em_format_retrievel(
+        solution_str=solution_str,
+        ground_truth=ground_truth,
+        method=method,
+        structure_format_score=structure_format_score,
+        final_format_score=final_format_score,
+        retrieval_score=retrieval_score,
+        format_score=format_score,
+        score=score,
+    )
+    
+    # Count valid search turns and check final answer requirement
+    valid_search_turns = count_valid_search_turns(solution_str, ground_truth['target'])
+    has_final_answer = has_final_answer_tag(solution_str)
+    
+    # Get detailed scoring components for logging
+    is_valid_format, _ = is_valid_sequence(solution_str)
+    retrieval_correct = False
+    if is_valid_format:
+        retrieval_correct = is_retrieval_correct(solution_str, ground_truth['target'])
+    answer = extract_solution(solution_str=solution_str)
+    answer_correct = False
+    if answer is not None:
+        answer_correct = em_check(answer, ground_truth['target'])
+    
+    do_print = random.randint(1, 64) == 1
+    if do_print:
+        print(f"--------------------------------")
+        print(f"Valid search turns: {valid_search_turns}")
+        print(f"Min required valid search turns: {min_search_turns}")
+        print(f"Has final answer tag: {has_final_answer}")
+        print(f"Base score: {base_score}")
+        print(f"Answer correct: {answer_correct}")
+        print(f"Format valid: {is_valid_format}")
+        print(f"Retrieval correct: {retrieval_correct}")
+    
+    # Apply penalties
+    total_penalty = 0.0
+    missing_valid_turns = 0
+    valid_search_penalty_amount = 0.0
+    
+    # 1. Valid search penalty: 0.1 for each missing valid search turn below min_search_turns
+    if valid_search_turns < min_search_turns:
+        missing_valid_turns = min_search_turns - valid_search_turns
+        valid_search_penalty_amount = missing_valid_turns * search_penalty
+        total_penalty += valid_search_penalty_amount
+        if do_print:
+            print(f"Missing {missing_valid_turns} valid search turns, penalty: -{valid_search_penalty_amount:.2f}")
+    
+    # 2. Final answer penalty: 0.3 if not ending with answer tag
+    if not has_final_answer:
+        total_penalty += final_answer_penalty
+        if do_print:
+            print(f"Missing final answer tag, penalty: -{final_answer_penalty:.2f}")
+    
+    # Calculate final score
+    final_score = base_score - total_penalty
+    final_score = max(0.0, final_score)  # Ensure score doesn't go below 0
+    
+    if do_print:
+        print(f"Total penalty: -{total_penalty:.2f}")
+        print(f"Final score: {final_score}")
+    
+    # Store detailed metrics for wandb logging (will be accessed by the trainer)
+    if not hasattr(compute_score_em_format_retrievel_with_search_penalty, 'detailed_metrics'):
+        compute_score_em_format_retrievel_with_search_penalty.detailed_metrics = []
+    
+    compute_score_em_format_retrievel_with_search_penalty.detailed_metrics.append({
+        # Keys expected by trainer
+        'search_turns': valid_search_turns,  # Use valid_search_turns for the old search_turns key
+        'missing_turns': missing_valid_turns,
+        'base_score': base_score,
+        'final_score': final_score,
+        'penalty_applied': valid_search_turns < min_search_turns or not has_final_answer,
+        'penalty_amount': total_penalty,
+        'answer_correct': answer_correct,
+        'format_valid': is_valid_format,
+        'retrieval_correct': retrieval_correct,
+        
+        # Additional detailed keys for debugging
+        'valid_search_turns': valid_search_turns,
+        'min_search_turns': min_search_turns,
+        'missing_valid_turns': missing_valid_turns,
+        'has_final_answer': has_final_answer,
+        'valid_search_penalty_applied': valid_search_turns < min_search_turns,
+        'valid_search_penalty_amount': valid_search_penalty_amount,
+        'final_answer_penalty_applied': not has_final_answer,
+        'final_answer_penalty_amount': final_answer_penalty if not has_final_answer else 0.0,
+        'total_penalty': total_penalty,
+    })
+    
+    return final_score
