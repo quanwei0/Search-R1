@@ -1,16 +1,17 @@
-
-export HUGGINGFACE_HUB_TOKEN="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"
 # Set shared configuration parameters
-export CUDA_VISIBLE_DEVICES=0,1,2,3
+export RETRIEVAL_CUDA_VISIBLE_DEVICES=0,1,2,3
 export RETRIEVAL_PORT=8001
 export DATA_DIR='./data/alphamed_search_split'
 
+source activate /opt/conda/envs/retriever
+# # Pass GPU devices and port to retrieval script
+bash retrieval_launch.sh "$RETRIEVAL_CUDA_VISIBLE_DEVICES" "$RETRIEVAL_PORT"
+sleep 60
+conda activate /opt/conda/envs/searchr1-test
 # source activate retriever
 # # Pass GPU devices and port to retrieval script
 # bash retrieval_launch.sh "$CUDA_VISIBLE_DEVICES" "$RETRIEVAL_PORT"
 # sleep 60
-
-source activate searchr1
 
 export WANDB_API_KEY="810f91e58aa0fd1d03b11c60b0d1cffbb1d941f4"
 export WANDB_ENTITY="rl_agent"
