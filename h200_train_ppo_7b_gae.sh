@@ -16,12 +16,12 @@ export RETRIEVAL_PORT=$RETRIEVAL_PORT
 
 conda activate retriever
 # Pass GPU devices and port to retrieval script
-bash retrieval_launch.sh "$CUDA_VISIBLE_DEVICES" "$RETRIEVAL_PORT" "/data/Search-R1/data" &
+bash retrieval_launch.sh "$CUDA_VISIBLE_DEVICES" "$RETRIEVAL_PORT" &
 sleep 60
 
 conda activate searchr1
 
-export DATA_DIR='/data/Search-R1/data/nq_search'
+export DATA_DIR='./data/hotpotqa_search'
 
 export WANDB_API_KEY="810f91e58aa0fd1d03b11c60b0d1cffbb1d941f4"
 export WANDB_ENTITY="rl_agent"
@@ -38,7 +38,7 @@ WAND_PROJECT='Search-R1'
 # export BASE_MODEL='Qwen/Qwen2.5-3B-Instruct'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-3b-it-em
 export BASE_MODEL='Qwen/Qwen2.5-7B'
-EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-7b-em-gae-mixed-outcome-reward
+EXPERIMENT_NAME=hotpotqa-search-r1-ppo-qwen2.5-7b-em-gae-mixed-outcome-reward
 export EXPERIMENT_NAME=qw-$EXPERIMENT_NAME-$(date +%Y%m%d-%H%M%S)
 # export BASE_MODEL='Qwen/Qwen2.5-7B-Instruct'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-7b-it-em
@@ -95,7 +95,7 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     algorithm.kl_ctrl.kl_coef=0.001 \
     algorithm.no_think_rl=False \
     trainer.critic_warmup=0 \
-    trainer.logger=['console', 'wandb'] \
+    trainer.logger=['console','wandb'] \
     +trainer.val_only=False \
     +trainer.val_before_train=False \
     trainer.default_hdfs_dir=null \

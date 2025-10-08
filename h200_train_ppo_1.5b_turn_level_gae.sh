@@ -16,12 +16,12 @@ export RETRIEVAL_PORT=$RETRIEVAL_PORT
 
 conda activate retriever
 # Pass GPU devices and port to retrieval script
-bash retrieval_launch.sh "$CUDA_VISIBLE_DEVICES" "$RETRIEVAL_PORT" "/data/Search-R1/data" &
+bash retrieval_launch.sh "$CUDA_VISIBLE_DEVICES" "$RETRIEVAL_PORT" &
 sleep 60
 
 conda activate searchr1
 
-export DATA_DIR='/data/Search-R1/data/nq_search'
+export DATA_DIR='./data/nq_search'
 
 export WANDB_API_KEY="810f91e58aa0fd1d03b11c60b0d1cffbb1d941f4"
 export WANDB_ENTITY="rl_agent"

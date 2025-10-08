@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Parse command line arguments
-CUDA_DEVICES=${1:-"0,1,2,3"}
-RETRIEVAL_PORT=${2:-8001}
+CUDA_DEVICES=${1:-"6,7"}
+RETRIEVAL_PORT=${2:-8002}
 
 echo "Using CUDA devices: $CUDA_DEVICES"
 echo "Using retrieval port: $RETRIEVAL_PORT"
@@ -16,12 +16,12 @@ export RETRIEVAL_PORT=$RETRIEVAL_PORT
 
 conda activate retriever
 # Pass GPU devices and port to retrieval script
-bash retrieval_launch.sh "$CUDA_VISIBLE_DEVICES" "$RETRIEVAL_PORT" "/data/Search-R1/data" &
+bash retrieval_launch.sh "$CUDA_VISIBLE_DEVICES" "$RETRIEVAL_PORT" &
 sleep 60
 
 conda activate searchr1
 
-export DATA_DIR='/data/Search-R1/data/nq_hotpotqa_train'
+export DATA_DIR='./data/nq_hotpotqa_train'
 
 export WANDB_API_KEY="810f91e58aa0fd1d03b11c60b0d1cffbb1d941f4"
 export WANDB_ENTITY="rl_agent"
@@ -37,8 +37,8 @@ WAND_PROJECT='Search-R1'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-3b-em-gae
 # export BASE_MODEL='Qwen/Qwen2.5-3B-Instruct'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-3b-it-em
-export BASE_MODEL='Qwen/Qwen2.5-7B-Instruct'
-EXPERIMENT_NAME=val-qwen2.5-7b-it-maxturn4
+export BASE_MODEL='Zill1/StepSearch-7B-Base'
+EXPERIMENT_NAME=val-stepsearch-qwen2.5-7b-maxturn4
 export EXPERIMENT_NAME=qw-$EXPERIMENT_NAME-$(date +%Y%m%d-%H%M%S)
 # export BASE_MODEL='Qwen/Qwen2.5-7B-Instruct'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-7b-it-em
@@ -54,7 +54,7 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     data.train_data_num=null \
     data.val_data_num=null \
     data.train_batch_size=512 \
-    data.val_batch_size=1024 \
+    data.val_batch_size=512 \
     data.max_prompt_length=8192 \
     data.max_response_length=500 \
     data.max_start_length=2048 \
@@ -74,9 +74,9 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     actor_rollout_ref.actor.fsdp_config.grad_offload=True \
     actor_rollout_ref.actor.fsdp_config.optimizer_offload=True \
     actor_rollout_ref.rollout.log_prob_micro_batch_size=128 \
-    actor_rollout_ref.rollout.tensor_model_parallel_size=4 \
+    actor_rollout_ref.rollout.tensor_model_parallel_size=1 \
     actor_rollout_ref.rollout.name=vllm \
-    actor_rollout_ref.rollout.gpu_memory_utilization=0.9 \
+    actor_rollout_ref.rollout.gpu_memory_utilization=0.8 \
     actor_rollout_ref.ref.log_prob_micro_batch_size=128 \
     actor_rollout_ref.ref.fsdp_config.param_offload=True \
     actor_rollout_ref.rollout.n_agent=1 \
@@ -88,7 +88,7 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     +trainer.val_only=True \
     +trainer.val_before_train=True \
     trainer.default_hdfs_dir=null \
-    trainer.n_gpus_per_node=4 \
+    trainer.n_gpus_per_node=2 \
     trainer.nnodes=1 \
     trainer.save_freq=-1 \
     trainer.test_freq=-1 \
