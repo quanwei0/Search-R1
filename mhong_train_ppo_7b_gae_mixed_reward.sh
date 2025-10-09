@@ -30,7 +30,7 @@ WAND_PROJECT='Search-R1'
 
 
 export BASE_MODEL="/code/hongpaul-sandbox/temp/Search-R1/qwen_models/qwen-7b"
-EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-7b-em-gae-mixed-reward-new7-maxturn4
+EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-7b-em-gae-mixed-reward-new7-maxturn4-step1000
 export EXPERIMENT_NAME=qw-mhong-$EXPERIMENT_NAME-$(date +%Y%m%d-%H%M%S)
 # export BASE_MODEL='Qwen/Qwen2.5-1.5B-Instruct'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-1.5b-it-em
@@ -106,7 +106,7 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     trainer.project_name=$WAND_PROJECT \
     trainer.experiment_name=$EXPERIMENT_NAME \
     trainer.total_epochs=40 \
-    trainer.total_training_steps=600 \
+    trainer.total_training_steps=1000 \
     trainer.default_hdfs_dir=null \
     trainer.default_local_dir=verl_checkpoints/$EXPERIMENT_NAME \
     max_turns=4 \
