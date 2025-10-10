@@ -71,7 +71,7 @@ class RewardManager():
         if 'rm_scores' in data.batch.keys():
             return data.batch['rm_scores']
         
-        reward_type = self.config.algorithm.get('reward_type', 'answer_correctness')
+        reward_type = self.config.algorithm.get('reward_type', 'outcome_reward')
 
         answer_reward_tensor = torch.zeros_like(data.batch['responses'], dtype=torch.float32)
         answer_sub_em_reward_tensor = torch.zeros_like(data.batch['responses'], dtype=torch.float32)

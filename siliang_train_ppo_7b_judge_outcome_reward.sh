@@ -2,7 +2,7 @@ source /mnt/home/siliang/miniconda3/bin/activate
 conda init
 
 # Set shared configuration parameters
-export CUDA_VISIBLE_DEVICES=0,1,2,3
+export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
 export RETRIEVAL_PORT=8001
 
 conda activate retriever
@@ -19,18 +19,19 @@ export WANDB_ENTITY="rl_agent"
 
 WAND_PROJECT='Search-R1'
 
+REWARD_TYPE='judge_outcome_reward'
 
 # export BASE_MODEL='Qwen/Qwen2.5-1.5B'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-1.5b-em-gae
 # export BASE_MODEL='Qwen/Qwen2.5-1.5B-Instruct'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-1.5b-it-em
-export BASE_MODEL='Qwen/Qwen2.5-3B'
-EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-3b-em-gae
-export EXPERIMENT_NAME=qw-$EXPERIMENT_NAME-$(date +%Y%m%d-%H%M%S)
+# export BASE_MODEL='Qwen/Qwen2.5-3B'
+# export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-3b-em-gae
 # export BASE_MODEL='Qwen/Qwen2.5-3B-Instruct'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-3b-it-em
-# export BASE_MODEL='Qwen/Qwen2.5-7B'
-# export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-7b-em
+export BASE_MODEL='Qwen/Qwen2.5-7B'
+EXPERIMENT_NAME=nq-qwen2.5-7b-ppo-$REWARD_TYPE-maxturn4
+export EXPERIMENT_NAME=qw-$EXPERIMENT_NAME-$(date +%Y%m%d-%H%M%S)
 # export BASE_MODEL='Qwen/Qwen2.5-7B-Instruct'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-7b-it-em
 
@@ -54,6 +55,7 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     algorithm.adv_estimator=gae \
     algorithm.gamma=1 \
     algorithm.lam=1 \
+    +algorithm.reward_type=$REWARD_TYPE \
     actor_rollout_ref.model.path=$BASE_MODEL \
     actor_rollout_ref.actor.optim.lr=1e-6 \
     actor_rollout_ref.model.enable_gradient_checkpointing=True \
@@ -89,9 +91,9 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     +trainer.val_only=False \
     +trainer.val_before_train=False \
     trainer.default_hdfs_dir=null \
-    trainer.n_gpus_per_node=4 \
+    trainer.n_gpus_per_node=8 \
     trainer.nnodes=1 \
-    trainer.save_freq=-1 \
+    trainer.save_freq=600 \
     trainer.test_freq=-1 \
     trainer.project_name=$WAND_PROJECT \
     trainer.experiment_name=$EXPERIMENT_NAME \
@@ -99,7 +101,10 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     trainer.total_training_steps=600 \
     trainer.default_hdfs_dir=null \
     trainer.default_local_dir=verl_checkpoints/$EXPERIMENT_NAME \
-    max_turns=3 \
+    max_turns=4 \
+    +judge_host="slurm-h100-206-149" \
+    +judge_port=8002 \
+    +judge_model_name="Qwen/Qwen2.5-72B-Instruct" \
     retriever.url="http://127.0.0.1:$RETRIEVAL_PORT/retrieve" \
     retriever.topk=3 \
     2>&1 | tee ./outputs/log/$EXPERIMENT_NAME.log

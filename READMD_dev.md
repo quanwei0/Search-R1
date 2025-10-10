@@ -41,7 +41,7 @@ gzip -d $save_path/wiki-18.jsonl.gz
 
 Process the NQ dataset
 ```bash
-python scripts/data_process/nq_search.py --local_dir ./data/nq_search
+python scripts/data_process/nq_search.py --data_source nq --local_dir ./data/nq_search
 ```
 
 Download the dataset in the paper

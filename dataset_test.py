@@ -2,7 +2,7 @@ import pyarrow.parquet as pq
 import os
 
 # Read the dataset from the folder
-dataset_path = "./data/nq_hotpotqa_train"
+dataset_path = "./data/hotpotqa_search"
 
 # Read train parquet file
 train_table = pq.read_table(os.path.join(dataset_path, "train.parquet"))

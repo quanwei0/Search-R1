@@ -53,7 +53,13 @@ if __name__ == '__main__':
     dataset = datasets.load_dataset('RUC-NLPIR/FlashRAG_datasets', data_source)
 
     train_dataset = dataset['train']
-    test_dataset = dataset['dev']
+    # Use test split if available, otherwise use dev split
+    if 'test' in dataset:
+        test_dataset = dataset['test']
+        test_split_name = 'test'
+    else:
+        test_dataset = dataset['dev']
+        test_split_name = 'dev'
 
     # add a row to each data item that represents a unique id
     def make_map_fn(split):
@@ -88,7 +94,7 @@ if __name__ == '__main__':
         return process_fn
 
     train_dataset = train_dataset.map(function=make_map_fn('train'), with_indices=True)
-    test_dataset = test_dataset.map(function=make_map_fn('dev'), with_indices=True)
+    test_dataset = test_dataset.map(function=make_map_fn(test_split_name), with_indices=True)
 
     local_dir = args.local_dir
     hdfs_dir = args.hdfs_dir

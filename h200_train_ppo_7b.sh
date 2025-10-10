@@ -7,7 +7,7 @@ RETRIEVAL_PORT=${2:-8001}
 echo "Using CUDA devices: $CUDA_DEVICES"
 echo "Using retrieval port: $RETRIEVAL_PORT"
 
-source /code/hongpaul-sandbox/search/miniconda/bin/activate
+source /mnt/data1/wei00355/miniconda/bin/activate
 conda init
 
 # Set shared configuration parameters
@@ -19,27 +19,28 @@ conda activate retriever
 bash retrieval_launch.sh "$CUDA_VISIBLE_DEVICES" "$RETRIEVAL_PORT" &
 sleep 60
 
-conda activate search
+conda activate searchr1
 
-export DATA_DIR='./data/nq_search'
+export DATA_DIR='./data/nq_hotpotqa_train'
 
 export WANDB_API_KEY="810f91e58aa0fd1d03b11c60b0d1cffbb1d941f4"
 export WANDB_ENTITY="rl_agent"
 
-WAND_PROJECT='Search-R1'
+WAND_PROJECT='Search-R1-mixed-data'
 
+REWARD_TYPE='turn_reward'
 
-export BASE_MODEL="/code/hongpaul-sandbox/temp/Search-R1/qwen_models/qwen-7b"
-EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-7b-em-gae-maxturn4
-export EXPERIMENT_NAME=qw-mhong-$EXPERIMENT_NAME-$(date +%Y%m%d-%H%M%S)
+# export BASE_MODEL='Qwen/Qwen2.5-1.5B'
+# export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-1.5b-em-gae
 # export BASE_MODEL='Qwen/Qwen2.5-1.5B-Instruct'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-1.5b-it-em
 # export BASE_MODEL='Qwen/Qwen2.5-3B'
-# export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-3b-em
+# export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-3b-em-gae
 # export BASE_MODEL='Qwen/Qwen2.5-3B-Instruct'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-3b-it-em
-# export BASE_MODEL='Qwen/Qwen2.5-7B'
-# export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-7b-em
+export BASE_MODEL='Qwen/Qwen2.5-7B'
+EXPERIMENT_NAME=mixed-data-qwen2.5-7b-ppo-$REWARD_TYPE-new8-maxturn4
+export EXPERIMENT_NAME=qw-$EXPERIMENT_NAME-$(date +%Y%m%d-%H%M%S)
 # export BASE_MODEL='Qwen/Qwen2.5-7B-Instruct'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-7b-it-em
 
@@ -63,6 +64,7 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     algorithm.adv_estimator=gae \
     algorithm.gamma=1 \
     algorithm.lam=1 \
+    +algorithm.reward_type=$REWARD_TYPE \
     actor_rollout_ref.model.path=$BASE_MODEL \
     actor_rollout_ref.actor.optim.lr=1e-6 \
     actor_rollout_ref.model.enable_gradient_checkpointing=True \
@@ -100,14 +102,14 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     trainer.default_hdfs_dir=null \
     trainer.n_gpus_per_node=4 \
     trainer.nnodes=1 \
-    trainer.save_freq=-1 \
+    trainer.save_freq=500 \
     trainer.test_freq=-1 \
     trainer.project_name=$WAND_PROJECT \
     trainer.experiment_name=$EXPERIMENT_NAME \
     trainer.total_epochs=40 \
-    trainer.total_training_steps=600 \
+    trainer.total_training_steps=1000 \
     trainer.default_hdfs_dir=null \
-    trainer.default_local_dir=verl_checkpoints/$EXPERIMENT_NAME \
+    trainer.default_local_dir=/home/wei00355/mnt_data1/Search-R1/verl_checkpoints/$EXPERIMENT_NAME \
     max_turns=4 \
     retriever.url="http://127.0.0.1:$RETRIEVAL_PORT/retrieve" \
     retriever.topk=3 \

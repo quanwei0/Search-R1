@@ -558,7 +558,7 @@ if __name__ == "__main__":
 
     # Directory containing all JSON files
     directory_path = (
-        "./outputs/log_val_traj/val-nq-hotpotqa-ppo-qwen2.5-7b-em-gae-mixed-reward-new7-maxturn4_20250907_224559"
+        "./outputs/log_val_traj/qw-val-nq-ppo-mixed-reward-qwen2.5-7b-maxturn4-step500-20251009-023312_20251009_024249"
     )
 
     # Use command line argument if provided

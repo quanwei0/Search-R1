@@ -490,6 +490,7 @@ class RayPPOTrainer(object):
         total_training_steps = len(self.train_dataloader) * self.config.trainer.total_epochs
 
         if self.config.trainer.total_training_steps is not None:
+        # if self.config.trainer.total_training_steps < total_training_steps:
             total_training_steps = self.config.trainer.total_training_steps
 
         self.total_training_steps = total_training_steps
@@ -573,10 +574,10 @@ class RayPPOTrainer(object):
             # Prepare save directory once outside the loop
             save_dir = None
             if self.config.trainer.get('is_save_val_traj', False):
-                from datetime import datetime
-                timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')  # 20250730_153045
+                # from datetime import datetime
+                # timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')  # 20250730_153045
                 val_traj_dir = self.config.trainer.get('val_traj_dir', './outputs/log_val_traj')
-                save_dir = os.path.join(val_traj_dir, f"{self.config.trainer.experiment_name}_{timestamp}")
+                save_dir = os.path.join(val_traj_dir, f"{self.config.trainer.experiment_name}")
                 os.makedirs(save_dir, exist_ok=True)
             
             for i, batch_dict in enumerate(self.val_dataloader):
@@ -933,14 +934,14 @@ class RayPPOTrainer(object):
                         turn_level_reward_tensor = reward_dict['turn_level_reward']
 
                         # Get reward type and set token_level_scores accordingly
-                        reward_type = self.config.algorithm.get('reward_type', 'answer_correctness')
+                        reward_type = self.config.algorithm.get('reward_type', 'outcome_reward')
                         print(f"[INFO] reward_type: {reward_type}")
                         
                         # Reward type mapping
                         reward_mapping = {
-                            'answer_correctness': answer_reward_tensor,
-                            'mixed_outcome_reward': mixed_outcome_reward_tensor,
-                            'turn_level_reward': turn_level_reward_tensor,
+                            'outcome_reward': answer_reward_tensor,
+                            'merged_reward': mixed_outcome_reward_tensor,
+                            'turn_reward': turn_level_reward_tensor,
                         }
                         
                         # Handle special case for mixed_judge_reward
@@ -958,7 +959,7 @@ class RayPPOTrainer(object):
                         # Set token_level_scores based on reward_type
                         if reward_type in reward_mapping:
                             selected_tensor = reward_mapping[reward_type]
-                            print(f"[INFO] Using {reward_type}_tensor for token_level_scores")
+                            print(f"[INFO] Using {reward_type} for token_level_scores")
                             batch.batch['token_level_scores'] = selected_tensor
                         else:
                             raise ValueError(f"Unknown reward_type: {reward_type}. Valid options are: {list(reward_mapping.keys())}")
