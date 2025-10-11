@@ -40,7 +40,7 @@ WAND_PROJECT='Search-R1'
 REWARD_TYPE='judge_turn_reward'
 
 export BASE_MODEL="/code/hongpaul-sandbox/temp/Search-R1/qwen_models/qwen-7b"
-EXPERIMENT_NAME=nq-qwen2.5-7b-ppo-$REWARD_TYPE-new4-maxturn4
+EXPERIMENT_NAME=nq-qwen2.5-7b-ppo-${REWARD_TYPE//_/-}-new4-maxturn4
 export EXPERIMENT_NAME=qw-mhong-$EXPERIMENT_NAME-$(date +%Y%m%d-%H%M%S)
 # export BASE_MODEL='Qwen/Qwen2.5-1.5B-Instruct'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-1.5b-it-em
