@@ -352,7 +352,7 @@ def compute_score_step_retrieval_format(mid_turn_str, ground_truth):
 
         if "<search>" in turn_str:
             search_count += 1
-            search_penalty = -0.12 * search_count
+            search_penalty = -0.1 * search_count
         else:
             search_penalty = 0.0
         
