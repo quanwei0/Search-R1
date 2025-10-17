@@ -72,7 +72,7 @@ def make_prefix(dp, template_type):
     options = extract_options_from_question(question_text)
     
     if template_type == 'base':
-        """医学选择题模板，要求对每个选项进行搜索"""
+        """医学选择题模板，要求对每个选项进行搜索（旧版）"""
         
         # 构建选项文本
         options_text = ""
@@ -92,6 +92,33 @@ Question: {question_stem}
 Options:
 {options_text.strip()}
 """
+    
+    elif template_type == 'adaptive':
+        """自适应搜索模板，建议在遇到不熟悉概念时搜索"""
+        
+        # 构建选项文本
+        options_text = ""
+        for letter in sorted(options.keys()):
+            options_text += f"{letter}: {options[letter]}\n"
+        
+        prefix = f"""Answer the given medical multiple choice question. \
+Think step-by-step inside <think> and </think> tags. \
+When you encounter:
+- Unfamiliar medical terminology or drug names
+- Complex disease mechanisms you're uncertain about
+- Specific treatment protocols or guidelines you need to verify
+- Any information where you lack confidence
+
+You can search for clarification using <search> query </search>, and results will appear between <information> and </information>. \
+Use search strategically to fill knowledge gaps and improve answer accuracy. \
+After sufficient reasoning and any necessary searches, provide your final answer inside <answer> and </answer> with ONLY the letter (e.g., <answer>A</answer>).
+
+Question: {question_stem}
+
+Options:
+{options_text.strip()}
+"""
+    
     else:
         raise NotImplementedError
     
@@ -104,8 +131,8 @@ if __name__ == '__main__':
     parser.add_argument('--input_file', default='./data/AlphaMed19K/train19k.parquet')
     parser.add_argument('--local_dir', default='./data/alphamed_search')
     parser.add_argument('--hdfs_dir', default=None)
-    parser.add_argument('--template_type', type=str, default='base')
-    parser.add_argument('--test_size', type=int, default=500, help='Number of samples for test set')
+    parser.add_argument('--template_type', type=str, default='adaptive', choices=['base', 'adaptive'],
+                        help='Prompt template: base (strict search all) or adaptive (strategic search)')
 
     args = parser.parse_args()
 
@@ -158,43 +185,29 @@ if __name__ == '__main__':
         }
         return data
 
-    # 划分训练集和测试集
+    # 使用所有数据作为训练集，不划分test
     total_samples = len(df)
-    test_size = args.test_size
-    
-    # 最后 test_size 个样本作为测试集，其余作为训练集
-    train_df = df.iloc[:-test_size] if test_size > 0 else df
-    test_df = df.iloc[-test_size:] if test_size > 0 else pd.DataFrame()
+    train_df = df
     
     print(f"Total samples: {total_samples}")
     print(f"Train samples: {len(train_df)}")
-    print(f"Test samples: {len(test_df)}")
+    print(f"Using adaptive prompt template")
     
     # 处理训练集数据
     train_processed_data = []
     for idx, row in train_df.iterrows():
         train_processed_data.append(process_fn(row, idx, split='train'))
 
-    # 处理测试集数据
-    test_processed_data = []
-    for idx, row in test_df.iterrows():
-        test_processed_data.append(process_fn(row, idx, split='test'))
-
     # 转换为 DataFrame 并保存
     train_processed_df = pd.DataFrame(train_processed_data)
-    test_processed_df = pd.DataFrame(test_processed_data)
     
     local_dir = args.local_dir
     hdfs_dir = args.hdfs_dir
 
-    # 保存训练集和测试集
+    # 保存训练集
     train_processed_df.to_parquet(os.path.join(local_dir, 'train.parquet'))
-    if len(test_processed_df) > 0:
-        test_processed_df.to_parquet(os.path.join(local_dir, 'test.parquet'))
     
-    print(f"Saved train set to {os.path.join(local_dir, 'train.parquet')}")
-    if len(test_processed_df) > 0:
-        print(f"Saved test set to {os.path.join(local_dir, 'test.parquet')}")
+    print(f"✅ Saved train set to {os.path.join(local_dir, 'train.parquet')}")
 
     if hdfs_dir is not None:
         makedirs(hdfs_dir)

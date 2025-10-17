@@ -1,0 +1,192 @@
+{
+  "model_id": "meta-llama/Meta-Llama-3-8B",
+  "test_samples": 20,
+  "correct_count": 2,
+  "accuracy": 0.1,
+  "meta_accuracy": {
+    "step1": 0.1111111111111111,
+    "step2&3": 0.09090909090909091
+  },
+  "results": [
+    {
+      "id": 0,
+      "question": "A junior orthopaedic surgery resident is completing a carpal tunnel repair with the department chair...",
+      "correct_answer": "C",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ""
+    },
+    {
+      "id": 1,
+      "question": "A 67-year-old man with transitional cell carcinoma of the bladder comes to the physician because of ...",
+      "correct_answer": "E",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ".\n\nThank you!\n\n1.5k points\n\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n• 0\n..."
+    },
+    {
+      "id": 2,
+      "question": "Two weeks after undergoing an emergency cardiac catherization with stenting for unstable angina pect...",
+      "correct_answer": "C",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step2&3",
+      "full_output": ""
+    },
+    {
+      "id": 3,
+      "question": "A 39-year-old woman is brought to the emergency department because of fevers, chills, and left lower...",
+      "correct_answer": "D",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ""
+    },
+    {
+      "id": 4,
+      "question": "A 35-year-old man comes to the physician because of itchy, watery eyes for the past week. He has als...",
+      "correct_answer": "B",
+      "predicted_answer": "B",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\nThank you.\n\n1.5k points\n\nAnswer: B\n\nExplanation: The patient has allergic conjunctivitis. The most appropriate treatment is ketotifen eye drops. Ketotifen is a mast cell stabilizer that is used for the treatment of allergic conjunctivitis. Erythromycin ointment is used for the treatment of bacterial conjunctivitis. Fluorometholone eye drops are used for the treatment of uveitis. Latanoprost eye drops are used for the treatment of glaucoma. Warm compresses are used for the treatment of chalazio..."
+    },
+    {
+      "id": 5,
+      "question": "A 39-year-old man presents to the emergency department because of progressively worsening chest pain...",
+      "correct_answer": "E",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step2&3",
+      "full_output": ""
+    },
+    {
+      "id": 6,
+      "question": "A 68-year-old male comes to the physician for evaluation of right flank pain. He has a history of di...",
+      "correct_answer": "D",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ""
+    },
+    {
+      "id": 7,
+      "question": "A 65-year-old man is brought to the emergency department 30 minutes after the onset of acute chest p...",
+      "correct_answer": "C",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step2&3",
+      "full_output": ""
+    },
+    {
+      "id": 8,
+      "question": "A 37-year-old-woman presents to her primary care physician requesting a new form of birth control. S...",
+      "correct_answer": "C",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step2&3",
+      "full_output": ""
+    },
+    {
+      "id": 9,
+      "question": "A 23-year-old woman comes to the physician because she is embarrassed about the appearance of her na...",
+      "correct_answer": "A",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ""
+    },
+    {
+      "id": 10,
+      "question": "A 24-year-old G2P1 woman at 39 weeks’ gestation presents to the emergency department complaining of ...",
+      "correct_answer": "E",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ""
+    },
+    {
+      "id": 11,
+      "question": "A 72-year-old man comes to the physician because of a 2-month history of fatigue and worsening abdom...",
+      "correct_answer": "D",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step2&3",
+      "full_output": ""
+    },
+    {
+      "id": 12,
+      "question": "A 20-year-old man comes to the physician because of worsening gait unsteadiness and bilateral hearin...",
+      "correct_answer": "B",
+      "predicted_answer": "B",
+      "is_correct": true,
+      "meta_info": "step1",
+      "full_output": ".\nThank you.\n\nAnswer: B"
+    },
+    {
+      "id": 13,
+      "question": "A 47-year-old executive schedules an appointment his physician for a routine medical check-up. He cu...",
+      "correct_answer": "E",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ""
+    },
+    {
+      "id": 14,
+      "question": "A microbiologist is studying the emergence of a virulent strain of the virus. After a detailed study...",
+      "correct_answer": "D",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ""
+    },
+    {
+      "id": 15,
+      "question": "A 59-year-old overweight woman presents to the urgent care clinic with the complaint of severe abdom...",
+      "correct_answer": "B",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step2&3",
+      "full_output": ""
+    },
+    {
+      "id": 16,
+      "question": "A 7-year-old boy is brought to his pediatrician’s office for a follow-up visit. He was diagnosed wit...",
+      "correct_answer": "E",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nThanks in advance.\n\n1. IL-5 is a cytokine that is produced by T cells and mast cells. It is a potent chemoattractant for eosinophils and is involved in the pathogenesis of asthma. It is not involved in class switching of antibodies.\n2. IL-2 is a cytokine that is produced by T cells. It is involved in the proliferation of T cells and is not involved in class switching of antibodies.\n3. IL-10 is a cytokine that is produced by T cells and is involved in the inhibition of the immune response. It ..."
+    },
+    {
+      "id": 17,
+      "question": "A 3-month-old boy is brought the emergency department by his parents after an episode of cyanosis an...",
+      "correct_answer": "E",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step2&3",
+      "full_output": ".\nThank you.\n\n• 1\n• 2\n• 3\n• 4\n• 5\n• 6\n• 7\n• 8\n• 9\n• 10\n• 11\n• 12\n• 13\n• 14\n• 15\n• 16\n• 17\n• 18\n• 19\n• 20\n• 21\n• 22\n• 23\n• 24\n• 25\n• 26\n• 27\n• 28\n• 29\n• 30\n• 31\n• 32\n• 33\n• 34\n• 35\n• 36\n• 37\n• 38\n• 39\n• 40\n• 41\n• 42\n• 43\n• 44\n• 45\n• 46\n• 47\n• 48\n• 49\n• 50\n• 51\n• 52\n• 53\n• 54\n• 55\n• 56\n• 57\n• 58\n• 59\n• 60\n• 61\n• 62\n• 63\n• 64\n• 65\n• 66\n• 67\n• 68\n• 69\n• 70\n• 71\n• 72\n• 73\n• 74\n• 75\n• 76\n• 77\n• 78\n• 79\n• 80\n• 81\n• 82\n• 83\n• 84\n• 85\n• 86\n• 87\n• 88\n• 89\n• 90\n• 91\n• 92\n• 93\n• 94\n• 95\n• 96\n• 97\n• 98\n• 99\n..."
+    },
+    {
+      "id": 18,
+      "question": "A 29-year-old man presents to the emergency department due to central chest pain over the past 3 day...",
+      "correct_answer": "B",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step2&3",
+      "full_output": ""
+    },
+    {
+      "id": 19,
+      "question": "A 46-year-old man is brought to the emergency department for evaluation of altered mental status. He...",
+      "correct_answer": "E",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step2&3",
+      "full_output": ""
+    }
+  ]
+}

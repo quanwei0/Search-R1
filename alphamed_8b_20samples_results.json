@@ -1,0 +1,192 @@
+{
+  "model_id": "che111/AlphaMed-8B-instruct-rl",
+  "test_samples": 20,
+  "correct_count": 11,
+  "accuracy": 0.55,
+  "meta_accuracy": {
+    "step1": 0.5555555555555556,
+    "step2&3": 0.5454545454545454
+  },
+  "results": [
+    {
+      "id": 0,
+      "question": "A junior orthopaedic surgery resident is completing a carpal tunnel repair with the department chair...",
+      "correct_answer": "C",
+      "predicted_answer": "B",
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1:  The resident has inadvertently cut a flexor tendon during a carpal tunnel repair, but the tendon was successfully repaired.\nStep 2:  The attending physician advises the resident to leave the complication out of the operative report, citing that the patient will not be harmed and should not be worried unnecessarily.\nStep 3:  However, medical errors must be disclosed to patients, even if they were minor and did not result in harm.\nStep 4:  The Joint Commission requires that patients be..."
+    },
+    {
+      "id": 1,
+      "question": "A 67-year-old man with transitional cell carcinoma of the bladder comes to the physician because of ...",
+      "correct_answer": "E",
+      "predicted_answer": "E",
+      "is_correct": true,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient has transitional cell carcinoma of the bladder and has just started neoadjuvant chemotherapy. He presents with tinnitus and sensorineural hearing loss after receiving his first course of chemotherapy.\nStep 2: The chemotherapy regimen mentioned is neoadjuvant chemotherapy for transitional cell carcinoma of the bladder. However, the specific chemotherapy regimen is not provided.\nStep 3: The patient's symptoms of tinnitus and sensorineural hearing loss are consistent with cis..."
+    },
+    {
+      "id": 2,
+      "question": "Two weeks after undergoing an emergency cardiac catherization with stenting for unstable angina pect...",
+      "correct_answer": "C",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with decreased urinary output, malaise, fever, leukocytosis, and thrombocytopenia after undergoing cardiac catheterization with stenting. He has been started on aspirin, clopidogrel, and metoprolol.\nStep 2: His laboratory studies show a leukocytosis with a high erythrocyte sedimentation rate (ESR), indicating acute kidney injury (AKI) with acute pyelonephritis or post-renal transplant rejection. However, his renal biopsy shows intravascular spindle-shaped vacuoles..."
+    },
+    {
+      "id": 3,
+      "question": "A 39-year-old woman is brought to the emergency department because of fevers, chills, and left lower...",
+      "correct_answer": "D",
+      "predicted_answer": "D",
+      "is_correct": true,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient presents with fever, chills, tachypnea, tachycardia, hypotension (septic shock), and thrombocytopenia (platelet count of 14,200/mm^3). She also has mucopurulent discharge from the cervical os and left adnexal tenderness, indicating pelvic inflammatory disease (PID) complicated by septic shock.\nStep 2: The patient's laboratory studies show a high D-dimer level, indicating disseminated intravascular coagulation (DIC). Her fibrinogen level is slightly low, but her platelet co..."
+    },
+    {
+      "id": 4,
+      "question": "A 35-year-old man comes to the physician because of itchy, watery eyes for the past week. He has als...",
+      "correct_answer": "B",
+      "predicted_answer": "B",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with itchy, watery eyes (conjunctivitis) and sneezing (rhinitis), which are consistent with allergic conjunctivitis and allergic rhinitis.\nStep 2: He has a history of similar episodes in the springtime, which suggests seasonal allergic conjunctivitis.\nStep 3: His physical examination confirms bilateral conjunctival injection with watery discharge, consistent with allergic conjunctivitis.\nStep 4: Treatment for allergic conjunctivitis includes antihistamine eye drop..."
+    },
+    {
+      "id": 5,
+      "question": "A 39-year-old man presents to the emergency department because of progressively worsening chest pain...",
+      "correct_answer": "E",
+      "predicted_answer": "C",
+      "is_correct": false,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with chest pain and nausea after cocaine use at a bar. He has a history of hypertension and has been smoking cigarettes.\nStep 2: Cocaine use can cause myocardial infarction (MI) due to its vasoconstrictive properties. The patient's chest pain radiates to the epigastric area, suggesting cardiac ischemia.\nStep 3: Cocaine-induced chest pain is often referred to as cocaine-induced myocardial ischemia or cocaine-induced cardiomyopathy.\nStep 4: The patient's hypertensio..."
+    },
+    {
+      "id": 6,
+      "question": "A 68-year-old male comes to the physician for evaluation of right flank pain. He has a history of di...",
+      "correct_answer": "D",
+      "predicted_answer": "A",
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient presents with hypertension and flank pain, which is consistent with pyelonephritis (pyelonephritis is often referred to as pyelitis when it involves the renal pelvis). His blood pressure is significantly elevated, indicating hypertensive urgency.\nStep 2: The patient's flank pain is accompanied by tenderness in his right flank, suggesting pyonephrosis or renal colic. However, his ultrasound shows dilation of the right ureter and renal pelvis, indicating hydronephrosis.\nStep..."
+    },
+    {
+      "id": 7,
+      "question": "A 65-year-old man is brought to the emergency department 30 minutes after the onset of acute chest p...",
+      "correct_answer": "C",
+      "predicted_answer": "C",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with acute chest pain and is diagnosed with acute coronary syndrome (ACS) with ST-segment depressions in leads II, III, and aVF, indicating inferior myocardial infarction (MI). His pulse is tachycardic at 114/min, indicating tachyarrhythmia.\nStep 2: The patient undergoes percutaneous transluminal coronary angioplasty (PTCA) and has a left ventricular ejection fraction (LVEF) of 58% at discharge.\nStep 3: After an MI, patients are typically treated with antiplatelet..."
+    },
+    {
+      "id": 8,
+      "question": "A 37-year-old-woman presents to her primary care physician requesting a new form of birth control. S...",
+      "correct_answer": "C",
+      "predicted_answer": "C",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1:  The patient is requesting a switch from oral contraceptive pills (OCPs) to an intrauterine device (IUD) for birth control. She has a history of using OCPs for 8 years.\nStep 2:  The patient's vital signs are within normal limits, and her physical examination is unremarkable.\nStep 3:  The patient is interested in switching to a copper IUD, and we need to determine which past medical history statement would make copper IUD placement contraindicated.\nStep 4:  Copper IUDs are a highly eff..."
+    },
+    {
+      "id": 9,
+      "question": "A 23-year-old woman comes to the physician because she is embarrassed about the appearance of her na...",
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient presents with concerns about the appearance of her nails. A photograph of her nails shows nail pitting, which is consistent with psoriasis.\nStep 2: Psoriasis is a chronic inflammatory skin condition that can involve the nails, among other areas of the body. Nail pitting is a common finding in psoriasis.\nStep 3: Psoriasis can also involve other areas of the body, including the joints (psoriatic arthritis), skin (psoriatic plaques), and nails (nail pitting).\nStep 4: The pati..."
+    },
+    {
+      "id": 10,
+      "question": "A 24-year-old G2P1 woman at 39 weeks’ gestation presents to the emergency department complaining of ...",
+      "correct_answer": "E",
+      "predicted_answer": "B",
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient presents in labor at 39 weeks' gestation and is diagnosed with HIV. As part of her care, she undergoes rapid screening tests for HIV, which result in the administration of zidovudine during delivery to reduce the risk of mother-to-child transmission.\nStep 2: After the initial screening tests, a confirmatory test is performed to confirm the diagnosis of HIV.\nStep 3: The confirmatory test for HIV involves using an enzyme immunoassay (EIA) or a Western blot (WB) test.\nStep 4:..."
+    },
+    {
+      "id": 11,
+      "question": "A 72-year-old man comes to the physician because of a 2-month history of fatigue and worsening abdom...",
+      "correct_answer": "D",
+      "predicted_answer": "D",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with fatigue, abdominal pain, night sweats, shortness of breath on exertion, weight loss, and splenomegaly. His laboratory studies show a hemoglobin of 6.4 g/dL (indicative of anemia), a leukocyte count of 5,200/mm^3 (normal), and a platelet count of 96,000/mm^3 (thrombocytopenia). He has a diagnosis of myelofibrosis with myeloid metaplasis (also known as primary myelofibrosis), which is supported by his bone marrow aspiration showing extensive fibrosis.\nStep 2: T..."
+    },
+    {
+      "id": 12,
+      "question": "A 20-year-old man comes to the physician because of worsening gait unsteadiness and bilateral hearin...",
+      "correct_answer": "B",
+      "predicted_answer": "B",
+      "is_correct": true,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient presents with gait unsteadiness, bilateral hearing loss, and tingling sensations on his cheeks. He has been diagnosed with neurofibromatosis type 2 (NF2), which is associated with bilateral vestibular schwannomas.\nStep 2: NF2 is also known as bilateral acoustic neuroma syndrome. The patient's genetic evaluation shows a mutation of the NF2 gene on chromosome 22, which encodes merlin.\nStep 3: Individuals with NF2 are at increased risk of developing other tumors, including me..."
+    },
+    {
+      "id": 13,
+      "question": "A 47-year-old executive schedules an appointment his physician for a routine medical check-up. He cu...",
+      "correct_answer": "E",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient has a mid-systolic murmur heard in the 2nd left intercostal space that radiates to the carotids. This suggests aortic regurgitation murmur is not present, but rather a murmur of aortic stenosis (AS) or aortic regurgitation (AR) is not indicated. However, the murmur radiates to the carotids, which is typical of aortic regurgitation is not present, but rather aortic stenosis is not indicated here. The murmur described is a harsh, crescendo-decrescendo murmur of aortic stenos..."
+    },
+    {
+      "id": 14,
+      "question": "A microbiologist is studying the emergence of a virulent strain of the virus. After a detailed study...",
+      "correct_answer": "D",
+      "predicted_answer": "D",
+      "is_correct": true,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The question describes a process called reassortment, where two viruses from the same family infect a cell and exchange genetic material to create a new virus.\nStep 2: Reassortment occurs in viruses that have segmented genomes.\nStep 3: The viruses that undergo reassortment are influenza viruses.\nStep 4: The question asks which virus is capable of undergoing reassortment.\nStep 5: Among the options provided, rotavirus is known to undergo reassortment.\nStep 6: Rotavirus has a segmented g..."
+    },
+    {
+      "id": 15,
+      "question": "A 59-year-old overweight woman presents to the urgent care clinic with the complaint of severe abdom...",
+      "correct_answer": "B",
+      "predicted_answer": "A",
+      "is_correct": false,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with severe abdominal pain, nausea, vomiting, and a dull back pain. Her pain has no relation with food intake.\nStep 2: She has a history of cholelithiasis and is now presenting with severe abdominal pain. Her CT scan shows a calcified mass near her gallbladder.\nStep 3: A calcified mass near the gallbladder is indicative of gallstones causing gallbladder cancer (porcelain gallbladder). Porcelain gallbladder is a risk factor for gallbladder cancer.\nStep 4: The patie..."
+    },
+    {
+      "id": 16,
+      "question": "A 7-year-old boy is brought to his pediatrician’s office for a follow-up visit. He was diagnosed wit...",
+      "correct_answer": "E",
+      "predicted_answer": "D",
+      "is_correct": false,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient has asthma and experiences exacerbations of his symptoms in the springtime when flowers are blooming. He has been advised to stay away from pollen.\nStep 2: The patient is being considered for an experimental therapy that targets a mediator involved in his allergic asthma.\nStep 3: The experimental therapy aims to reduce the exaggerated allergic response to pollen.\nStep 4: The mediator targeted by the experimental therapy favors class switching of antibodies.\nStep 5: The med..."
+    },
+    {
+      "id": 17,
+      "question": "A 3-month-old boy is brought the emergency department by his parents after an episode of cyanosis an...",
+      "correct_answer": "E",
+      "predicted_answer": "E",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The pediatrician is trying to identify risk factors for Brief Resolved Unexplained Event (BRUE) in infants.\nStep 2: She recruits 75 infants with BRUE and 75 infants without BRUE of the same age, socioeconomic background, and family history of medical illness.\nStep 3: To control confounding bias, she needs to ensure that the groups are comparable in terms of age, socioeconomic background, and family history of medical illness.\nStep 4: The methods listed include stratified analysis (A),..."
+    },
+    {
+      "id": 18,
+      "question": "A 29-year-old man presents to the emergency department due to central chest pain over the past 3 day...",
+      "correct_answer": "B",
+      "predicted_answer": "A",
+      "is_correct": false,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with central chest pain that worsens when lying down and improves when leaning forward. He has a history of smoking cigarettes, but his vital signs are within normal limits. A scratching sound of a to-and-from character is audible over the left sternal border at end-expiration when he leans forward, which is consistent with a murmur of a hamman sign.\nStep 2: The patient's pain is described as sharp, severe, constant, and worsens when lying down, which is consisten..."
+    },
+    {
+      "id": 19,
+      "question": "A 46-year-old man is brought to the emergency department for evaluation of altered mental status. He...",
+      "correct_answer": "E",
+      "predicted_answer": "E",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with altered mental status, slurred speech, an alcoholic smell, and diminished deep tendon reflexes. He was found on the floor but is responsive when aroused.\nStep 2: His blood alcohol concentration is 0.04%, which is below the typical threshold for intoxication.\nStep 3: He has diminished deep tendon reflexes, which is consistent with Wernicke's sign or a nutritional deficiency, but his blood alcohol concentration is low.\nStep 4: His physical exam also shows an at..."
+    }
+  ]
+}

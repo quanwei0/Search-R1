@@ -1,12 +1,10 @@
 #!/usr/bin/env python3
 """
-Convert test.jsonl to alphamed_search dataset format
-Based on the existing alphamed_search.py processing logic
+Convert baseline_test/test.jsonl to parquet format with adaptive prompt
 """
 
 import json
 import pandas as pd
-import argparse
 import os
 
 def make_prefix(question_text, options):
@@ -38,18 +36,21 @@ Options:
     
     return prefix
 
-def process_jsonl_to_alphamed_format(input_file, output_file, data_source='test_medical'):
+def process_jsonl_to_parquet(input_file, output_file, data_source='baseline_test'):
     """
-    Convert test.jsonl to alphamed_search format
+    Convert test.jsonl to parquet format with adaptive prompt
     """
     processed_data = []
     
     with open(input_file, 'r', encoding='utf-8') as f:
         for idx, line in enumerate(f):
+            if not line.strip():  # 跳过空行
+                continue
+                
             data = json.loads(line.strip())
             
             question_text = data['question'].strip()
-            correct_answer = data['answer_idx'].strip()  # 使用answer_idx作为正确答案
+            correct_answer = data['answer_idx'].strip()
             options = data['options']
             meta_info = data.get('meta_info', 'unknown')
             
@@ -58,13 +59,13 @@ def process_jsonl_to_alphamed_format(input_file, output_file, data_source='test_
             
             # 构建solution
             solution = {
-                "target": [correct_answer],  # 保持与原格式一致，使用列表
-                "options": options,  # 添加选项信息用于验证
+                "target": [correct_answer],
+                "options": options,
             }
             
-            # 构建数据项，完全按照alphamed_search格式
+            # 构建数据项
             processed_item = {
-                "id": f"test_{idx}",
+                "id": f"baseline_test_{idx}",
                 "question": question_text,
                 "golden_answers": [correct_answer],
                 "data_source": data_source,
@@ -80,10 +81,10 @@ def process_jsonl_to_alphamed_format(input_file, output_file, data_source='test_
                 "extra_info": {
                     'split': 'test',
                     'index': idx,
-                    'subset_name': f'MedQA-Test-{meta_info}',
+                    'subset_name': f'BaselineTest-{meta_info}',
                     'original_question': question_text,
                     'meta_info': meta_info,
-                    'original_answer': data.get('answer', ''),  # 保留原始答案文本
+                    'original_answer': data.get('answer', ''),
                 },
                 "metadata": None
             }
@@ -114,45 +115,27 @@ def process_jsonl_to_alphamed_format(input_file, output_file, data_source='test_
     
     return df
 
-def main():
-    parser = argparse.ArgumentParser(description='Convert test.jsonl to alphamed_search format with adaptive search prompt')
-    parser.add_argument('--input_file', 
-                       default='/home/li003968/Search-R1/data/test.jsonl',
-                       help='Input JSONL file path')
-    parser.add_argument('--output_file', 
-                       default='/home/li003968/Search-R1/data/alphamed_search/test.parquet',
-                       help='Output parquet file path')
-    parser.add_argument('--data_source', 
-                       default='test_medical',
-                       help='Data source identifier')
+if __name__ == '__main__':
+    # 设置路径
+    input_file = '/home/li003968/Search-R1/baseline_test/test.jsonl'
+    output_file = '/home/li003968/Search-R1/baseline_test/test.parquet'
     
-    args = parser.parse_args()
-    
-    print("🚀 开始转换test.jsonl到alphamed格式...")
-    print(f"📁 输入文件: {args.input_file}")
-    print(f"📁 输出文件: {args.output_file}")
-    print(f"🏷️  数据源: {args.data_source}")
+    print("🚀 开始转换baseline_test/test.jsonl到parquet格式...")
+    print(f"📁 输入文件: {input_file}")
+    print(f"📁 输出文件: {output_file}")
     print(f"📝 使用自适应搜索提示词 (adaptive prompt)")
     
     # 检查输入文件是否存在
-    if not os.path.exists(args.input_file):
-        print(f"❌ 错误: 输入文件不存在: {args.input_file}")
-        return
-    
-    # 创建输出目录
-    output_dir = os.path.dirname(args.output_file)
-    if output_dir:
-        os.makedirs(output_dir, exist_ok=True)
+    if not os.path.exists(input_file):
+        print(f"❌ 错误: 输入文件不存在: {input_file}")
+        exit(1)
     
     # 处理文件
-    df = process_jsonl_to_alphamed_format(
-        args.input_file, 
-        args.output_file, 
-        args.data_source
-    )
+    df = process_jsonl_to_parquet(input_file, output_file)
     
     print(f"\n🎉 转换完成!")
-    print(f"✅ Test dataset已保存到: {args.output_file}")
+    print(f"✅ Test dataset已保存到: {output_file}")
 
-if __name__ == '__main__':
-    main()
+
+
+

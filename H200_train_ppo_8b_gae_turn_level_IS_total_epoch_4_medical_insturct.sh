@@ -1,7 +1,7 @@
 # Set shared configuration parameters
 export CUDA_VISIBLE_DEVICES=0,1,2,3
 export RETRIEVAL_PORT=8001
-export DATA_DIR='./data/alphamed_search_split'
+export DATA_DIR='./data/alphamed_search'
 
 # source activate retriever
 # # Pass GPU devices and port to retrieval script
@@ -17,7 +17,7 @@ WAND_PROJECT='Search-R1'
 
 
 export BASE_MODEL='meta-llama/Meta-Llama-3-8B-Instruct'
-export EXPERIMENT_NAME=Medical-H200-search-r1-ppo-meta-llama-3-8b-it-em-gae-turn-IS-total-epoch-4-Minibatch256-saved-checkpoint-seed3-lr-warmup-200-valid-search-penalty-0.1-final-answer-penalty-0.3
+export EXPERIMENT_NAME=Medical-H200-search-r1-ppo-meta-llama-3-8b-total-epoch-2-adaptive-prompt-lr-warmup-0.600-mini-batch-128-micro-batch-32
 # export BASE_MODEL='Qwen/Qwen2.5-1.5B-Instruct'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-1.5b-it-em
 # export BASE_MODEL='Qwen/Qwen2.5-3B'
@@ -42,7 +42,7 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     data.train_batch_size=256 \
     data.val_batch_size=128 \
     data.max_prompt_length=4096 \
-    data.max_response_length=500 \
+    data.max_response_length=1000 \
     data.max_start_length=2048 \
     data.max_obs_length=500 \
     data.shuffle_train_dataloader=True \
@@ -55,7 +55,7 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     actor_rollout_ref.actor.optim.lr=1e-6 \
     actor_rollout_ref.model.enable_gradient_checkpointing=True \
     actor_rollout_ref.model.use_remove_padding=True \
-    actor_rollout_ref.actor.optim.lr_warmup_steps_ratio=0.200 \
+    actor_rollout_ref.actor.optim.lr_warmup_steps_ratio=0.600 \
     actor_rollout_ref.actor.ppo_mini_batch_size=128 \
     actor_rollout_ref.actor.ppo_micro_batch_size=32 \
     actor_rollout_ref.actor.fsdp_config.param_offload=True \
@@ -71,7 +71,6 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     actor_rollout_ref.rollout.temperature=1 \
     actor_rollout_ref.actor.state_masking=True \
     +actor_rollout_ref.actor.importance_sampling_level=token \
-    +actor_rollout_ref.actor.detach_ratio=variance_reduction \
     critic.optim.lr=1e-5 \
     critic.model.use_remove_padding=True \
     critic.optim.lr_warmup_steps_ratio=0.015 \
@@ -95,7 +94,7 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     trainer.test_freq=25 \
     trainer.project_name=$WAND_PROJECT \
     trainer.experiment_name=$EXPERIMENT_NAME \
-    trainer.total_epochs=4 \
+    trainer.total_epochs=2 \
     trainer.total_training_steps=2000 \
     trainer.default_hdfs_dir=null \
     trainer.default_local_dir=/mnt/data1/li003968/verl_checkpoints/$EXPERIMENT_NAME \

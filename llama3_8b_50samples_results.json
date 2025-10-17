@@ -1,0 +1,462 @@
+{
+  "model_id": "meta-llama/Meta-Llama-3-8B",
+  "test_samples": 50,
+  "correct_count": 10,
+  "accuracy": 0.2,
+  "meta_accuracy": {
+    "step1": 0.15384615384615385,
+    "step2&3": 0.25
+  },
+  "results": [
+    {
+      "id": 0,
+      "question": "A 65-year-old male is treated for anal carcinoma with therapy including external beam radiation. How...",
+      "correct_answer": "E",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ""
+    },
+    {
+      "id": 1,
+      "question": "A 56-year-old man with a history of hypertension presents to his physician with progressive fatigue ...",
+      "correct_answer": "A",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step2&3",
+      "full_output": ""
+    },
+    {
+      "id": 2,
+      "question": "A 65-year-old man comes to the physician because of a 1-week history of yellowish discoloration of h...",
+      "correct_answer": "D",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ""
+    },
+    {
+      "id": 3,
+      "question": "A 72-year-old woman is brought to the physician by her daughter because of a 6-month history of wors...",
+      "correct_answer": "D",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ""
+    },
+    {
+      "id": 4,
+      "question": "A 61-year-old man with schizophrenia in a locked inpatient psychiatry unit was observed making an un...",
+      "correct_answer": "B",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step2&3",
+      "full_output": ".\nThank you.\n\n2.5k points\n\n• 1\n\nTardive dyskinesia\n\nExplanation:\n\nTardive dyskinesia is a movement disorder that can occur after long-term use of antipsychotic medications. It is characterized by involuntary, repetitive movements of the face, mouth, and tongue. These movements can include lip smacking, tongue thrusting, and facial grimacing. Tardive dyskinesia can also affect the arms, legs, and trunk, causing repetitive movements such as rocking or writhing.\n\nTardive dyskinesia is a common side..."
+    },
+    {
+      "id": 5,
+      "question": "A 17-year-old football player with no significant past medical history, social history, or family hi...",
+      "correct_answer": "B",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step2&3",
+      "full_output": ""
+    },
+    {
+      "id": 6,
+      "question": "An otherwise healthy 26-year-old man comes to the physician for medication counseling after recently...",
+      "correct_answer": "C",
+      "predicted_answer": "C",
+      "is_correct": true,
+      "meta_info": "step1",
+      "full_output": ".\n\nAnswer: C"
+    },
+    {
+      "id": 7,
+      "question": "A 15-year-old woman presents with fever, altered mental status and a petechial rash on her lower ext...",
+      "correct_answer": "B",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ""
+    },
+    {
+      "id": 8,
+      "question": "A 2-year-old boy is brought to the physician for evaluation of pallor and increasing lethargy for 2 ...",
+      "correct_answer": "C",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step2&3",
+      "full_output": ""
+    },
+    {
+      "id": 9,
+      "question": "A 17-year-old girl is referred by her dentist for a suspected eating disorder. She has been visiting...",
+      "correct_answer": "A",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step2&3",
+      "full_output": ""
+    },
+    {
+      "id": 10,
+      "question": "A 14-year-old girl is brought to the physician by her father because of fever, chills, abdominal pai...",
+      "correct_answer": "D",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ""
+    },
+    {
+      "id": 11,
+      "question": "A 22-year-old female college student is treated with metronidazole after presenting to student healt...",
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "meta_info": "step1",
+      "full_output": ".\n\nAnswer: A"
+    },
+    {
+      "id": 12,
+      "question": "A 23-year-old primigravida presents for a regular prenatal care visit at 16 weeks gestation. She com...",
+      "correct_answer": "D",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step2&3",
+      "full_output": ""
+    },
+    {
+      "id": 13,
+      "question": "An 80-year-old man is transferred from a step-down unit to a med-surg floor in the hospital. He had ...",
+      "correct_answer": "A",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step2&3",
+      "full_output": ".\n\n1. The patient is hypothermic, hypotensive, and hypoxic. The patient is also not passing urine. The patient is obese and has a history of abdominal and pelvic surgery. The patient is also on narcotics. The patient is also not passing urine. The patient is obese and has a history of abdominal and pelvic surgery. The patient is also on narcotics. The patient is also not passing urine. The patient is obese and has a history of abdominal and pelvic surgery. The patient is also on narcotics. The p..."
+    },
+    {
+      "id": 14,
+      "question": "A healthy 19-year-old man presents to his primary care provider complaining of painless “blisters” i...",
+      "correct_answer": "A",
+      "predicted_answer": "C",
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ".\n\nAnswer: C"
+    },
+    {
+      "id": 15,
+      "question": "A 56-year-old man presents to the clinic complaining of subacute back pain for the past month. The p...",
+      "correct_answer": "C",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ""
+    },
+    {
+      "id": 16,
+      "question": "A 4-year-old boy is brought to the emergency department because of severe abdominal pain and bilious...",
+      "correct_answer": "D",
+      "predicted_answer": "D",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nAnswer: D"
+    },
+    {
+      "id": 17,
+      "question": "A 3-week-old male newborn is brought to the hospital because of poor weight gain since birth. He was...",
+      "correct_answer": "C",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step2&3",
+      "full_output": ""
+    },
+    {
+      "id": 18,
+      "question": "A 57-year-old female with a past medical history of alcoholism presents to the emergency room vomiti...",
+      "correct_answer": "D",
+      "predicted_answer": "C",
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ".\nThank you!\n\n1.5k points\n\nAnswer: C\n\nExplanation: The patient in the vignette has a bleeding esophageal varices, which is a complication of portal hypertension. The most common cause of portal hypertension is cirrhosis. The most common cause of cirrhosis is alcoholism. The patient in the vignette has a history of alcoholism and cirrhosis. The most common cause of bleeding esophageal varices is portal hypertension. The most common cause of portal hypertension is cirrhosis. The most common cause ..."
+    },
+    {
+      "id": 19,
+      "question": "A 65-year-old man with a history of hypertension, obesity, and alcoholic cirrhosis is seen in clinic...",
+      "correct_answer": "A",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ""
+    },
+    {
+      "id": 20,
+      "question": "A 66-year-old man is brought to the emergency room by his wife due to abdominal distension and persi...",
+      "correct_answer": "A",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ""
+    },
+    {
+      "id": 21,
+      "question": "A 27-year-old man presents to the emergency department after a motor vehicle collision. The patient ...",
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\nThank you.\n\n1.5k points\n\nAnswer: A\n\nExplanation: Cardiac contusion\n\nCardiac contusion is a blunt injury to the heart. It is a common injury in motor vehicle accidents. The patient may present with chest pain, dysrhythmias, and ECG changes. The diagnosis is made by ECG and echocardiogram. The patient may require a temporary pacemaker. The patient may also develop pericarditis and pericardial effusion. The patient may also develop myocardial infarction, which is a complication of cardiac contusi..."
+    },
+    {
+      "id": 22,
+      "question": "A 56-year-old man presents to the emergency department for progressively worsening fatigue, malaise,...",
+      "correct_answer": "C",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step2&3",
+      "full_output": ""
+    },
+    {
+      "id": 23,
+      "question": "A 29-year-old woman presents to the clinic after several months of weight loss. She noticed a 6.8 kg...",
+      "correct_answer": "B",
+      "predicted_answer": "C",
+      "is_correct": false,
+      "meta_info": "step2&3",
+      "full_output": ".\nThank you!\n\n1.5k points\n\nAnswer: C\n\nExplanation: The patient has symptoms of hyperthyroidism, including weight loss, heat intolerance, and tremor. The elevated heart rate and blood pressure are also consistent with hyperthyroidism. The urine pregnancy test is negative, ruling out gestational hyperthyroidism. The best single treatment option for this patient is propranolol, a beta-blocker. Propranolol is used to treat the symptoms of hyperthyroidism, such as tremor and palpitations. It does not..."
+    },
+    {
+      "id": 24,
+      "question": "A 21-year-old man comes to the physician because of pruritus and a hypopigmented rash on his upper b...",
+      "correct_answer": "C",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step2&3",
+      "full_output": ""
+    },
+    {
+      "id": 25,
+      "question": "A 5-year-old female is brought to a speech therapist for continuing work on improving her communicat...",
+      "correct_answer": "A",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ".\nThank you.\n\n• 1\nWhat are you looking for?"
+    },
+    {
+      "id": 26,
+      "question": "A 62-year old female comes to the physician because of vaginal spotting and urinary urgency for the ...",
+      "correct_answer": "B",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step2&3",
+      "full_output": ".\nThank you.\n\n1.5k points\n\n1 answer\n0\n0 votes\n0\n0 votes\n0\n0 votes\n0\n0 votes\n0\n0 votes\n0\n0 votes\n0\n0 votes\n0\n0 votes\n0\n0 votes\n0\n0 votes\n0\n0 votes\n0\n0 votes\n0\n0 votes\n0\n0 votes\n0\n0 votes\n0\n0 votes\n0\n0 votes\n0\n0 votes\n0\n0 votes\n0\n0 votes\n0\n0 votes\n0\n0 votes\n0\n0 votes\n0\n0 votes\n0\n0 votes\n0\n0 votes\n0\n0 votes\n0\n0 votes\n0\n0 votes\n0\n0 votes\n0\n0 votes\n0\n0 votes\n0\n0 votes\n0\n0 votes\n0\n0 votes\n0\n0 votes\n0\n0 votes\n0\n0 votes\n0\n0 votes\n0\n0 votes\n0\n0 votes\n0\n0 votes\n0\n0 votes\n0\n0 votes\n0\n0 votes\n0\n0 votes\n0\n0 ..."
+    },
+    {
+      "id": 27,
+      "question": "A 59-year-old man is evaluated for progressive joint pain. There is swelling and tenderness over the...",
+      "correct_answer": "B",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step2&3",
+      "full_output": ".\nThank you."
+    },
+    {
+      "id": 28,
+      "question": "A newborn is found to be extremely cyanotic immediately after birth. He then develops progressive re...",
+      "correct_answer": "D",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ""
+    },
+    {
+      "id": 29,
+      "question": "A 25-year-old male involved in a knife fight presents with a penetrating wound to the chest. The pat...",
+      "correct_answer": "C",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step2&3",
+      "full_output": ""
+    },
+    {
+      "id": 30,
+      "question": "A post-mortem lung examination of a 68-year-old male overweight male with evidence of chronic lower ...",
+      "correct_answer": "B",
+      "predicted_answer": "C",
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ".\n\n1. A post-mortem lung examination of a 68-year-old male overweight male with evidence of chronic lower extremity edema, a 60 pack-year smoking history and daily productive cough would be most likely to reveal:\n\nOptions:\nA: Hypereosinophilia\nB: Reid Index > 50%\nC: Non-caseating granulomas\nD: Evidence of a necrotizing infection\nE: Keratin pearls\n\nPlease reason step by step, and put the final answer in \\boxed{}.\n\n2. A post-mortem lung examination of a 68-year-old male overweight male with eviden..."
+    },
+    {
+      "id": 31,
+      "question": "A 54-year-old male makes an appointment with his primary care physician due to chronic fatigue that ...",
+      "correct_answer": "B",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ""
+    },
+    {
+      "id": 32,
+      "question": "A 44-year-old African-American woman comes to the physician for a routine examination. She is concer...",
+      "correct_answer": "C",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ""
+    },
+    {
+      "id": 33,
+      "question": "A 60-year-old woman is brought to the clinic by her daughter for evaluation. The daughter reports th...",
+      "correct_answer": "B",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step2&3",
+      "full_output": ""
+    },
+    {
+      "id": 34,
+      "question": "A 30-year-old woman comes to the physician because she has been unable to conceive for 3 years. Anal...",
+      "correct_answer": "D",
+      "predicted_answer": "D",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nAnswer: D"
+    },
+    {
+      "id": 35,
+      "question": "A 55-year-old truck driver is brought to a physician by his wife. She states that her husband develo...",
+      "correct_answer": "C",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ""
+    },
+    {
+      "id": 36,
+      "question": "A previously healthy 30-year-old woman comes to the physician for the evaluation of pain during sexu...",
+      "correct_answer": "C",
+      "predicted_answer": "C",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\nThank you.\n\nAnswer: C"
+    },
+    {
+      "id": 37,
+      "question": "A 50-year-old man visits his physician after 20 years of not seeking any medical care. He is concern...",
+      "correct_answer": "D",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ""
+    },
+    {
+      "id": 38,
+      "question": "A 26-year-old woman is brought to the emergency department 20 minutes after being involved in a high...",
+      "correct_answer": "C",
+      "predicted_answer": "E",
+      "is_correct": false,
+      "meta_info": "step2&3",
+      "full_output": ".\nThank you.\n\nAnswer: E"
+    },
+    {
+      "id": 39,
+      "question": "A 26-year-old G1P0 woman presents to her primary care physician’s office with feelings of anxiety an...",
+      "correct_answer": "C",
+      "predicted_answer": "A",
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ".\n\nAnswer: A"
+    },
+    {
+      "id": 40,
+      "question": "A 32-year-old woman comes to the physician because of a 3-week history of intermittent loose stools ...",
+      "correct_answer": "E",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ".\nThank you.\n\n1.5k points 3 3\n\nExplanation:\n\nThe eggs of Schistosoma mansoni have lateral spines and are oval in shape. The eggs are passed in the stool and hatch in freshwater. The larvae penetrate the skin of people who are exposed to contaminated water. The larvae migrate to the liver, where they mature into adult worms. The adult worms live in the veins of the pelvis and lower extremities. The female worms lay eggs that are passed in the stool. The eggs cause an intense inflammatory reaction..."
+    },
+    {
+      "id": 41,
+      "question": "A 3-month-old girl is brought to a pediatrician by her parents. She has central cyanosis without sig...",
+      "correct_answer": "B",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ""
+    },
+    {
+      "id": 42,
+      "question": "Six days after undergoing surgical repair of a hip fracture, a previously healthy 79-year-old woman ...",
+      "correct_answer": "D",
+      "predicted_answer": "D",
+      "is_correct": true,
+      "meta_info": "step1",
+      "full_output": ".\nThank you.\n\n1.5k points\n\nAnswer: D\n\nExplanation: The patient has delirium, which is a common cause of confusion in the elderly. It is characterized by inattention, disorientation, and hallucinations. It is often precipitated by a medical illness, such as a urinary tract infection, or by a medication, such as an opioid. The patient's history of alcohol use is not relevant to the current condition. Dementia is a chronic condition that is not reversible."
+    },
+    {
+      "id": 43,
+      "question": "A 54-year-old woman with a past medical history of mental retardation, hypertension, and diabetes pr...",
+      "correct_answer": "E",
+      "predicted_answer": "E",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\nThank you!\n\n1.5k points\n\nAnswer: E\n\nExplanation:\n\nThe patient in the question is presenting with a subacute onset of spasticity, hyperreflexia, and a positive Babinski sign. Additionally, the patient has a history of mental retardation, hypertension, and diabetes. The patient also has a history of hand deformities and a \"clunk\" when posterior force is applied to the head while anterior force is applied to the cervical spine. These findings are consistent with a diagnosis of subacute combined d..."
+    },
+    {
+      "id": 44,
+      "question": "A 24-year-old man is brought to the emergency department 15 minutes after he sustained a stab wound ...",
+      "correct_answer": "C",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step2&3",
+      "full_output": ""
+    },
+    {
+      "id": 45,
+      "question": "A 40-year-old man presents to his primary-care doctor for a follow-up of his hypertension. He is asy...",
+      "correct_answer": "D",
+      "predicted_answer": "D",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\nThank you.\n\n1.5k points\n\nAnswer: D\n\nExplanation: The patient has autosomal dominant polycystic kidney disease (ADPKD). The most common cause of end-stage renal disease in patients younger than 50 years of age, ADPKD is characterized by the development of multiple cysts in the kidneys. The cysts are lined by epithelial cells that secrete fluid, leading to progressive enlargement of the kidneys. The cysts can also develop in the liver, pancreas, and other organs. The patient's father had a kidne..."
+    },
+    {
+      "id": 46,
+      "question": "A 17-year-old female is brought to the emergency room by her father because she has been experiencin...",
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "meta_info": "step1",
+      "full_output": ".\n\n1. Answer: A\n2. Explanation:\n3. The patient has a pulmonary embolism, which is a common complication of pregnancy. The patient is a female, and the inheritance pattern is autosomal dominant."
+    },
+    {
+      "id": 47,
+      "question": "A 26-year-old male presents to his primary care physician with complaints of burning with urination,...",
+      "correct_answer": "B",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ""
+    },
+    {
+      "id": 48,
+      "question": "A 37-year-old man with no significant past medical history is rear-ended in a motor vehicle accident...",
+      "correct_answer": "C",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step2&3",
+      "full_output": ".\n"
+    },
+    {
+      "id": 49,
+      "question": "A 43-year-old man with a history of schizophrenia, currently controlled with medication, comes in fo...",
+      "correct_answer": "C",
+      "predicted_answer": "E",
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ".\nThank you.\n\nAnswer: E"
+    }
+  ]
+}

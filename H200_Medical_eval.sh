@@ -1,7 +1,7 @@
 # Set shared configuration parameters
 export CUDA_VISIBLE_DEVICES=0,1,2,3
 export RETRIEVAL_PORT=8001
-export DATA_DIR='./data/alphamed_search_split'
+export DATA_DIR='./data/alphamed_search_test'
 
 # source activate retriever
 # # Pass GPU devices and port to retrieval script
@@ -95,7 +95,7 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     trainer.test_freq=-1 \
     trainer.project_name=$WAND_PROJECT \
     trainer.experiment_name=$EXPERIMENT_NAME \
-    trainer.total_epochs=4 \
+    trainer.total_epochs=2 \
     trainer.total_training_steps=2000 \
     trainer.default_hdfs_dir=null \
     trainer.default_local_dir=/mnt/data1/li003968/verl_checkpoints/$EXPERIMENT_NAME \

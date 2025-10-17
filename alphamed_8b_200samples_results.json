@@ -1,0 +1,1812 @@
+{
+  "model_id": "che111/AlphaMed-8B-instruct-rl",
+  "test_samples": 100,
+  "correct_count": 120,
+  "accuracy": 0.6,
+  "meta_accuracy": {
+    "step1": 0.5428571428571428,
+    "step2&3": 0.6631578947368421
+  },
+  "results": [
+    {
+      "id": 0,
+      "question": "A junior orthopaedic surgery resident is completing a carpal tunnel repair with the department chair...",
+      "correct_answer": "C",
+      "predicted_answer": "B",
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1:  The resident has inadvertently cut a flexor tendon during a carpal tunnel repair, but the tendon was successfully repaired.\nStep 2:  The attending physician advises the resident to leave the complication out of the operative report, citing that the patient will not be harmed and should not be worried unnecessarily.\nStep 3:  However, medical errors must be disclosed to patients, even if they were minor and did not result in harm.\nStep 4:  The Joint Commission requires that patients be..."
+    },
+    {
+      "id": 1,
+      "question": "A 67-year-old man with transitional cell carcinoma of the bladder comes to the physician because of ...",
+      "correct_answer": "E",
+      "predicted_answer": "E",
+      "is_correct": true,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient has transitional cell carcinoma of the bladder and has just started neoadjuvant chemotherapy. He presents with tinnitus and sensorineural hearing loss after receiving his first course of chemotherapy.\nStep 2: The chemotherapy regimen mentioned is neoadjuvant chemotherapy for transitional cell carcinoma of the bladder. However, the specific chemotherapy regimen is not provided.\nStep 3: The patient's symptoms of tinnitus and sensorineural hearing loss are consistent with cis..."
+    },
+    {
+      "id": 2,
+      "question": "Two weeks after undergoing an emergency cardiac catherization with stenting for unstable angina pect...",
+      "correct_answer": "C",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with decreased urinary output, malaise, fever, leukocytosis, and thrombocytopenia after undergoing cardiac catheterization with stenting. He has been started on aspirin, clopidogrel, and metoprolol.\nStep 2: His laboratory studies show a leukocytosis with a high erythrocyte sedimentation rate (ESR), indicating acute kidney injury (AKI) with acute pyelonephritis or post-renal transplant rejection. However, his renal biopsy shows intravascular spindle-shaped vacuoles..."
+    },
+    {
+      "id": 3,
+      "question": "A 39-year-old woman is brought to the emergency department because of fevers, chills, and left lower...",
+      "correct_answer": "D",
+      "predicted_answer": "D",
+      "is_correct": true,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient presents with fever, chills, tachypnea, tachycardia, hypotension (septic shock), and thrombocytopenia (platelet count of 14,200/mm^3). She also has mucopurulent discharge from the cervical os and left adnexal tenderness, indicating pelvic inflammatory disease (PID) complicated by septic shock.\nStep 2: The patient's laboratory studies show a high D-dimer level, indicating disseminated intravascular coagulation (DIC). Her fibrinogen level is slightly low, but her platelet co..."
+    },
+    {
+      "id": 4,
+      "question": "A 35-year-old man comes to the physician because of itchy, watery eyes for the past week. He has als...",
+      "correct_answer": "B",
+      "predicted_answer": "B",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with itchy, watery eyes (conjunctivitis) and sneezing (rhinitis), which are consistent with allergic conjunctivitis and allergic rhinitis.\nStep 2: He has a history of similar episodes in the springtime, which suggests seasonal allergic conjunctivitis.\nStep 3: His physical examination confirms bilateral conjunctival injection with watery discharge, consistent with allergic conjunctivitis.\nStep 4: Treatment for allergic conjunctivitis includes antihistamine eye drop..."
+    },
+    {
+      "id": 5,
+      "question": "A 39-year-old man presents to the emergency department because of progressively worsening chest pain...",
+      "correct_answer": "E",
+      "predicted_answer": "C",
+      "is_correct": false,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with chest pain and nausea after cocaine use at a bar. He has a history of hypertension and has been smoking cigarettes.\nStep 2: Cocaine use can cause myocardial infarction (MI) due to its vasoconstrictive properties. The patient's chest pain radiates to the epigastric area, suggesting cardiac ischemia.\nStep 3: Cocaine-induced chest pain is often referred to as cocaine-induced myocardial ischemia or cocaine-induced cardiomyopathy.\nStep 4: The patient's hypertensio..."
+    },
+    {
+      "id": 6,
+      "question": "A 68-year-old male comes to the physician for evaluation of right flank pain. He has a history of di...",
+      "correct_answer": "D",
+      "predicted_answer": "A",
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient presents with hypertension and flank pain, which is consistent with pyelonephritis (pyelonephritis is often referred to as pyelitis when it involves the renal pelvis). His blood pressure is significantly elevated, indicating hypertensive urgency.\nStep 2: The patient's flank pain is accompanied by tenderness in his right flank, suggesting pyonephrosis or renal colic. However, his ultrasound shows dilation of the right ureter and renal pelvis, indicating hydronephrosis.\nStep..."
+    },
+    {
+      "id": 7,
+      "question": "A 65-year-old man is brought to the emergency department 30 minutes after the onset of acute chest p...",
+      "correct_answer": "C",
+      "predicted_answer": "C",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with acute chest pain and is diagnosed with acute coronary syndrome (ACS) with ST-segment depressions in leads II, III, and aVF, indicating inferior myocardial infarction (MI). His pulse is tachycardic at 114/min, indicating tachyarrhythmia.\nStep 2: The patient undergoes percutaneous transluminal coronary angioplasty (PTCA) and has a left ventricular ejection fraction (LVEF) of 58% at discharge.\nStep 3: After an MI, patients are typically treated with antiplatelet..."
+    },
+    {
+      "id": 8,
+      "question": "A 37-year-old-woman presents to her primary care physician requesting a new form of birth control. S...",
+      "correct_answer": "C",
+      "predicted_answer": "C",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1:  The patient is requesting a switch from oral contraceptive pills (OCPs) to an intrauterine device (IUD) for birth control. She has a history of using OCPs for 8 years.\nStep 2:  The patient's vital signs are within normal limits, and her physical examination is unremarkable.\nStep 3:  The patient is interested in switching to a copper IUD, and we need to determine which past medical history statement would make copper IUD placement contraindicated.\nStep 4:  Copper IUDs are a highly eff..."
+    },
+    {
+      "id": 9,
+      "question": "A 23-year-old woman comes to the physician because she is embarrassed about the appearance of her na...",
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient presents with concerns about the appearance of her nails. A photograph of her nails shows nail pitting, which is consistent with psoriasis.\nStep 2: Psoriasis is a chronic inflammatory skin condition that can involve the nails, among other areas of the body. Nail pitting is a common finding in psoriasis.\nStep 3: Psoriasis can also involve other areas of the body, including the joints (psoriatic arthritis), skin (psoriatic plaques), and nails (nail pitting).\nStep 4: The pati..."
+    },
+    {
+      "id": 10,
+      "question": "A 24-year-old G2P1 woman at 39 weeks’ gestation presents to the emergency department complaining of ...",
+      "correct_answer": "E",
+      "predicted_answer": "B",
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient presents in labor at 39 weeks' gestation and is diagnosed with HIV. As part of her care, she undergoes rapid screening tests for HIV, which result in the administration of zidovudine during delivery to reduce the risk of mother-to-child transmission.\nStep 2: After the initial screening tests, a confirmatory test is performed to confirm the diagnosis of HIV.\nStep 3: The confirmatory test for HIV involves using an enzyme immunoassay (EIA) or a Western blot (WB) test.\nStep 4:..."
+    },
+    {
+      "id": 11,
+      "question": "A 72-year-old man comes to the physician because of a 2-month history of fatigue and worsening abdom...",
+      "correct_answer": "D",
+      "predicted_answer": "D",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with fatigue, abdominal pain, night sweats, shortness of breath on exertion, weight loss, and splenomegaly. His laboratory studies show a hemoglobin of 6.4 g/dL (indicative of anemia), a leukocyte count of 5,200/mm^3 (normal), and a platelet count of 96,000/mm^3 (thrombocytopenia). He has a diagnosis of myelofibrosis with myeloid metaplasis (also known as primary myelofibrosis), which is supported by his bone marrow aspiration showing extensive fibrosis.\nStep 2: T..."
+    },
+    {
+      "id": 12,
+      "question": "A 20-year-old man comes to the physician because of worsening gait unsteadiness and bilateral hearin...",
+      "correct_answer": "B",
+      "predicted_answer": "B",
+      "is_correct": true,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient presents with gait unsteadiness, bilateral hearing loss, and tingling sensations on his cheeks. He has been diagnosed with neurofibromatosis type 2 (NF2), which is associated with bilateral vestibular schwannomas.\nStep 2: NF2 is also known as bilateral acoustic neuroma syndrome. The patient's genetic evaluation shows a mutation of the NF2 gene on chromosome 22, which encodes merlin.\nStep 3: Individuals with NF2 are at increased risk of developing other tumors, including me..."
+    },
+    {
+      "id": 13,
+      "question": "A 47-year-old executive schedules an appointment his physician for a routine medical check-up. He cu...",
+      "correct_answer": "E",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient has a mid-systolic murmur heard in the 2nd left intercostal space that radiates to the carotids. This suggests aortic regurgitation murmur is not present, but rather a murmur of aortic stenosis (AS) or aortic regurgitation (AR) is not indicated. However, the murmur radiates to the carotids, which is typical of aortic regurgitation is not present, but rather aortic stenosis is not indicated here. The murmur described is a harsh, crescendo-decrescendo murmur of aortic stenos..."
+    },
+    {
+      "id": 14,
+      "question": "A microbiologist is studying the emergence of a virulent strain of the virus. After a detailed study...",
+      "correct_answer": "D",
+      "predicted_answer": "D",
+      "is_correct": true,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The question describes a process called reassortment, where two viruses from the same family infect a cell and exchange genetic material to create a new virus.\nStep 2: Reassortment occurs in viruses that have segmented genomes.\nStep 3: The viruses that undergo reassortment are influenza viruses.\nStep 4: The question asks which virus is capable of undergoing reassortment.\nStep 5: Among the options provided, rotavirus is known to undergo reassortment.\nStep 6: Rotavirus has a segmented g..."
+    },
+    {
+      "id": 15,
+      "question": "A 59-year-old overweight woman presents to the urgent care clinic with the complaint of severe abdom...",
+      "correct_answer": "B",
+      "predicted_answer": "A",
+      "is_correct": false,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with severe abdominal pain, nausea, vomiting, and a dull back pain. Her pain has no relation with food intake.\nStep 2: She has a history of cholelithiasis and is now presenting with severe abdominal pain. Her CT scan shows a calcified mass near her gallbladder.\nStep 3: A calcified mass near the gallbladder is indicative of gallstones causing gallbladder cancer (porcelain gallbladder). Porcelain gallbladder is a risk factor for gallbladder cancer.\nStep 4: The patie..."
+    },
+    {
+      "id": 16,
+      "question": "A 7-year-old boy is brought to his pediatrician’s office for a follow-up visit. He was diagnosed wit...",
+      "correct_answer": "E",
+      "predicted_answer": "D",
+      "is_correct": false,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient has asthma and experiences exacerbations of his symptoms in the springtime when flowers are blooming. He has been advised to stay away from pollen.\nStep 2: The patient is being considered for an experimental therapy that targets a mediator involved in his allergic asthma.\nStep 3: The experimental therapy aims to reduce the exaggerated allergic response to pollen.\nStep 4: The mediator targeted by the experimental therapy favors class switching of antibodies.\nStep 5: The med..."
+    },
+    {
+      "id": 17,
+      "question": "A 3-month-old boy is brought the emergency department by his parents after an episode of cyanosis an...",
+      "correct_answer": "E",
+      "predicted_answer": "E",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The pediatrician is trying to identify risk factors for Brief Resolved Unexplained Event (BRUE) in infants.\nStep 2: She recruits 75 infants with BRUE and 75 infants without BRUE of the same age, socioeconomic background, and family history of medical illness.\nStep 3: To control confounding bias, she needs to ensure that the groups are comparable in terms of age, socioeconomic background, and family history of medical illness.\nStep 4: The methods listed include stratified analysis (A),..."
+    },
+    {
+      "id": 18,
+      "question": "A 29-year-old man presents to the emergency department due to central chest pain over the past 3 day...",
+      "correct_answer": "B",
+      "predicted_answer": "A",
+      "is_correct": false,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with central chest pain that worsens when lying down and improves when leaning forward. He has a history of smoking cigarettes, but his vital signs are within normal limits. A scratching sound of a to-and-from character is audible over the left sternal border at end-expiration when he leans forward, which is consistent with a murmur of a hamman sign.\nStep 2: The patient's pain is described as sharp, severe, constant, and worsens when lying down, which is consisten..."
+    },
+    {
+      "id": 19,
+      "question": "A 46-year-old man is brought to the emergency department for evaluation of altered mental status. He...",
+      "correct_answer": "E",
+      "predicted_answer": "E",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with altered mental status, slurred speech, an alcoholic smell, and diminished deep tendon reflexes. He was found on the floor but is responsive when aroused.\nStep 2: His blood alcohol concentration is 0.04%, which is below the typical threshold for intoxication.\nStep 3: He has diminished deep tendon reflexes, which is consistent with Wernicke's sign or a nutritional deficiency, but his blood alcohol concentration is low.\nStep 4: His physical exam also shows an at..."
+    },
+    {
+      "id": 20,
+      "question": "A 77-year-old woman presents to the emergency room with the complaints of fever, malaise, and night ...",
+      "correct_answer": "C",
+      "predicted_answer": "C",
+      "is_correct": true,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient presents with fever, malaise, night sweats, and enlarged axillary lymph nodes. She has a history of breast cancer treated with radiation and chemotherapy, as well as a history of smoking.\nStep 2: The patient's lymph nodes are palpable, and fine-needle aspiration demonstrates centroblastic and immunoblastic cells suspicious for diffuse large B-cell lymphoma (DLBCL).\nStep 3: The patient's history of breast cancer treated with radiation and chemotherapy is relevant, as she no..."
+    },
+    {
+      "id": 21,
+      "question": "A 3-month-old infant is brought to her pediatrician because she coughs and seems to have difficulty ...",
+      "correct_answer": "A",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The infant presents with coughing, difficulty breathing while feeding (dyspnea on feeding), less energy, and a high-pitched holosystolic murmur heard at the lower left sternal border. These findings are consistent with congestive heart failure (CHF) and a patent ductus arteriosus (PDA) murmur, which is typically a continuous murmur (\"machinery\" murmur) heard best over the left upper back. However, the murmur described is holosystolic, suggesting a PDA with pulmonary congestion.\nStep 2..."
+    },
+    {
+      "id": 22,
+      "question": "A 30-year-old African American woman comes to the physician for the evaluation of a dry cough and ch...",
+      "correct_answer": "D",
+      "predicted_answer": "D",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with a dry cough, chest discomfort, headaches, muscle aches, joint pain, fever, and chills after hiking in Mississippi. She has a history of asthma and has smoked one pack of cigarettes daily for the past 10 years.\nStep 2: The patient's symptoms of fever, cough, chest discomfort, headaches, muscle aches, joint pain, and chills are consistent with pneumonia. Her recent hiking trip in Mississippi is relevant.\nStep 3: Laboratory studies show polysaccharide antigen po..."
+    },
+    {
+      "id": 23,
+      "question": "A 62-year-old patient has been hospitalized for a week due to a stroke. One week into the hospitaliz...",
+      "correct_answer": "E",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient has developed pneumonia while hospitalized for a stroke. He has fever, cough, and new consolidation on chest radiography, indicating hospital-acquired pneumonia (HAP).\nStep 2: The patient's leukocyte count is mildly elevated, and he has thrombocytopenia (platelet count of 280,000/mm^3), which is consistent with thrombotic thromocytopenic purpura (TTP) or heparin-induced thrombocytopenia (HIT), but there's no evidence of HIT. However, his thrombocytopenia is likely due to h..."
+    },
+    {
+      "id": 24,
+      "question": "A 6-year-old boy is brought to the emergency department by his mother for worsening wheezing and sho...",
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with worsening wheezing and shortness of breath after missing his asthma medications. He has a tachypneic respiratory distress syndrome with a pulse of 120/min (tachycardia) and respirations of 40/min (tachypnea). He is given nebulized albuterol and ipratropium, as well as intravenous methylprednisolone for a presumed asthma exacerbation.\nStep 2: After treatment, the child becomes limp and lethargic, with a pulse of 150/min (tachyarrhythmia). He has status asthmat..."
+    },
+    {
+      "id": 25,
+      "question": "A 5-year-old female suffers from recurrent infections by Aspergillus species, Pseudomonas species, a...",
+      "correct_answer": "E",
+      "predicted_answer": "E",
+      "is_correct": true,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient suffers from recurrent infections by Aspergillus species, Pseudomonas species, and Staphylococcus aureus. This suggests chronic granulomatous disease (CGD).\nStep 2: Chronic granulomatous disease (CGD) is characterized by recurrent infections with catalase-positive bacteria and fungi.\nStep 3: The nitroblue tetrazolium test is used to assess the function of neutrophils. A failure of neutrophils to react during this test indicates chronic granulomatous disease.\nStep 4: Chroni..."
+    },
+    {
+      "id": 26,
+      "question": "A 3-year-old boy presents to the emergency department with a ‘cough-like-a-seal bark’ and a high-pit...",
+      "correct_answer": "E",
+      "predicted_answer": "E",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with a cough-like-a-seal bark (croup) and inspiratory stridor without wheezing. He also has a high fever and is experiencing respiratory distress.\nStep 2: The patient's symptoms are consistent with croup, which is often caused by viral infections.\nStep 3: Croup can lead to complications such as bacterial tracheitis, but the patient's presentation of a barking cough (cough-like-a-seal bark) and inspiratory stridor is typical of croup.\nStep 4: The patient's fever an..."
+    },
+    {
+      "id": 27,
+      "question": "A 26-year-old woman presents to a gynecologist after a missed period. After performing a complete ph...",
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient presents with a pregnancy despite taking oral contraceptives regularly. She has recently started treatment for pulmonary tuberculosis (TB) with rifampin, isoniazid, pyrazinamide, and ethambutol.\nStep 2: Oral contraceptives can fail if certain medications induce enzymes that metabolize estrogen or progesterone components of the pill.\nStep 3: Rifampin is known to induce the cytochrome P450 enzyme system, specifically CYP3A4.\nStep 4: The induction of CYP3A4 by rifampin leads ..."
+    },
+    {
+      "id": 28,
+      "question": "A 4-year-old previously healthy boy presents with 4 days of intermittent vomiting and 5-6 daily loos...",
+      "correct_answer": "D",
+      "predicted_answer": "D",
+      "is_correct": true,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient presents with vomiting, diarrhea, bloody stools, fever, hypertension, tachycardia, and dry mucous membranes, indicating hemolytic uremic syndrome (HUS) complicated by shock (hemolytic uremic syndrome shock syndrome). He also has Guillain-Barré syndrome (GBS) symptoms, with lower extremity weakness and diminished patellar deep tendon reflexes.\nStep 2: The patient's symptoms of vomiting, diarrhea, bloody stools, fever, hypertension, and tachycardia are consistent with hemorr..."
+    },
+    {
+      "id": 29,
+      "question": "A 3-week-old male newborn is brought to the physician because of an inward turning of his left foref...",
+      "correct_answer": "D",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with an inward turning of his left forefoot, specifically a concavity of the medial border of the left foot with a skin crease just below the ball of the great toe. This is consistent with a congenital talipes equinovarus (CTEV) variant known as a cavus foot deformity or a cavovarus deformity, but the key detail provided is that tickling the lateral border of the foot leads to correction of the deformity.\nStep 2: The patient was born at 38 weeks' gestation by cesa..."
+    },
+    {
+      "id": 30,
+      "question": "A 42-year-old woman comes to the emergency department because of a 2-day history of right upper abdo...",
+      "correct_answer": "E",
+      "predicted_answer": "A",
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient presents with fever, nausea, right upper quadrant tenderness, and a distended abdomen. Her temperature is 38.5°C (101.3°F), indicating cholangitis. Her leukocyte count is elevated at 14,000/mm^3.\nStep 2: She has a BMI of 34 kg/m^2, indicating obesity. Her abdominal ultrasonography results are inconclusive.\nStep 3: Cholescintigraphy shows that the bile flows into the small bowel, indicating a cholescintigraphy result consistent with bile duct obstruction.\nStep 4: Given her ..."
+    },
+    {
+      "id": 31,
+      "question": "A 72-year-old woman is admitted to the intensive care unit for shortness of breath and palpitations....",
+      "correct_answer": "C",
+      "predicted_answer": "C",
+      "is_correct": true,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient's pressure-volume loop is shown, with a gray loop representing the patient's data and a black loop representing a normal pressure-volume loop for comparison.\nStep 2: The patient's pressure-volume loop appears to be shifted upward compared to the normal loop, indicating increased ventricular stiffness.\nStep 3: The patient's symptoms include shortness of breath and palpitations, and she has been admitted to the intensive care unit.\nStep 4: The patient's cardiac catheterizati..."
+    },
+    {
+      "id": 32,
+      "question": "A 22-year-old woman is brought to the emergency department because of a 2-day history of fever, inte...",
+      "correct_answer": "E",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient presents with fever, tachycardia (pulse of 130/min), fatigue, pallor, petechiae, and ecchymoses after being treated for bacterial meningitis. Her laboratory studies show severe thrombocytopenia (platelet count of 20,000/mm^3) and fever.\nStep 2: Given her recent hospitalization for bacterial meningitis, she now has septic thrombocytopenic purpura (TTP), also known as disseminated intravascular coagulation (DIC), fever, and tachycardia. Her fever is likely due to sepsis.\nSte..."
+    },
+    {
+      "id": 33,
+      "question": "An otherwise healthy 50-year-old man comes to the physician because of a 6-month history of increasi...",
+      "correct_answer": "B",
+      "predicted_answer": "E",
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient presents with upper abdominal pain, nausea, vomiting, diarrhea, weight loss, and bilateral pitting pedal edema (edema of the legs). He has been diagnosed with Zollinger-Ellison syndrome (ZES), which is suggested by his symptoms of severe peptic ulcer disease and diarrhea.\nStep 2: Zollinger-Ellison syndrome is often associated with gastrinomas, which are gastrin-secreting tumors. Gastrinomas can lead to excessive gastrin secretion, causing peptic ulcers and diarrhea.\nStep 3..."
+    },
+    {
+      "id": 34,
+      "question": "A 27-year-old man presents to the emergency department. He was brought in by staff from the homeless...",
+      "correct_answer": "B",
+      "predicted_answer": "A",
+      "is_correct": false,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with hypotension (BP 97/48 mmHg), tachycardia (pulse 140/min), and hyperglycemia (glucose 589 mg/dL). He is diagnosed with hyperglycemic hyperosmolar nonketotic syndrome (HHNS).\nStep 2: The patient's initial treatment includes fluid resuscitation and insulin therapy.\nStep 3: The patient's blood glucose has normalized after treatment.\nStep 4: The patient's initial laboratory values show hyperglycemia with a glucose level of 589 mg/dL. He requires insulin therapy.\nS..."
+    },
+    {
+      "id": 35,
+      "question": "A 67-year-old man who was diagnosed with arthritis 16 years ago presents with right knee swelling an...",
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with knee swelling and pain, difficulty walking, and back pain that improves with rest. He has a history of arthritis diagnosed 16 years ago.\nStep 2: The patient's arthritis was diagnosed 16 years ago, and now he has bilateral knee swelling. He also has back pain that improves with rest.\nStep 3: The patient's physical examination reveals pitting of his nails, which is consistent with psoriatic nails (pitting nails are a feature of psoriatic nails).\nStep 4: The pat..."
+    },
+    {
+      "id": 36,
+      "question": "A 65-year-old woman schedules an appointment with her physician for evaluation of weight loss and we...",
+      "correct_answer": "E",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient presents with weight loss, weakness, bladder incontinence, and weakness that improves after brief exercise. Her weakness is more noticeable when climbing stairs or combing hair, which suggests fatigue-induced weakness, also known as fatigue weakness.\nStep 2: The patient's bladder incontinence is due to urinary incontinence, and she was given an anticholinesterase agent to treat urinary retention. However, the anticholinesterase agent did not improve her urinary incontinenc..."
+    },
+    {
+      "id": 37,
+      "question": "A 3-month-old boy presents to his pediatrician with persistent diarrhea, oral candidiasis, and signs...",
+      "correct_answer": "A",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient presents with persistent diarrhea, oral candidiasis, and RSV pneumonia. Oral candidiasis (thrush) is often seen in immunocompromised patients.\nStep 2: The patient's laboratory results show that his HIV PCR is negative. Therefore, we need to consider other immunodeficiencies.\nStep 3: The patient's symptoms include persistent diarrhea, oral candidiasis (thrush), and RSV pneumonia. Oral candidiasis is often seen in immunocompromised patients with cell-mediated immunity defect..."
+    },
+    {
+      "id": 38,
+      "question": "A 53-year-old man with recurrent pancreatic adenocarcinoma is enrolled in a clinical trial for a nov...",
+      "correct_answer": "E",
+      "predicted_answer": "D",
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The therapeutic index (TI) is a measure of the relative safety of a drug. It is calculated by dividing the dose that produces toxicity by the dose that produces the desired therapeutic effect.\nStep 2: From the information provided, we know that the dose-response trial had the following results:\n- 10 mg dose: 6/59 patients demonstrated improvement\n- 20 mg dose: 19/49 patients demonstrated improvement\n- 30 mg dose: 26/53 patients demonstrated improvement\n- 40 mg dose: 46/51 patients dem..."
+    },
+    {
+      "id": 39,
+      "question": "A 67-year-old male is seen by neurology after he was noticed to be speaking strangely by his family....",
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient presented with acute ischemic stroke and was treated with tissue plasminogen activator (tPA). He was found to have aphasia, but after treatment, he was able to recover most of his speech.\nStep 2: The patient's family noticed that he was speaking strangely, and after his stroke treatment, he was found to have fluent speech. He is able to comprehend both one and two-step instructions, but he remains unable to complete tasks involving verbal repetition.\nStep 3: The patient's ..."
+    },
+    {
+      "id": 40,
+      "question": "A 27-year-old woman presents to the office with concerns about her long struggle with her physical a...",
+      "correct_answer": "D",
+      "predicted_answer": "D",
+      "is_correct": true,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient presents with concerns about her physical appearance, specifically her acne, unwanted facial hair (hirsutism), and weight. She has recently been diagnosed with impaired glucose regulation, as evidenced by a glucose tolerance test showing a plasma glucose level of 160 mg/dL after 2 hours of a 75 g dose of oral glucose.\nStep 2: The patient's hirsutism is a key component of her presentation. Hirsutism is excessive hair growth in a male-like pattern, and it's often associated ..."
+    },
+    {
+      "id": 41,
+      "question": "А 43-уеаr-old mаn рrеѕеntѕ wіth tіnglіng аnd numbnеѕѕ of the lowеr lіmbѕ for 2 wееkѕ. Не also сomрlа...",
+      "correct_answer": "C",
+      "predicted_answer": "A",
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient presents with tingling and numbness in his lower limbs, persistent pain in his legs, and decreased sensation to pain in both lower limbs. He has a history of type 2 diabetes mellitus.\nStep 2: The patient's symptoms of tingling and numbness in his lower limbs are consistent with peripheral neuropathy, and his pain in his legs is consistent with claudication or possibly intermittent claudication due to peripheral artery disease (PAD).\nStep 3: The patient's ankle-brachial pre..."
+    },
+    {
+      "id": 42,
+      "question": "A one-day-old male is evaluated in the hospital nursery for bilious vomiting. The patient has urinat...",
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with bilious vomiting after birth, which is concerning for intestinal obstruction. He has not passed meconium, which is consistent with meconium ileus or intestinal atresia.\nStep 2: The patient's prenatal history includes a quadruple screen that demonstrated decreased maternal serum alpha-fetoprotein (AFP), increased beta-hCG, decreased unconjugated estriol, and increased inhibin A, which is consistent with a diagnosis of Down syndrome (trisomy 21).\nStep 3: The pa..."
+    },
+    {
+      "id": 43,
+      "question": "A healthy 23-year-old male is undergoing an exercise stress test as part of his physiology class. If...",
+      "correct_answer": "C",
+      "predicted_answer": "D",
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1:  The question asks about the oxygen content in different areas of the body before and after an exercise stress test.\nStep 2:  We're given that a healthy 23-year-old male is undergoing an exercise stress test, and blood samples will be taken at different locations before and after the test.\nStep 3:  The question specifically asks which area of the body would contain the lowest oxygen content at both time points.\nStep 4:  During an exercise stress test, oxygen consumption increases, and..."
+    },
+    {
+      "id": 44,
+      "question": "A 45-year-old G5P4105 presents to her gynecologist’s office with six months of increasingly heavy pe...",
+      "correct_answer": "B",
+      "predicted_answer": "B",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with heavy menstrual bleeding (menorrhagia), irregular cycles, intermenstrual bleeding (dysfunctional uterine bleeding), dysmenorrhea, mild dyspareunia, and a \"heavy feeling\" in her pelvis. She has a history of five vaginal deliveries and now experiences urinary frequency.\nStep 2: Given her heavy menstrual bleeding, irregular cycles, and dysmenorrhea, the patient likely has uterine atony and adenomyosis. Her history of five vaginal deliveries increases her risk of..."
+    },
+    {
+      "id": 45,
+      "question": "A man is brought into the emergency department by the police department. The officer state that the ...",
+      "correct_answer": "E",
+      "predicted_answer": "E",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with confusion, slurred speech, ataxia, and cannot stand without support. His labs show a high chloride level (hyperchloremic metabolic acidosis) and his vitals are normal. He has a history of public alcohol intoxication and is homeless.\nStep 2: The patient's presentation of confusion, slurred speech, ataxia, and inability to stand without support suggests Wernicke's encephalopathy or alcohol withdrawal, but his primary issue appears to be related to his intoxicat..."
+    },
+    {
+      "id": 46,
+      "question": "A medical research study is evaluating an investigational novel drug (medication 1) compared with st...",
+      "correct_answer": "C",
+      "predicted_answer": "A",
+      "is_correct": false,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1:  To answer this question, we first need to understand the concept of the number needed to treat (NNT).\nStep 2:  The NNT is a measure of the efficacy of a treatment, specifically the number of patients who need to be treated with the intervention (in this case, medication 1) instead of the control (medication 2) to prevent one adverse outcome.\nStep 3:  The primary endpoint of the study is death from cardiac causes at 45 days post-myocardial infarction (MI).\nStep 4:  We're given that th..."
+    },
+    {
+      "id": 47,
+      "question": "A 55-year-old man comes to the physician because of a 6-week history of tingling pain in the sole of...",
+      "correct_answer": "A",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with exertional calf pain (claudication) when he uses the incline feature on the treadmill, forcing him to take frequent breaks. He has a history of hypertension and smoking, and his blood pressure is significantly elevated.\nStep 2: The patient's exertional calf pain is consistent with intermittent claudication of the lower extremities. However, he also experiences tingling pain in his foot when he raises it above chest level during exercises, which is indicative ..."
+    },
+    {
+      "id": 48,
+      "question": "A 29-year-old primigravid woman at 35 weeks' gestation is admitted to the hospital in labor. She has...",
+      "correct_answer": "B",
+      "predicted_answer": "B",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient is admitted at 35 weeks' gestation in labor, and fetal heartbeats cannot be detected by fetal doppler monitor. Ultrasound shows decreased amniotic fluid levels (oligohydramnios) and no evidence of fetal movement, respiration, or heart activity.\nStep 2: The patient delivers a stillborn infant weighing 2296 g. Physical examination shows no signs of life, and there are no visible malformations.\nStep 3: The next step in management after a stillbirth involves obtaining informat..."
+    },
+    {
+      "id": 49,
+      "question": "A 67-year-old man is hospitalized after several days of fever and increasing shortness of breath. Re...",
+      "correct_answer": "D",
+      "predicted_answer": "D",
+      "is_correct": true,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient has influenza A pneumonia complicated by Acute Respiratory Distress Syndrome (ARDS). He requires intubation and ICU care.\nStep 2: After several weeks of supportive therapy, the patient's lung function improves.\nStep 3: We're asked about the regeneration of alveolar lining after damage to alveoli occurs.\nStep 4: Alveolar regeneration involves the proliferation of type II pneumocytes, which are responsible for producing surfactant.\nStep 5: Type II pneumocytes are known to di..."
+    },
+    {
+      "id": 50,
+      "question": "A 65-year-old male is treated for anal carcinoma with therapy including external beam radiation. How...",
+      "correct_answer": "E",
+      "predicted_answer": "E",
+      "is_correct": true,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: Radiation therapy can cause damage to DNA in cancer cells.\nStep 2: Ionizing radiation, such as that used in external beam radiation therapy, can cause double-stranded DNA breaks.\nStep 3: Double-stranded DNA breaks are a type of DNA damage that can lead to cell death.\nStep 4: The question asks how radiation affects cancer cells.\nStep 5: Ionizing radiation can induce breaks in double-stranded DNA.\nStep 6: Considering the options provided, we need to determine which type of DNA damage is..."
+    },
+    {
+      "id": 51,
+      "question": "A 56-year-old man with a history of hypertension presents to his physician with progressive fatigue ...",
+      "correct_answer": "A",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with severe hypertension (malignant hypertension) and muscle cramps. His blood pressure is significantly elevated at 174/111 mmHg.\nStep 2: The patient's laboratory values show a creatinine of 1.4 mg/dL, indicating mild renal impairment. His potassium level is normal.\nStep 3: The patient's severe hypertension is causing hypertensive emergencies, and he requires immediate blood pressure management.\nStep 4: The patient's creatinine is mildly elevated, but his blood u..."
+    },
+    {
+      "id": 52,
+      "question": "A 65-year-old man comes to the physician because of a 1-week history of yellowish discoloration of h...",
+      "correct_answer": "D",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient presents with jaundice (icterus) and generalized pruritus, which is consistent with cholestatic jaundice. He also has jaundice of the skin (carotenemia is not mentioned), which is known as jaundice of the sclera.\nStep 2: The patient's urinalysis shows an elevated concentration of bilirubin, indicating conjugated jaundice. The low concentration of urobilinogen in his urine suggests that there is obstructive jaundice.\nStep 3: The patient's jaundice is caused by cholestatic j..."
+    },
+    {
+      "id": 53,
+      "question": "A 72-year-old woman is brought to the physician by her daughter because of a 6-month history of wors...",
+      "correct_answer": "D",
+      "predicted_answer": "D",
+      "is_correct": true,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient has been started on galantamine for Alzheimer's disease and has developed nausea, vomiting, abdominal cramps, and diarrhea after treatment initiation.\nStep 2: Galantamine is a cholinesterase inhibitor used to treat Alzheimer's disease.\nStep 3: The patient's symptoms of nausea, vomiting, abdominal cramps, and diarrhea are consistent with cholinergic syndrome, which is a known side effect of cholinesterase inhibitors.\nStep 4: Cholinergic syndrome can be treated with antichol..."
+    },
+    {
+      "id": 54,
+      "question": "A 61-year-old man with schizophrenia in a locked inpatient psychiatry unit was observed making an un...",
+      "correct_answer": "B",
+      "predicted_answer": "B",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient has schizophrenia and is being treated with haloperidol. He has developed new symptoms of lip smacking, pursing his mouth, and excessive blinking.\nStep 2: The symptoms described are excessive lip smacking (smacking motion with his lips), pursing his mouth, and blinking excessively. These are characteristic of tardive dyskinesia.\nStep 3: Tardive dyskinesia is a side effect of long-term treatment with antipsychotics, particularly first-generation antipsychotics like haloperi..."
+    },
+    {
+      "id": 55,
+      "question": "A 17-year-old football player with no significant past medical history, social history, or family hi...",
+      "correct_answer": "B",
+      "predicted_answer": "B",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with itching in his groin, which started during summer workouts. He has a physical examination revealing an erythematous, well-demarcated patch with peripheral scale on the left thigh, pubic region, and perineum. This description is consistent with jock itch, also known as tinea cruris.\nStep 2: Tinea cruris is a fungal infection of the groin area. The presence of an erythematous patch with peripheral scale is consistent with dermatophytosis.\nStep 3: To confirm the..."
+    },
+    {
+      "id": 56,
+      "question": "An otherwise healthy 26-year-old man comes to the physician for medication counseling after recently...",
+      "correct_answer": "C",
+      "predicted_answer": "C",
+      "is_correct": true,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: Risperidone is an antipsychotic medication used to treat schizophrenia.\nStep 2: Risperidone can cause several adverse effects, including hyperprolactinemia, weight gain, and QT interval prolongation.\nStep 3: Risperidone can also cause hyperprolactinemia, which may lead to gynecomastia.\nStep 4: Risperidone is an atypical antipsychotic, and one of its side effects is hyperprolactinemia.\nStep 5: Gynecomastia is a known side effect of risperidone due to its dopamine antagonist properties...."
+    },
+    {
+      "id": 57,
+      "question": "A 15-year-old woman presents with fever, altered mental status and a petechial rash on her lower ext...",
+      "correct_answer": "B",
+      "predicted_answer": "B",
+      "is_correct": true,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient presents with fever, altered mental status (septic shock), petechial rash (purpura), nausea, vomiting, and hypotension (hypotensive shock). Her temperature is 104°F (40°C), indicating septic shock.\nStep 2: The patient has a petechial rash and hypotensive shock, which is consistent with hemorrhagic fever with renal syndrome (HFRS) or septic shock due to meningococcemia. However, she also has heavy menstrual bleeding (menorrhagia) and a tampon in her vagina.\nStep 3: The pati..."
+    },
+    {
+      "id": 58,
+      "question": "A 2-year-old boy is brought to the physician for evaluation of pallor and increasing lethargy for 2 ...",
+      "correct_answer": "C",
+      "predicted_answer": "E",
+      "is_correct": false,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with pallor, lethargy, fever, tachypnea, tachycardia, and hypotension after experiencing abdominal pain, vomiting, bloody diarrhea. His laboratory studies show a leukocytosis, thrombocytopenia, and schistocytes on his blood smear.\nStep 2: The patient's bloody diarrhea has resolved, but he now has hemolytic uremic syndrome (HUS), which is suggested by his thrombocytopenia, schistocytes, and acute kidney injury (indicated by his elevated creatinine).\nStep 3: HUS is ..."
+    },
+    {
+      "id": 59,
+      "question": "A 17-year-old girl is referred by her dentist for a suspected eating disorder. She has been visiting...",
+      "correct_answer": "A",
+      "predicted_answer": "C",
+      "is_correct": false,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient has been inducing vomiting by putting her fingers down her throat, which indicates bulimia nervosa. She has a history of dental caries, which is consistent with bulimia nervosa due to frequent vomiting.\nStep 2: Bulimia nervosa is characterized by recurrent episodes of binge eating followed by compensatory behaviors such as vomiting, laxatives, or diuretics.\nStep 3: The patient's BMI is at the 50th percentile, which means she is not underweight.\nStep 4: Bulimia nervosa can ..."
+    },
+    {
+      "id": 60,
+      "question": "A 14-year-old girl is brought to the physician by her father because of fever, chills, abdominal pai...",
+      "correct_answer": "D",
+      "predicted_answer": "C",
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient presents with fever, chills, abdominal pain, profuse non-bloody diarrhea, diffuse abdominal tenderness, mild hepatosplenomegaly, and a faint salmon-colored rash. Her symptoms began after returning from Indonesia.\nStep 2: Given her recent travel history to Indonesia, we should consider infectious causes of her fever and diarrhea. Her symptoms of fever, abdominal pain, and diarrhea are consistent with typhoid fever.\nStep 3: Typhoid fever is caused by Salmonella Typhi. Howeve..."
+    },
+    {
+      "id": 61,
+      "question": "A 22-year-old female college student is treated with metronidazole after presenting to student healt...",
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient presents with symptoms of vaginitis, which is treated with metronidazole. After consuming alcohol at a party, she experiences facial flushing, nausea, tachycardia, dyspnea, headache, and abdominal cramps.\nStep 2: Metronidazole can cause disulfiram-like reactions when combined with alcohol. A disulfiram-like reaction includes symptoms such as facial flushing, nausea, tachycardia, dyspnea, headache, and abdominal cramps.\nStep 3: Disulfiram is used to treat chronic alcoholism..."
+    },
+    {
+      "id": 62,
+      "question": "A 23-year-old primigravida presents for a regular prenatal care visit at 16 weeks gestation. She com...",
+      "correct_answer": "D",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents at 16 weeks gestation with increased fatigability, but her vital signs are within normal limits. Her complete blood count (CBC) results show a mild thrombocytopenia (platelet count of 210,000/mm^3), which is indicative of thrombocytopenic thrombocythemia, also known as thrombotic thrombocytopenic purpura (TTP) or hemolytic uremic syndrome (HUS), but her platelet count is actually elevated, indicating thrombocytosis.\nStep 2: The patient's platelet count is elevated..."
+    },
+    {
+      "id": 63,
+      "question": "An 80-year-old man is transferred from a step-down unit to a med-surg floor in the hospital. He had ...",
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient is an 80-year-old man who underwent hernia surgery 14 hours ago and is now being transferred to a med-surg floor. He has a heart rate of 98 bpm and a blood pressure of 100/75 mmHg, indicating possible hypotension.\nStep 2: The patient's oxygen saturation is 90%, indicating mild hypoxemia.\nStep 3: The patient's temperature is slightly elevated at 98.2°F, but his respiratory rate is 15/min and his lungs are clear.\nStep 4: His blood pressure is low, and he has not passed urine..."
+    },
+    {
+      "id": 64,
+      "question": "A healthy 19-year-old man presents to his primary care provider complaining of painless “blisters” i...",
+      "correct_answer": "A",
+      "predicted_answer": "D",
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient presents with painless blisters in his mouth, a white film on his tongue and the sides of his mouth, and a bitter metallic taste. He has patches of white pseudomembranes that can be wiped away to reveal erythematous mucosa, which is consistent with oral candidiasis (thrush).\nStep 2: The patient's symptoms of oral candidiasis are likely due to his use of antibiotics, but he denies taking any medications. However, he is a competitive swimmer and has a history of multiple sex..."
+    },
+    {
+      "id": 65,
+      "question": "A 56-year-old man presents to the clinic complaining of subacute back pain for the past month. The p...",
+      "correct_answer": "C",
+      "predicted_answer": "C",
+      "is_correct": true,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient presents with subacute back pain that is worse at night. He has a history of non-small cell lung cancer, but his cancer was successfully treated 1 year ago.\nStep 2: The patient's back pain is described as a dull, constant ache that is worse at night, which is consistent with metastatic spinal cancer.\nStep 3: The patient's past medical history of non-small cell lung cancer increases his risk of metastatic spinal cancer.\nStep 4: Metastatic spinal cancer often causes vertebra..."
+    },
+    {
+      "id": 66,
+      "question": "A 4-year-old boy is brought to the emergency department because of severe abdominal pain and bilious...",
+      "correct_answer": "D",
+      "predicted_answer": "D",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with severe abdominal pain, bilious vomiting, fever (100°F), tachycardia (122 bpm), and a distended abdomen. He has signs of peritonitis, including tenderness, guarding, and rebound tenderness, indicating perforated appendicitis or a perforated viscus.\nStep 2: The patient's symptoms are consistent with perforated appendicitis complicated by peritonitis, which requires emergency surgery.\nStep 3: The patient is a minor, and his parents are unavailable. In emergency ..."
+    },
+    {
+      "id": 67,
+      "question": "A 3-week-old male newborn is brought to the hospital because of poor weight gain since birth. He was...",
+      "correct_answer": "C",
+      "predicted_answer": "C",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with a fever, tachycardia (tachyarrhythmia), tachypnea, irritability, and a midline neck swelling. His mother has a history of Graves' disease and underwent a near-total thyroidectomy in the second trimester of her pregnancy.\nStep 2: The patient's fever, tachycardia (tachyarrhythmia), and tachypnea are consistent with thyrotoxic crisis (thyroid storm), also known as Graves' disease storm. However, the key finding here is the midline neck swelling, which is a thyro..."
+    },
+    {
+      "id": 68,
+      "question": "A 57-year-old female with a past medical history of alcoholism presents to the emergency room vomiti...",
+      "correct_answer": "D",
+      "predicted_answer": "B",
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient presents with hematemesis and black tarry stools (melena), and her vital signs reveal tachycardia (tachyarrhythmia) and hypotension (shock). She has a history of alcoholism and splenomegaly.\nStep 2: Given her hematemesis, melena, tachycardia, and hypotension, she has hemorrhagic shock due to upper gastrointestinal bleeding. Her splenomegaly suggests cirrhosis with portal hypertension.\nStep 3: The emergent upper endoscopy reveals bleeding from varices in the lower 1/3 of th..."
+    },
+    {
+      "id": 69,
+      "question": "A 65-year-old man with a history of hypertension, obesity, and alcoholic cirrhosis is seen in clinic...",
+      "correct_answer": "A",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient has a history of alcoholic cirrhosis, hypertension, and obesity. He presents with hypertension and is found to have a new liver nodule, which is a 2 cm lesion in the right hepatic lobe with arterial phase enhancement on CT.\nStep 2: The patient has cirrhosis due to alcoholic liver disease, and he has a new liver nodule that is enhancing in the arterial phase. This suggests a hepatocellular carcinoma (HCC).\nStep 3: The patient's HCC is small (2 cm) and has arterial phase enh..."
+    },
+    {
+      "id": 70,
+      "question": "A 66-year-old man is brought to the emergency room by his wife due to abdominal distension and persi...",
+      "correct_answer": "A",
+      "predicted_answer": "E",
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient presents with abdominal distension, persistent somnolence (hepatic encephalopathy), and a history of cirrhosis. He has ascites, as evidenced by shifting dullness and a positive fluid wave.\nStep 2: The patient's hepatic encephalopathy is likely due to his cirrhosis. Hepatic encephalopathy can be precipitated by various factors, including infections, gastrointestinal bleeding, medications, and electrolyte imbalances.\nStep 3: The patient's vital signs are within normal limits..."
+    },
+    {
+      "id": 71,
+      "question": "A 27-year-old man presents to the emergency department after a motor vehicle collision. The patient ...",
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents after a motor vehicle collision and is found to have a pulse of 120/min (tachycardia) and a blood pressure of 107/58 mmHg (hypotension). He has been given 2 liters of Ringer lactate solution and morphine.\nStep 2: The patient's echocardiogram shows elevated pulmonary capillary wedge pressure (PCWP) and troponins, indicating cardiogenic shock. He has chest pain and bruising over his chest wall.\nStep 3: The patient's hypotension and tachycardia are consistent with ca..."
+    },
+    {
+      "id": 72,
+      "question": "A 56-year-old man presents to the emergency department for progressively worsening fatigue, malaise,...",
+      "correct_answer": "C",
+      "predicted_answer": "C",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with fever, abdominal pain, diarrhea, fatigue, malaise, scleral icterus, hepatomegaly, ascites, and leukocytosis. He has a history of cirrhosis and is admitted with spontaneous bacterial peritonitis (SBP) due to Escherichia coli.\nStep 2: The patient develops oliguric acute kidney injury (AKI) after starting intravenous cefotaxime and albumin for SBP. He has cirrhosis-related complications, including hepatorenal syndrome (HRS).\nStep 3: HRS is a type of kidney injur..."
+    },
+    {
+      "id": 73,
+      "question": "A 29-year-old woman presents to the clinic after several months of weight loss. She noticed a 6.8 kg...",
+      "correct_answer": "B",
+      "predicted_answer": "D",
+      "is_correct": false,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with unintentional weight loss, tachycardia (heart rate 110/min), hypertension (blood pressure 146/78 mmHg), and warm skin. She also reports feeling warmer than her boyfriend, which suggests hyperthyroidism.\nStep 2: The patient's symptoms of weight loss, tachycardia, hypertension, and warm skin are consistent with hyperthyroidism. Her fine tremor when her arms are outstretched is a classic sign of hyperthyroidism known as a palm tremor or palm tremor of hyperthyro..."
+    },
+    {
+      "id": 74,
+      "question": "A 21-year-old man comes to the physician because of pruritus and a hypopigmented rash on his upper b...",
+      "correct_answer": "C",
+      "predicted_answer": "C",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with pruritus and a hypopigmented rash on his upper body after returning from a trip to the Bahamas. He has a history of type 1 diabetes mellitus.\nStep 2: The patient's symptoms of pruritus and hypopigmented rash are consistent with tinea versicolor, which is caused by Malassezia yeast. Tinea versicolor is often associated with pruritic patches of hypopigmentation or hyperpigmentation.\nStep 3: Tinea versicolor is typically diagnosed clinically, but a potassium hyd..."
+    },
+    {
+      "id": 75,
+      "question": "A 5-year-old female is brought to a speech therapist for continuing work on improving her communicat...",
+      "correct_answer": "A",
+      "predicted_answer": "D",
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient presents with developmental delay, a high-pitched cry, microcephaly, epicanthal folds, and a holosystolic murmur. Her holosystolic murmur is consistent with patent ductus arteriosus (PDA).\nStep 2: The patient's high-pitched cry is described as a \"mewing cry,\" which is characteristic of congenital rubella syndrome. However, the patient's other findings of microcephaly, epicanthal folds, and developmental delay are consistent with Down syndrome, but she also has a holosystol..."
+    },
+    {
+      "id": 76,
+      "question": "A 62-year old female comes to the physician because of vaginal spotting and urinary urgency for the ...",
+      "correct_answer": "B",
+      "predicted_answer": "B",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with vaginal spotting and urinary urgency. Her pelvic exam reveals a firm, immobile erythematous mass on the right inner vaginal wall, which is consistent with a vaginal carcinoma.\nStep 2: Given her age and symptoms of vaginal bleeding, a vaginal carcinoma should be considered. However, her vaginal bleeding is described as spotting, and her pelvic exam reveals a firm, immobile mass on the right inner vaginal wall, which is likely a vaginal carcinoma.\nStep 3: The p..."
+    },
+    {
+      "id": 77,
+      "question": "A 59-year-old man is evaluated for progressive joint pain. There is swelling and tenderness over the...",
+      "correct_answer": "B",
+      "predicted_answer": "C",
+      "is_correct": false,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with progressive joint pain and swelling of the metacarpophalangeal joints of both hands. His hand radiograph shows evidence of rheumatoid arthritis (RA), but he also has hemochromatosis with a transferrin saturation of 88% and serum ferritin of 1,200 ng/mL.\nStep 2: Hemochromatosis can lead to hemochromatosis arthropathy, also known as osteoarthritis of the second and third metacarpophalangeal joints.\nStep 3: Hemochromatosis arthropathy is associated with hemochro..."
+    },
+    {
+      "id": 78,
+      "question": "A newborn is found to be extremely cyanotic immediately after birth. He then develops progressive re...",
+      "correct_answer": "D",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The newborn presents with cyanosis immediately after birth, progressive respiratory failure, a single loud S2 heart sound, and a machine-like murmur at the left upper sternal border. He has been diagnosed with hypoplastic left heart syndrome (HLHS) and has undergone a balloon atrial septostomy (Rashkind procedure).\nStep 2: The newborn's cyanosis is due to HLHS, which includes pulmonary atresia, hypoplastic left ventricle, aortic stenosis, and mitral stenosis. He has undergone a balloo..."
+    },
+    {
+      "id": 79,
+      "question": "A 25-year-old male involved in a knife fight presents with a penetrating wound to the chest. The pat...",
+      "correct_answer": "C",
+      "predicted_answer": "C",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient has a penetrating wound to the chest, resulting in a penetrating trauma to the right ventricle. He presents with hypotension (shock) due to cardiac tamponade (cardiac arrest) from the penetrating injury.\nStep 2: The patient has a penetrating injury to the right ventricle, which is known as a penetrating cardiac injury. Right ventricular injuries can lead to cardiac tamponade, known as cardiac arrest due to tension pneumothorax or cardiac tamponade.\nStep 3: The patient's pe..."
+    },
+    {
+      "id": 80,
+      "question": "A post-mortem lung examination of a 68-year-old male overweight male with evidence of chronic lower ...",
+      "correct_answer": "B",
+      "predicted_answer": "B",
+      "is_correct": true,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient has chronic lower extremity edema, a daily productive cough, and a smoking history of 60 pack-years. He is also overweight.\nStep 2: Given his smoking history and productive cough, chronic obstructive pulmonary disease (COPD) is a consideration. However, his chronic lower extremity edema suggests congestive heart failure (CHF), which is consistent with his age and smoking history.\nStep 3: The patient's smoking history and productive cough also raise the possibility of chron..."
+    },
+    {
+      "id": 81,
+      "question": "A 54-year-old male makes an appointment with his primary care physician due to chronic fatigue that ...",
+      "correct_answer": "B",
+      "predicted_answer": "D",
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient presents with chronic fatigue and has enlarged nodules that are not tender to palpation, which suggests hepatomegaly due to hepatoma (hepatocellular carcinoma). He has a history of hypertension and diabetes.\nStep 2: The patient's biopsy shows characteristic changes in chromosome 18, which points towards hepatocellular carcinoma associated with hemochromatosis, hepatitis B, or hepatocellular adenoma. However, the patient's biopsy shows nodules that are not tender to palpati..."
+    },
+    {
+      "id": 82,
+      "question": "A 44-year-old African-American woman comes to the physician for a routine examination. She is concer...",
+      "correct_answer": "C",
+      "predicted_answer": "C",
+      "is_correct": true,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient's uncle died of metastatic melanoma, and she is concerned about her own risk of melanoma.\nStep 2: Melanoma can be classified into several subtypes, including superficial spreading melanoma, nodular melanoma, lentigo maligna melanoma, acral lentiginous melanoma, and desmoplastic melanoma.\nStep 3: Acral lentiginous melanoma is more common in individuals of African descent.\nStep 4: The patient's ethnicity is African-American, and she has a family history of melanoma.\nStep 5: ..."
+    },
+    {
+      "id": 83,
+      "question": "A 60-year-old woman is brought to the clinic by her daughter for evaluation. The daughter reports th...",
+      "correct_answer": "B",
+      "predicted_answer": "B",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with bilateral shoulder tenderness (Purpura hemorrhagica), stiff neck (meningismus), and laboratory evidence of thrombocytopenia (platelet count of 190,000/mm^3). Her laboratory work also shows a significantly elevated erythrocyte sedimentation rate (ESR) and C-reactive protein (CRP).\nStep 2: The patient's elevated ESR and CRP suggest inflammation. Her thrombocytopenia is consistent with thrombotic thrombocytopenic purpura (TTP) or disseminated intravascular coagu..."
+    },
+    {
+      "id": 84,
+      "question": "A 30-year-old woman comes to the physician because she has been unable to conceive for 3 years. Anal...",
+      "correct_answer": "D",
+      "predicted_answer": "D",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with infertility and a history of pelvic pain accompanied by painful diarrhea. She has irritable bowel syndrome-like symptoms, which are consistent with irritable bowel syndrome (IBS), specifically irritable bowel syndrome with pain associated with defecation (IBS-D).\nStep 2: The patient's painful diarrhea is likely related to her pelvic pain, which is described as episodic pelvic and back pain. Her symptoms are consistent with mittelschmerz, which is ovulatory pa..."
+    },
+    {
+      "id": 85,
+      "question": "A 55-year-old truck driver is brought to a physician by his wife. She states that her husband develo...",
+      "correct_answer": "C",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient has a history of tricuspid valve replacement surgery 1 year ago and presents with fever and weakness. He also has hemorrhages on his nail beds, which suggests Janeway lesions.\nStep 2: Given his recent hospitalization for tricuspid valve replacement surgery, we should consider complications related to endocarditis, particularly prosthetic valve endocarditis (PVE).\nStep 3: The patient's fever and weakness are consistent with infective endocarditis (IE), and the Janeway lesio..."
+    },
+    {
+      "id": 86,
+      "question": "A previously healthy 30-year-old woman comes to the physician for the evaluation of pain during sexu...",
+      "correct_answer": "C",
+      "predicted_answer": "C",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with pain during sexual intercourse (dyspareunia) and crampy pelvic pain that starts one day before menses and lasts for 7 days. Her physical examination reveals rectovaginal tenderness.\nStep 2: The patient's symptoms of dyspareunia and pelvic pain are consistent with adenomyosis or endometriosis. However, her physical examination shows rectovaginal tenderness, which is often seen in deep infiltrating endometriosis.\nStep 3: The patient's menstrual cramps are consi..."
+    },
+    {
+      "id": 87,
+      "question": "A 50-year-old man visits his physician after 20 years of not seeking any medical care. He is concern...",
+      "correct_answer": "D",
+      "predicted_answer": "D",
+      "is_correct": true,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient presents with hypertension (blood pressure 130/90 mmHg) and hyperlipidemia (total cholesterol 250 mg/dL, LDL-cholesterol 186 mg/dL). He has a family history of heart disease and is concerned about his risk of heart attack.\nStep 2: The patient's hypertension is mild and may not require immediate treatment, but his hyperlipidemia is significant, with an LDL-cholesterol level of 186 mg/dL.\nStep 3: The patient's LDL-cholesterol level meets the criteria for high-intensity stati..."
+    },
+    {
+      "id": 88,
+      "question": "A 26-year-old woman is brought to the emergency department 20 minutes after being involved in a high...",
+      "correct_answer": "C",
+      "predicted_answer": "C",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient was involved in a high-speed motor vehicle collision and presents with severe injuries, including facial lacerations, respiratory distress, tachypnea (tachypnea is defined as a respiratory rate > 24 breaths/min), tachycardia (pulse of 130/min), hypotension (blood pressure of 90/58 mmHg), and an oxygen saturation of 70% on room air. She has a fractured left second rib, which is consistent with a blunt traumatic injury.\nStep 2: The patient's respiratory distress and hypotens..."
+    },
+    {
+      "id": 89,
+      "question": "A 26-year-old G1P0 woman presents to her primary care physician’s office with feelings of anxiety an...",
+      "correct_answer": "C",
+      "predicted_answer": "C",
+      "is_correct": true,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient presents with anxiety, trouble sleeping, palpitations, fatigue, and a tachycardia (pulse of 105/min). She is pregnant and has a diffusely enlarged thyroid gland with thyroid bruits, indicating hyperthyroidism due to a thyroid storm or toxic multinodular goiter, but her thyroid function tests show hyperthyroidism with a low TSH level.\nStep 2: The patient's hyperthyroidism is due to Graves' disease, which is often associated with a diffusely enlarged thyroid gland (goiter) a..."
+    },
+    {
+      "id": 90,
+      "question": "A 32-year-old woman comes to the physician because of a 3-week history of intermittent loose stools ...",
+      "correct_answer": "E",
+      "predicted_answer": "E",
+      "is_correct": true,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient presents with loose stools, weight loss, diffuse abdominal tenderness, hepatomegaly, splenomegaly, and eosinophilia. She recently immigrated from Uganda.\nStep 2: The patient's leukocyte count shows eosinophilia, indicating a parasitic infection.\nStep 3: Stool culture shows oval-shaped eggs with lateral spines, which is consistent with Schistosoma mansoni infection.\nStep 4: Schistosoma mansoni infection is known to cause intestinal schistosomiasis, which can lead to hepatos..."
+    },
+    {
+      "id": 91,
+      "question": "A 3-month-old girl is brought to a pediatrician by her parents. She has central cyanosis without sig...",
+      "correct_answer": "B",
+      "predicted_answer": "E",
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient has central cyanosis without signs of respiratory distress or heart failure, and an echocardiogram reveals severe pulmonary outflow obstruction, right ventricular hypertrophy, a ventricular septal defect, and an overriding of the aorta. This information points to tetralogy of Fallot (TOF).\nStep 2: Tetralogy of Fallot includes four components: pulmonary stenosis, ventricular septal defect, right ventricular hypertrophy, and an overriding aorta. The patient's echocardiogram ..."
+    },
+    {
+      "id": 92,
+      "question": "Six days after undergoing surgical repair of a hip fracture, a previously healthy 79-year-old woman ...",
+      "correct_answer": "D",
+      "predicted_answer": "D",
+      "is_correct": true,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient is a 79-year-old woman who underwent surgical repair of a hip fracture six days prior and is now experiencing agitation, confusion, and delirium. Delirium is a sudden onset of confusion and altered mental status.\nStep 2: Delirium can be caused by various factors, including medications, medical conditions, and withdrawal from substances.\nStep 3: The patient's medication list includes oxycodone for pain management after her hip fracture surgery.\nStep 4: Delirium is a common ..."
+    },
+    {
+      "id": 93,
+      "question": "A 54-year-old woman with a past medical history of mental retardation, hypertension, and diabetes pr...",
+      "correct_answer": "E",
+      "predicted_answer": "E",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with new-onset spasticity, 3+ reflexes, and a positive Babinski sign, indicating upper motor neuron damage. She also has a \"clunk\" when posterior force is applied to the head while anterior force is applied to the cervical spine, which is consistent with a Kernig's sign, but in this case, it's a \"clunk\" indicative of a Klumpke's collar sign or a \"clunk\" heard during a neck exam, specifically a Adams' test, which is indicative of a cervical spine injury. However, t..."
+    },
+    {
+      "id": 94,
+      "question": "A 24-year-old man is brought to the emergency department 15 minutes after he sustained a stab wound ...",
+      "correct_answer": "C",
+      "predicted_answer": "E",
+      "is_correct": false,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient has sustained a stab wound to the left chest just below the clavicle, and he presents with signs of tension pneumothorax (tachypnea, tachycardia, hypotension) after being intubated and receiving fluid resuscitation.\nStep 2: The stab wound is located at the 5th intercostal space at the midclavicular line, which is consistent with a traumatic injury to the heart, specifically a cardiac tamponade.\nStep 3: The patient's hypotension is due to cardiac tamponade (cardiac arrest) ..."
+    },
+    {
+      "id": 95,
+      "question": "A 40-year-old man presents to his primary-care doctor for a follow-up of his hypertension. He is asy...",
+      "correct_answer": "D",
+      "predicted_answer": "D",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with poorly controlled hypertension and palpable flank masses bilaterally. His laboratory studies show a creatinine of 2.5.\nStep 2: Given his palpable flank masses, the patient likely has polycystic kidney disease (PKD). His family history of kidney disease also supports this diagnosis.\nStep 3: PKD can lead to complications such as kidney failure, hematuria, and cysts in other organs like the liver.\nStep 4: Patients with PKD are at risk of developing intracerebral..."
+    },
+    {
+      "id": 96,
+      "question": "A 17-year-old female is brought to the emergency room by her father because she has been experiencin...",
+      "correct_answer": "A",
+      "predicted_answer": "B",
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient presents with shortness of breath, chest pain that worsens with breathing or coughing (pleuritic chest pain), and hemoptysis (coughing up blood). Her pulse is tachycardic (tachypulse), but her oxygen saturation is only slightly decreased. She has pulmonary congestion, but her blood pressure is normal.\nStep 2: The patient's symptoms of shortness of breath, chest pain that worsens with breathing or coughing, and hemoptysis are consistent with pulmonary edema due to pulmonary..."
+    },
+    {
+      "id": 97,
+      "question": "A 26-year-old male presents to his primary care physician with complaints of burning with urination,...",
+      "correct_answer": "B",
+      "predicted_answer": "B",
+      "is_correct": true,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient presents with symptoms of urethritis, including burning with urination (dysuria) and penile discharge, along with intermittent fevers. A urethral smear shows gram-negative diplococci within white blood cells, which is consistent with gonorrhea.\nStep 2: Gonorrhea is caused by Neisseria gonorrhoeae. The patient is prescribed ceftriaxone, which is appropriate treatment for gonorrhea.\nStep 3: The patient returns with the same infection one year later. We need to determine why ..."
+    },
+    {
+      "id": 98,
+      "question": "A 37-year-old man with no significant past medical history is rear-ended in a motor vehicle accident...",
+      "correct_answer": "C",
+      "predicted_answer": "C",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with neck pain after a motor vehicle accident, which is consistent with cervical strain.\nStep 2: However, cervical spine injuries can occur after motor vehicle accidents, even without obvious trauma.\nStep 3: The patient's neck pain is significant enough that cervical spine clearance is necessary.\nStep 4: The National Emergency X-Radiography Utilization Study (NEXUS) criteria recommend cervical spine imaging for patients with neck pain after trauma if any of the fo..."
+    },
+    {
+      "id": 99,
+      "question": "A 43-year-old man with a history of schizophrenia, currently controlled with medication, comes in fo...",
+      "correct_answer": "C",
+      "predicted_answer": "C",
+      "is_correct": true,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient presents with galactorrhea (abnormal milk discharge from the nipples) and diminished sexual drive (hyposexuality). He has a history of schizophrenia.\nStep 2: The patient's schizophrenia medications include antipsychotics. Some antipsychotics can cause hyperprolactinemia as a side effect.\nStep 3: Galactorrhea is often associated with hyperprolactinemia. Dopamine agonists can decrease prolactin secretion.\nStep 4: Metoclopramide is known to cause hyperprolactinemia as a side ..."
+    },
+    {
+      "id": 100,
+      "question": "A 2-day-old male newborn is brought to the physician because of yellowing of the skin and sclerae fo...",
+      "correct_answer": "E",
+      "predicted_answer": "C",
+      "is_correct": false,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The newborn presents with jaundice (yellowing of the skin and sclerae) at 2 days old, which is consistent with physiologic jaundice. However, his jaundice is severe (total bilirubin of 11.3 mg/dL), and he has a mild splenomegaly (his spleen tip is palpated just below the left costal margin). His hemoglobin is normal, but his reticulocyte count is elevated at 9%, indicating hemolysis.\nStep 2: The newborn's mother has no medical insurance and did not receive prenatal care. His mother is..."
+    },
+    {
+      "id": 101,
+      "question": "A 65-year old man presents with gradually worsening rigidity of his arms and legs and slowness in pe...",
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient presents with rigidity of his arms and legs, slowness in performing tasks (bradykinesia), and hand tremors that increase at rest and decrease with focused movements. He has Parkinson's disease-like symptoms, including parkinsonian tremors (also known as resting tremors) and parkinsonism.\nStep 2: The patient's gait is described as a shortened, shuffling gait, which is consistent with parkinsonian gait.\nStep 3: The patient's symptoms of parkinsonism are likely due to Parkins..."
+    },
+    {
+      "id": 102,
+      "question": "The patient is given prophylactic labetalol and magnesium sulfate. Examination shows absent deep ten...",
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient is given prophylactic labetalol and magnesium sulfate for eclampsia prevention. Magnesium sulfate can cause neuromuscular blockade, including absent deep tendon reflexes (Trousseau's sign of tetany).\nStep 2: The patient's absent deep tendon reflexes are likely due to magnesium toxicity.\nStep 3: The treatment for magnesium toxicity includes stopping magnesium sulfate administration.\nStep 4: Calcium gluconate may be administered to counteract magnesium toxicity.\nStep 5: The ..."
+    },
+    {
+      "id": 103,
+      "question": "A 75-year-old woman is brought by a patrolman to the emergency department because of altered mental ...",
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient presents with altered mental status, hypotension (shock), bradycardia, and hypothermia. She has a history of wandering and was found next to a highway, suggesting she may have been trying to cross the road. Her physical examination reveals decorticate posturing (indicative of coma), eyes opening to pain (indicative of a Glasgow Coma Scale of 2), dry hair, coarse skin, and non-pitting edema around her face and extremities.\nStep 2: The patient's laboratory studies show hypot..."
+    },
+    {
+      "id": 104,
+      "question": "A 66-year-old male presents to his primary care physician to discuss his increasing shortness of bre...",
+      "correct_answer": "C",
+      "predicted_answer": "A",
+      "is_correct": false,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with shortness of breath when exerting himself, particularly when mowing his lawn or climbing stairs. His physical examination reveals an early diastolic blowing, decrescendo murmur heard best at the left sternal border, which is indicative of aortic regurgitation (AR). He also has a midsystolic murmur heard best at the right upper sternal border, which is consistent with pulmonary regurgitation due to pulmonary hypertension secondary to AR.\nStep 2: The patient's ..."
+    },
+    {
+      "id": 105,
+      "question": "A 28-year-old woman presents following a suicide attempt 2 days ago. She says that her attempt was a...",
+      "correct_answer": "B",
+      "predicted_answer": "B",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents after a suicide attempt following a fight with her boyfriend. She slit her wrists in an attempt to keep him from breaking up with her.\nStep 2: The patient has a history of turbulent relationships and is described as impulsive and manipulative by her family members.\nStep 3: The patient's behavior since admission has included spitting at staff members and exhibiting emotional dysregulation.\nStep 4: The patient's suicide attempt and emotional dysregulation, combined ..."
+    },
+    {
+      "id": 106,
+      "question": "A 50-year-old man presents to his primary care doctor following an inguinal hernia repair. The patie...",
+      "correct_answer": "C",
+      "predicted_answer": "A",
+      "is_correct": false,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient has a calcified pulmonary nodule in his right middle lobe, which is described as 8 mm initially and 10 mm one year later. The nodule is described as having regular margins and appears calcified.\nStep 2: Calcified pulmonary nodules are often benign, and the management of pulmonary nodules depends on their size and characteristics.\nStep 3: The patient's nodule is 10 mm in size, which is considered a pulmonary nodule of a size that requires follow-up.\nStep 4: The patient's no..."
+    },
+    {
+      "id": 107,
+      "question": "A 29-year-old man comes in for evaluation of infertility. He has been trying to conceive for over 2 ...",
+      "correct_answer": "A",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient presents with infertility, gynecomastia, small testes, sparse body hair, and a tall stature. He has Kallmann syndrome, which is characterized by delayed puberty and anosmia.\nStep 2: Kallmann syndrome is associated with Klinefelter syndrome, hypopituitarism, and other conditions. However, the patient's physical exam reveals gynecomastia and small testes, suggesting Kallmann syndrome with Klinefelter syndrome variant known as Kallmann syndrome with Klinefelter syndrome varia..."
+    },
+    {
+      "id": 108,
+      "question": "A 13-year-old boy presents to the emergency department with severe knee, hip, and groin pain. The pa...",
+      "correct_answer": "E",
+      "predicted_answer": "A",
+      "is_correct": false,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with severe knee, hip, and groin pain, which is consistent with transient osteochondritis dissecans or hip fractures, but his primary issue appears to be a hip injury.\nStep 2: The patient's physical exam reveals an inability to bear weight on his left leg and limited range of motion of the left hip, suggesting a hip fracture or dislocation.\nStep 3: Given the patient's age and presentation of severe hip pain and limited range of motion, he likely has a hip fracture..."
+    },
+    {
+      "id": 109,
+      "question": "A 28-year-old man comes to the physician because of diarrhea and crampy abdominal pain for 5 weeks. ...",
+      "correct_answer": "C",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with diarrhea, crampy abdominal pain, mucoid strings with his stool (pseudomelanosis coli), abdominal bloating, and weight loss. He has a thrombocytopenic thrombotic purpura (TTP)-like thrombocytopenia with a platelet count of 410,000/mm^3 (thrombocytosis).\nStep 2: The patient's diarrhea is consistent with irritable bowel syndrome (IBS), inflammatory bowel disease (IBD), or carcinoid syndrome. However, his diarrhea is chronic, and he has mucoid strings with his st..."
+    },
+    {
+      "id": 110,
+      "question": "A 51-year-old man is brought to the emergency department because of a 2-day history of fever, abdomi...",
+      "correct_answer": "D",
+      "predicted_answer": "D",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with fever, abdominal pain, confusion (delirium), and confusion-related fever (delirium tremens), which suggests sepsis. He also has a fever of 38.3°C (100.9°F), tachycardia (pulse 101/min), and a blood pressure of 104/68 mmHg. His confusion is likely due to hepatic encephalopathy given his scleral icterus and ascites.\nStep 2: The patient has cirrhosis, as evidenced by scleral icterus, ascites, and a leukocyte count of 13,900/mm^3 (leukocytosis). His ascitic fluid..."
+    },
+    {
+      "id": 111,
+      "question": "An 18-month-old girl is brought to the emergency department because of a cough that her parents are ...",
+      "correct_answer": "C",
+      "predicted_answer": "E",
+      "is_correct": false,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with a cough, runny nose, low-grade fever, hoarseness, a rough-sounding cough (croup), high-pitched sounds when taking breaths (stridor), and a barking cough. She has inspiratory stridor that worsens when she cries.\nStep 2: The patient's symptoms are consistent with croup, which is a common respiratory illness in children. Croup can be caused by viruses, and the patient's symptoms of hoarseness and stridor are typical of croup.\nStep 3: The patient's respiratory ra..."
+    },
+    {
+      "id": 112,
+      "question": "A 43-year-old woman presents with complaints of retrosternal burning associated with eating. It has ...",
+      "correct_answer": "B",
+      "predicted_answer": "A",
+      "is_correct": false,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with complaints of retrosternal burning associated with eating, which is consistent with gastroesophageal reflux disease (GERD). However, her blood pressure is significantly elevated, indicating hypertensive urgency.\nStep 2: The patient's chief complaint is angina pectoris equivalent known as angina pectoris of the esophagus, also known as angina pectoris of the chest, which is heartburn. Her hypertension needs to be addressed urgently.\nStep 3: The patient's hyper..."
+    },
+    {
+      "id": 113,
+      "question": "A 67-year-old man with chronic kidney disease comes to the physician because of worsening fatigue an...",
+      "correct_answer": "D",
+      "predicted_answer": "D",
+      "is_correct": true,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient presents with worsening fatigue, shortness of breath on exertion, tachycardia (pulse of 105/min), conjunctival pallor, and bounding pulses. His laboratory studies show hemolytic anemia (hemoglobin 8.6 g/dL), elevated ferritin (325 ng/mL), and acute kidney injury (urea nitrogen 45 mg/dL, creatinine 2.2 mg/dL). He has chronic kidney disease and is prescribed metformin and insulin.\nStep 2: The patient's tachycardia (pulse of 105/min) and bounding pulses suggest congestive hea..."
+    },
+    {
+      "id": 114,
+      "question": "A 41-year-old man presents to the emergency department with a 6-hour history of muscle cramping, dec...",
+      "correct_answer": "D",
+      "predicted_answer": "C",
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient presents with muscle cramping, diarrhea, decreased appetite, fast shallow breathing (Kussmaul breathing), and abdominal pain. His labs show a pH of 7.25 with a pCO2 of 22 mmHg, indicating respiratory alkalosis with metabolic acidosis (compensatory metabolic acidosis).\nStep 2: The patient's symptoms of muscle cramping, diarrhea, and abdominal pain are consistent with hyperchloremic metabolic acidosis (HAGMA) due to gastroenteritis.\nStep 3: The patient's diarrhea is likely c..."
+    },
+    {
+      "id": 115,
+      "question": "A scientist is studying the properties of myosin-actin interactions in a sample of human muscle tiss...",
+      "correct_answer": "E",
+      "predicted_answer": "A",
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1:  To answer this question, we'll go step by step through the process of cross-bridge cycling in muscle contraction.\nStep 2:  The scientist has identified a drug that selectively inhibits phosphate release by the myosin head. We need to understand the steps of cross-bridge cycling and how phosphate release fits into this process.\nStep 3:  Cross-bridge cycling refers to the series of steps involved in muscle contraction, where myosin heads bind to actin filaments and undergo a power stro..."
+    },
+    {
+      "id": 116,
+      "question": "A 16-year-old boy with a seizure disorder and cognitive delay is brought to the physician because of...",
+      "correct_answer": "D",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient presents with progressively worsening right lower extremity weakness, a seizure disorder, cognitive delay, and a holosystolic murmur at the cardiac apex. He also has retinal lesions consistent with retinitis pigmentosa.\nStep 2: The patient's seizure disorder and cognitive delay suggest tuberous sclerosis complex (TSC), neurofibromatosis type 1 (NF1), or other neurocutaneous disorders. However, his physical examination also reveals holosystolic murmurs consistent with mitra..."
+    },
+    {
+      "id": 117,
+      "question": "A 66-year-old man presents to the emergency department with abdominal pain, nausea, and vomiting. He...",
+      "correct_answer": "D",
+      "predicted_answer": "D",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with hypertension, abdominal pain, nausea, vomiting, and diffuse abdominal tenderness. His blood pressure is significantly elevated at 184/102 mmHg, indicating hypertensive emergency. He also has a history of diabetic nephropathy, which is reflected in his elevated creatinine of 3.1 mg/dL.\nStep 2: The patient's abdominal pain improves after an enema and bowel movements, suggesting he has ischemic colitis related to his hypertensive emergency.\nStep 3: The patient's..."
+    },
+    {
+      "id": 118,
+      "question": "A 56-year-old man comes to the clinic for a check-up. He presents with a 1-year history of worsening...",
+      "correct_answer": "E",
+      "predicted_answer": "E",
+      "is_correct": true,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient presents with shortness of breath and weight loss, and has a significant smoking history. He has been diagnosed with chronic obstructive pulmonary disease (COPD) based on his pulmonary function test results, which show an FEV1/FVC ratio of 60% and an FEV1 of 50% of the predicted value.\nStep 2: The patient's pulmonary function test results also show a total lung capacity (TLC) of 110% of predicted and a residual volume (RV) of 115% of predicted, indicating hyperinflation of..."
+    },
+    {
+      "id": 119,
+      "question": "A 25-year-old zookeeper presents to the office complaining of a dry cough, fever, and chills for the...",
+      "correct_answer": "C",
+      "predicted_answer": "C",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with dry cough, fever, chills, and fatigue after working with birds at the zoo. His symptoms come in episodes at the end of his workday, suggesting occupational asthma or hypersensitivity pneumonitis.\nStep 2: Hypersensitivity pneumonitis (HP) is a lung disease caused by an immune response to inhaled antigens. The patient's job as a zookeeper involves working with birds, which is a common cause of HP.\nStep 3: The patient's symptoms of cough, fever, chills, and fati..."
+    },
+    {
+      "id": 120,
+      "question": "A 60-year-old female presents to her gynecologist with vaginal bleeding. She underwent menopause ten...",
+      "correct_answer": "D",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient underwent a laparoscopic hysterectomy for endometrial cancer and developed left-sided flank pain and hematuria after the procedure.\nStep 2: The patient's symptoms of flank pain and hematuria are consistent with hemorrhage from the left kidney, known as post-renal hemorrhage or hemorrhage from the kidney.\nStep 3: During a hysterectomy for endometrial cancer, the uterine arteries are ligated to remove the uterus.\nStep 4: The uterine arteries give off branches to the bladder,..."
+    },
+    {
+      "id": 121,
+      "question": "A 40-year-old man presents to the physician with progressive weight loss for the last 3 months. He a...",
+      "correct_answer": "B",
+      "predicted_answer": "B",
+      "is_correct": true,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1:  The patient presents with progressive weight loss, night sweats, and fever, which are classic symptoms of Hodgkin lymphoma (HL).\nStep 2:  He has been diagnosed with Hodgkin lymphoma, and we need to determine which viral infection is most likely to have played a role in its pathogenesis.\nStep 3:  Epstein-Barr virus (EBV) is known to be associated with Hodgkin lymphoma, particularly classical Hodgkin lymphoma.\nStep 4:  EBV has been implicated in the pathogenesis of Hodgkin lymphoma, pa..."
+    },
+    {
+      "id": 122,
+      "question": "A 28-year-old gravida 1 at 32 weeks gestation is evaluated for an abnormal ultrasound that showed fe...",
+      "correct_answer": "E",
+      "predicted_answer": "E",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with a history of fever, headaches, myalgias, arthralgias, and a pruritic maculapapular rash during her first trimester of pregnancy. She also has a diagnosis of fetal microcephaly at 32 weeks gestation.\nStep 2: The patient's symptoms of fever, headaches, myalgias, arthralgias, and a pruritic maculopapular rash are consistent with dengue fever, but she also has a diagnosis of fetal microcephaly.\nStep 3: Fetal microcephaly has been linked to Zika virus infection du..."
+    },
+    {
+      "id": 123,
+      "question": "A 41-year-old G3P1 woman presents with a sudden onset throbbing headache, tinnitus, nausea, and left...",
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient presents with a sudden onset throbbing headache (migraine equivalent), tinnitus, nausea, left-sided weakness (stroke), hypertension, and laboratory findings of thrombocytopenia (thrombocytopenia is actually a platelet count of 230,000/mm^3, which is thrombocytosis), increased fibrinogen degradation products (FDPs), and a prolonged activated partial thromboplastin time (aPTT). She also has preeclampsia-like symptoms, including hypertension and proteinuria.\nStep 2: The patie..."
+    },
+    {
+      "id": 124,
+      "question": "A obstetrician is working in a developing country to help promote maternal health and fetal well bei...",
+      "correct_answer": "B",
+      "predicted_answer": "B",
+      "is_correct": true,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1:  The obstetrician has delivered a baby who he suspects has congenital hypothyroidism due to inadequate maternal iodine intake.\nStep 2:  Congenital hypothyroidism caused by iodine deficiency is known as cretinism.\nStep 3:  Cretinism can result in physical and developmental delays.\nStep 4:  Signs of cretinism include hypotonia, umbilical hernia, mild jaundice, and macroglossia.\nStep 5:  Macroglossia (enlarged tongue) is a common feature of cretinism.\nStep 6:  Hypotonia is also expected ..."
+    },
+    {
+      "id": 125,
+      "question": "A 33-year-old nurse is referred to an infectious disease specialist after she exhibited a PPD skin t...",
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient has a positive purified protein derivative (PPD) skin test with 17 mm of induration, indicating latent tuberculosis (TB).\nStep 2: According to the Centers for Disease Control and Prevention (CDC), a PPD result of 10 mm or more is considered positive in individuals with HIV infection, recent contacts of someone with TB, or other immunocompromising conditions.\nStep 3: The patient's PPD result is 17 mm, but she denies any symptoms of active TB.\nStep 4: The patient's managemen..."
+    },
+    {
+      "id": 126,
+      "question": "An 81-year-old woman is brought to the emergency room by her son after witnessing the patient fall a...",
+      "correct_answer": "A",
+      "predicted_answer": "C",
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient presents with hypertension-induced hypertensive emergency (hypertensive urgency) after falling down the stairs after experiencing palpitations. Her blood pressure is significantly elevated at 152/96 mmHg.\nStep 2: She has a history of atrial fibrillation and was taking warfarin. Her physical examination reveals a left pupil that is dilated and non-reactive to light (pupillary dilation is a sign of a third cranial nerve palsy), which is consistent with a subarachnoid hemorrh..."
+    },
+    {
+      "id": 127,
+      "question": "A 67-year-old man with peripheral neuropathy comes to the physician for a follow-up examination afte...",
+      "correct_answer": "D",
+      "predicted_answer": "D",
+      "is_correct": true,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient has monoclonal gammopathy of undetermined significance (MGUS) with 6% monoclonal plasma cells in his bone marrow biopsy.\nStep 2: The patient's monoclonal plasma cells have downregulated class I major histocompatibility molecules, which is a mechanism used by some cancer cells to evade immune surveillance.\nStep 3: The immune cells that lyse abnormal cells without the need for opsonization, priming, or prior activation are natural killer cells.\nStep 4: Natural killer cells a..."
+    },
+    {
+      "id": 128,
+      "question": "A 47-year-old woman comes to the physician because of progressive muscle weakness for five months. S...",
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with progressive muscle weakness in her shoulders and hips, difficulty getting up from chairs (getting up from chairs is known as getting up from a chair test or the \"chair test\"), climbing stairs, and combing her hair. She also has dysphagia with solid foods but not liquids. Her neurologic examination shows moderate weakness in the arm abductors and hip flexors bilaterally.\nStep 2: The patient's laboratory studies show elevated creatine kinase (CK) levels, indica..."
+    },
+    {
+      "id": 129,
+      "question": "A 41-year-old man presents to the emergency room with sudden onset of blurry vision one hour ago. He...",
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with sudden onset blurry vision, double vision seeing two images on top of each other (diplopia), nausea, vomiting, and watery diarrhea after eating food at a picnic. He also has fixed pupillary dilation (mydriasis) and difficulty depressing both eyes (paralysis of downward gaze), indicating bilateral third nerve palsy.\nStep 2: The patient's symptoms of nausea, vomiting, watery diarrhea, and bilateral third nerve palsy are consistent with botulism. However, botuli..."
+    },
+    {
+      "id": 130,
+      "question": "A 4-week-old female newborn is brought to the physician because of increasing yellowing of her eyes ...",
+      "correct_answer": "B",
+      "predicted_answer": "B",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient is a 4-week-old newborn presenting with jaundice, also known as neonatal jaundice. Her jaundice is described as scleral icterus and jaundice, and her bilirubin levels show a total bilirubin of 15 mg/dL with a direct bilirubin of 12.3 mg/dL.\nStep 2: The patient's jaundice started at 2 weeks of age, and her stools have become pale over the past week. She was breastfed until recently but was switched to formula feeds after her parents read online that breastfeeding could be c..."
+    },
+    {
+      "id": 131,
+      "question": "A 43-year-old man comes to the emergency department with nausea, abdominal discomfort, diarrhea, and...",
+      "correct_answer": "B",
+      "predicted_answer": "B",
+      "is_correct": true,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient recently underwent a total thyroidectomy for papillary thyroid cancer. He presents with nausea, abdominal discomfort, diarrhea, and perioral numbness after surgery.\nStep 2: The patient's symptoms of nausea, abdominal discomfort, diarrhea, and perioral numbness are consistent with hypocalcemia, which is a known complication of thyroidectomy due to damage to the parathyroid glands.\nStep 3: The patient's hypocalcemia is likely due to transient hypoparathyroidism after thyroid..."
+    },
+    {
+      "id": 132,
+      "question": "A 68-year-old woman presents with left lower quadrant pain that worsens with defecation. She describ...",
+      "correct_answer": "A",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient presents with left lower quadrant pain that worsens with defecation, which is consistent with diverticulitis. However, her leukocytosis and thrombocytopenia suggest diverticulitis complicated by diverticulitis-related bleeding, also known as hemorrhage, and possibly diverticulitis-related bleeding with thrombocytopenia, known as thrombocytopenic purpura (TTP) or thrombotic thrombocytopenic purpura (TTP), but her thrombocytopenia is likely due to thrombocytopenia associated..."
+    },
+    {
+      "id": 133,
+      "question": "A 67-year-old man presents to his primary care physician for erectile dysfunction. He states that fo...",
+      "correct_answer": "B",
+      "predicted_answer": "B",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with erectile dysfunction (ED) and deep and burning buttock and hip pain when walking, which is relieved by rest. He also has weak lower extremity and femoral pulses.\nStep 2: The patient's pain when walking is described as deep and burning buttock and hip pain that is relieved by rest. This is consistent with intermittent claudication due to peripheral arterial disease (PAD).\nStep 3: The patient's ED is also related to his PAD. He has a history of coronary artery ..."
+    },
+    {
+      "id": 134,
+      "question": "A 55-year-old man with a history of chronic glomerulonephritis due to IgA nephropathy presents to yo...",
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient has a history of chronic glomerulonephritis due to IgA nephropathy and presents with bone pain. He likely has secondary hyperparathyroidism due to chronic kidney disease (CKD).\nStep 2: Chronic kidney disease can lead to osteitis fibrosa cystica, also known as osteodystrophia fibrosa, which is associated with hyperparathyroidism.\nStep 3: Secondary hyperparathyroidism in CKD is typically due to decreased calcium levels (hypocalcemia) and increased phosphate levels (hyperphos..."
+    },
+    {
+      "id": 135,
+      "question": "A medical researcher is studying the physiology of the immune system in order to better understand t...",
+      "correct_answer": "C",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The researcher is studying the immune system, specifically the CD8+ T cells. CD8+ T cells are cytotoxic T cells that play a crucial role in cell-mediated immunity.\nStep 2: The researcher has isolated CD8+ T cells and mixed them with infected cells. He has identified a protein bound to CD8 that is composed of two chains from an adjacent cell.\nStep 3: The protein bound to CD8 is likely CD8αα or CD8β chains, but the question asks about the protein that was bound to CD8. The protein bound..."
+    },
+    {
+      "id": 136,
+      "question": "A 61-year-old Caucasian male presents to your office with chest pain. He states that he is worried a...",
+      "correct_answer": "D",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient presents with chest pain that worsens with large meals and spicy foods. He experiences relief with calcium carbonate.\nStep 2: The patient's chest pain is described as worsening with large meals and spicy foods, which is consistent with angina pectoris, but he denies dyspnea on exertion.\nStep 3: However, his chest pain is also described as gastroesophageal reflux-like, with relief provided by calcium carbonate.\nStep 4: The patient's father died of a heart attack at age 62, ..."
+    },
+    {
+      "id": 137,
+      "question": "A 36-year-old woman comes to the clinic because of tearing and a foreign body sensation in her eyes ...",
+      "correct_answer": "E",
+      "predicted_answer": "D",
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient presents with tearing and a foreign body sensation in her eyes, palpitations, nervousness, sweating, heat intolerance, eyelid retraction (Dalton's sign), and tremors. Her thyroid-stimulating hormone (TSH) level is suppressed, indicating hyperthyroidism. She also has Graves' disease, which is confirmed by the presence of thyroid-stimulating immunoglobulin.\nStep 2: The patient's eye symptoms are consistent with Graves' ophthalmopathy, which includes eyelid retraction (Dalton..."
+    },
+    {
+      "id": 138,
+      "question": "A 7-year-old boy is brought to a pediatrician by his parents for evaluation of frequent bed wetting ...",
+      "correct_answer": "C",
+      "predicted_answer": "C",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1:  The patient presents with nocturnal enuresis, also known as bedwetting. Nocturnal enuresis is defined as the involuntary urination during sleep after the age of 5 years.\nStep 2:  The patient's history reveals that he has never been dry at night continuously for 1 week, which is consistent with nocturnal enuresis.\nStep 3:  The patient's physical examination is normal, and his laboratory investigations show no evidence of urinary tract infections or other abnormalities.\nStep 4:  Noctur..."
+    },
+    {
+      "id": 139,
+      "question": "A 52-year-old man with a history of gastric cancer that was treated with subtotal gastrectomy dies i...",
+      "correct_answer": "D",
+      "predicted_answer": "A",
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1:  The patient had gastric cancer treated with subtotal gastrectomy and died in a motor vehicle collision. At autopsy, there's unilateral atrophy of the neurons in the area indicated by the arrow, which is the pyramidal decussation (also known as the decussation of the pyramids).\nStep 2:  The pyramidal decussation is located in the medulla oblongata, and damage to this area can result in a condition known as hemiplegia due to the loss of corticospinal tract fibers.\nStep 3:  The corticos..."
+    },
+    {
+      "id": 140,
+      "question": "A 24-year-old pregnant woman at 28 weeks gestation presents to the emergency department with complai...",
+      "correct_answer": "D",
+      "predicted_answer": "B",
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient presents with fever, chills, joint pain (arthritis), headaches, and difficulty moving her neck (meningismus). She also has a tick bite and an erythematous rash on her arm.\nStep 2: The patient's symptoms of fever, chills, arthritis (knee and ankle joints), headaches, and meningismus are consistent with Lyme disease (Lyme borreliosis) and Rocky Mountain spotted fever (RMSF). However, she also has a tick bite.\nStep 3: The patient is pregnant at 28 weeks gestation, and she has..."
+    },
+    {
+      "id": 141,
+      "question": "A 25-year-old woman presents to her physician with a four month history of fatigue and weakness. The...",
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with hypertension, fatigue, weakness, and a history of amenorrhea. Her blood pressure is significantly elevated at 160/100 mmHg, and she has a history of smoking a pack of cigarettes per day. Her laboratory workup reveals hyperglycemia and Cushing's syndrome, confirmed by a 24-hour urinary cortisol level of 470 µg.\nStep 2: The patient's cortisol levels are elevated, and her ACTH levels are low, indicating Cushing's syndrome with adrenal hyperplasia due to ACTH-ind..."
+    },
+    {
+      "id": 142,
+      "question": "A 67-year-woman with non-Hodgkin lymphoma comes to the physician because of progressively increasing...",
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient has non-Hodgkin lymphoma and has recently completed a cycle of chemotherapy with vincristine. She presents with numbness and tingling in her fingers and toes, decreased sensation to light touch in her distal extremities, and decreased knee and ankle reflexes.\nStep 2: Vincristine is a vinca alkaloid that causes peripheral neuropathy as a side effect. The peripheral neuropathy caused by vincristine is a neurotoxicity that results from vincristine's effects on microtubule dyn..."
+    },
+    {
+      "id": 143,
+      "question": "A 68-year-old man comes to the physician with a 1-week history of painless hematuria. A CT scan of t...",
+      "correct_answer": "B",
+      "predicted_answer": "B",
+      "is_correct": true,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient presents with painless hematuria and a CT scan shows bladder wall thickening. Cystoscopy reveals several sessile masses with central necrosis arising from the bladder wall, which is consistent with bladder cancer.\nStep 2: The patient has bladder cancer, specifically invasive bladder cancer, given the presence of central necrosis in the masses.\nStep 3: The biopsy specimen shows moderately differentiated urothelial cells with abundant mitotic figures and nuclear atypia, indi..."
+    },
+    {
+      "id": 144,
+      "question": "A 14-year-old girl comes to the physician with her father for evaluation of her short stature. She f...",
+      "correct_answer": "D",
+      "predicted_answer": "D",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with short stature, and her height is at the 2nd percentile. Her bone age is 11 years, which is delayed compared to her chronological age of 14 years.\nStep 2: She has breast development at Tanner stage 2, but pubic and axillary hair are absent. Her father has short stature, but he is now tall as an adult.\nStep 3: Given her short stature, delayed bone age, and absent pubic and axillary hair, she likely has delayed puberty.\nStep 4: Her father's short stature during ..."
+    },
+    {
+      "id": 145,
+      "question": "A 5-year-old boy is brought to the physician because of facial swelling that started 5 days ago. Two...",
+      "correct_answer": "D",
+      "predicted_answer": "D",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with facial swelling (periorbital edema), tachycardia (tachycardia), and mildly low blood pressure (hypotension), indicating heart failure. He also has a history of a recent sore throat.\nStep 2: The patient's laboratory studies show significant proteinuria (proteinuria) with a urine protein of 4+, but his hemoglobin and serum albumin levels are normal.\nStep 3: Given the recent sore throat and proteinuria, post-streptococcal glomerulonephritis (PSGN) should be cons..."
+    },
+    {
+      "id": 146,
+      "question": "A 60-year-old man is referred to a dermatologist by his family physician for management of a rare ca...",
+      "correct_answer": "D",
+      "predicted_answer": "D",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with confluent scaly patches, plaques, and generalized erythroderma along his torso and lower extremities. He also has a solid skin lesion greater than 1 cm in diameter.\nStep 2: The patient's dermatologist suspects a malignancy given his erythroderma and skin lesion. Erythroderma is often associated with mycosis fungoides or cutaneous T-cell lymphoma, but it can also be associated with other types of skin cancers.\nStep 3: The patient's physical examination reveals..."
+    },
+    {
+      "id": 147,
+      "question": "A 35-year-old woman comes to the physician because she has been feeling very stressed over the past ...",
+      "correct_answer": "D",
+      "predicted_answer": "D",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with stress, difficulty relaxing, worries, difficulty concentrating at work, fatigue, marital fights, and shoplifting. She has been diagnosed with shoplifting, which is a symptom of kleptomania.\nStep 2: Kleptomania is characterized by recurrent shoplifting without a compulsive need to possess the stolen items. The patient feels relieved after shoplifting but experiences shame and guilt afterward.\nStep 3: The patient's symptoms of stress, anxiety, difficulty relaxi..."
+    },
+    {
+      "id": 148,
+      "question": "A 65-year-old man presents to his primary care physician for a change in his behavior over the past ...",
+      "correct_answer": "B",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with a change in behavior, including inappropriate language and physical interactions, worsening memory, and trouble caring for himself. His blood pressure is significantly elevated at 162/103 mmHg.\nStep 2: The patient's hypertension needs to be addressed urgently, but first, let's address his dementia diagnosis. He has vascular hypertension, which may contribute to vascular dementia.\nStep 3: The patient's behavior changes include using foul language, grabbing peo..."
+    },
+    {
+      "id": 149,
+      "question": "An 11-month-old boy is brought to the clinic by his mother for a rash on his trunk, which he has had...",
+      "correct_answer": "E",
+      "predicted_answer": "A",
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: Staphylococcal scalded skin syndrome (SSSS) is caused by Staphylococcus aureus.\nStep 2: SSSS involves the production of exfoliative toxins by S. aureus.\nStep 3: The exfoliative toxins cleave desmoglein 1, leading to the formation of blisters.\nStep 4: The primary defense against S. aureus involves antibodies.\nStep 5: IgG is involved in the primary defense against many pathogens.\nStep 6: However, the primary defense against S. aureus toxins involves IgG antibodies.\nStep 7: The specific ..."
+    },
+    {
+      "id": 150,
+      "question": "A 52-year-old man is brought to the emergency department with dry cough, shortness of breath, and lo...",
+      "correct_answer": "A",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with cough, shortness of breath, low-grade fever, and diffuse crackles over bibasilar lung fields, indicating pneumonia. He also has leukocytosis and thrombocytopenia.\nStep 2: His laboratory studies show a leukocytosis with a leukocyte count of 16,000/mm^3 and thrombocytopenia with a platelet count of 150,000/mm^3. He has pneumonia and sepsis-induced thrombocytopenia.\nStep 3: The patient's pneumonia appears to be secondary to influenza pneumonia, given his symptom..."
+    },
+    {
+      "id": 151,
+      "question": "A transvaginal ultrasound shows an intrauterine heteroechoic mass with numerous anechoic spaces and ...",
+      "correct_answer": "E",
+      "predicted_answer": "E",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient has a transvaginal ultrasound showing an intrauterine heteroechoic mass with numerous anechoic spaces, indicating a molar pregnancy. However, there's no identifiable fetus or amniotic fluid.\nStep 2: The ovaries are enlarged and have multiple thin-walled, septated cysts with clear content, which is consistent with ovarian hyperstimulation syndrome (OHSS) or theca lutein cysts.\nStep 3: The presence of a molar pregnancy (hydatidiform mole) is consistent with choriocarcinoma o..."
+    },
+    {
+      "id": 152,
+      "question": "A 75-year-old woman is brought to the emergency department by her son because of a 2-day history of ...",
+      "correct_answer": "A",
+      "predicted_answer": "C",
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient presents with fever, headache, malaise, and dry cough, which are consistent with influenza.\nStep 2: The patient's son reports that other members of the family have had similar symptoms during the past week, but he has not had any symptoms.\nStep 3: The patient has been confirmed to have influenza virus, specifically an influenza A virus with a helical capsid and a segmented genome.\nStep 4: Influenza A viruses are known to cause seasonal outbreaks of influenza.\nStep 5: The q..."
+    },
+    {
+      "id": 153,
+      "question": "A 71-year-old man comes to the physician for a routine visit. His psychiatric history is significant...",
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient has a history of major depression with psychotic features after his wife's death from pancreatic cancer. He has a previous suicide attempt, which is a significant risk factor for future suicide attempts.\nStep 2: The patient's current mental health status is stable, and he denies suicidal thoughts or thoughts of self-harm.\nStep 3: The question asks about the strongest risk factor for suicide in this patient.\nStep 4: A previous suicide attempt is a well-established risk fact..."
+    },
+    {
+      "id": 154,
+      "question": "A 4-year-old boy is brought to the physician because of a generalized rash for 3 days. During this p...",
+      "correct_answer": "D",
+      "predicted_answer": "D",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with a generalized rash, severe itching, fever, headache, muscle pain, and a recent history of a runny nose. He has returned from a camping trip and attends a daycare center.\nStep 2: The patient's symptoms include fever, headache, muscle pain, severe itching, and a generalized rash. He has a rash that includes macules, papules, crusted lesions, and fluid-filled vesicles.\nStep 3: The patient's rash is described as having macules, papules, crusted lesions, and fluid..."
+    },
+    {
+      "id": 155,
+      "question": "A 19-year-old man is brought to the emergency department by ambulance because of unusual behavior th...",
+      "correct_answer": "E",
+      "predicted_answer": "C",
+      "is_correct": false,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with a fever of 100.2°F (37.9°C), tachycardia (pulse 115/min), tachypnea (respirations 24/min), hypertension (blood pressure 160/89 mmHg), and diaphoresis. He is also disoriented and experiencing hallucinations.\nStep 2: The patient's temperature is slightly elevated, his pulse is tachycardic, his respirations are tachypneic, and his blood pressure is hypertensive. He is also diaphoretic and disoriented, which suggests a diagnosis of a hyperadrenergic state, specif..."
+    },
+    {
+      "id": 156,
+      "question": "A 22-year-old male presents to the emergency room complaining of neck stiffness. He reports that his...",
+      "correct_answer": "B",
+      "predicted_answer": "B",
+      "is_correct": true,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient presents with neck stiffness and a pulse of 105 bpm (tachycardia). He has a history of schizophrenia and takes albuterol. He recently took more of his medication because he was hearing voices.\nStep 2: The patient's neck stiffness is consistent with meningitis or meningismus, but his temperature is only slightly elevated. He has a tachycardia, which is likely related to his anxiety.\nStep 3: The patient's neck is flexed and rotated to the right, which is indicative of nuchal..."
+    },
+    {
+      "id": 157,
+      "question": "A 13-month-old boy is brought to the physician for a well-child examination. Physical examination sh...",
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient presents with hepatosplenomegaly and a milky venous blood sample after refrigeration, which indicates lipemia retinalis. The creamy supernatant layer that forms after refrigeration is characteristic of chylomicrons.\nStep 2: The patient's genetic analysis shows a mutation in the apolipoprotein C-II gene (APOC2). Apolipoprotein C-II is a component of lipoprotein lipase, which is involved in the breakdown of chylomicrons.\nStep 3: The patient's condition is likely lipemia reti..."
+    },
+    {
+      "id": 158,
+      "question": "A 41-year-old man comes to the emergency department with nausea, abdominal discomfort, and diarrhea ...",
+      "correct_answer": "D",
+      "predicted_answer": "C",
+      "is_correct": false,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with nausea, abdominal discomfort, diarrhea, perioral numbness, upper-extremity muscle cramping, and fatigue after undergoing a total thyroidectomy. He has a history of Roux-en-Y gastric bypass surgery and recently underwent thyroidectomy for a Hurthle cell lesion.\nStep 2: The patient's symptoms of nausea, abdominal discomfort, diarrhea, perioral numbness, and muscle cramping are consistent with hypocalcemia and hypoparathyroidism, which is a known complication of..."
+    },
+    {
+      "id": 159,
+      "question": "A 9-year-old boy is brought to a physician by his mother for evaluation of generalized weakness, inc...",
+      "correct_answer": "C",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient presents with generalized weakness, increased urination (polyuria), increased thirst (polydipsia), fatigue, and constipation. His urinalysis showed elevated urinary calcium excretion. He has hypertension, but his blood pressure is only slightly elevated.\nStep 2: The patient's symptoms of polyuria, polydipsia, fatigue, and constipation are consistent with diabetes insipidus or diabetes mellitus, but his urinalysis showed elevated urinary calcium excretion, which points towa..."
+    },
+    {
+      "id": 160,
+      "question": "A 5-year-old boy of African descent is presented to the emergency department by his parents. The chi...",
+      "correct_answer": "D",
+      "predicted_answer": "C",
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient has sickle-cell disease (SCD) and has undergone a partial splenectomy due to splenic infarction.\nStep 2: Asplenic individuals are at increased risk of infections from encapsulated bacteria, including Streptococcus pneumoniae, Haemophilus influenzae, and Neisseria meningitidis.\nStep 3: The spleen has different zones, including the red pulp (which includes the cords of Billroth) and the white pulp (which includes the periarteriolar lymphoid sheath).\nStep 4: The spleen's func..."
+    },
+    {
+      "id": 161,
+      "question": "A 51-year-old woman presents to her primary care physician complaining of months of dry mouth and dr...",
+      "correct_answer": "B",
+      "predicted_answer": "B",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with dry mouth (xerostomia) and dry eyes (xerophthalmia), which are symptoms of Sjögren's syndrome. She also has tender parotid glands bilaterally, known as parotitis.\nStep 2: The patient's serum anti-Ro and anti-La autoantibodies are confirmed at high titers, which is consistent with Sjögren's syndrome.\nStep 3: Patients with Sjögren's syndrome are at increased risk of developing lymphoma. Specifically, they are at risk of developing non-Hodgkin lymphoma.\nStep 4: ..."
+    },
+    {
+      "id": 162,
+      "question": "A 59-year-old man presents to his primary care provider with fatigue, a progressively worsening coug...",
+      "correct_answer": "D",
+      "predicted_answer": "D",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with fatigue, cough with flecks of blood (hemoptysis), shortness of breath, and dark urine. He has a history of smoking and hypertension. His laboratory results show positive anti-glomerular basement membrane (anti-GBM) serologies.\nStep 2: Anti-GBM antibodies are associated with Goodpasture syndrome, which is a pulmonary-renal syndrome characterized by glomerulonephritis and pulmonary hemorrhage.\nStep 3: Goodpasture syndrome can be associated with rapidly progress..."
+    },
+    {
+      "id": 163,
+      "question": "A 32-year-old man with HIV infection is brought to the emergency department by his roommate because ...",
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient presents with fever, headache, vomiting, and nuchal rigidity, indicating meningitis. His HIV infection increases his risk of opportunistic infections.\nStep 2: His temperature is 38.5°C, and he has signs of meningitis, including Kernig and Brudzinski signs. His lumbar puncture shows an opening pressure of 32 cm H2O, indicating increased intracranial pressure.\nStep 3: The patient's HIV medications include trimethoprim-sulfamethoxazole, dolutegravir, and tenofovir-emtricitabi..."
+    },
+    {
+      "id": 164,
+      "question": "A 70-year-old woman comes to the physician for the evaluation of back pain. For the past six days, s...",
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with back pain and hypertension, but her blood pressure is significantly elevated at 145/92 mmHg. She also has a rash described as a long erythematous rash covered with multiple clear vesicles and crusty lesions extending from her back to below her right breast.\nStep 2: The patient's rash is described as a herpes zoster rash, specifically shingles. Shingles is caused by reactivation of varicella-zoster virus.\nStep 3: The patient's hypertension needs to be managed,..."
+    },
+    {
+      "id": 165,
+      "question": "A type of fatal adrenal cancer has an average survival rate of 3 years after the onset of clinically...",
+      "correct_answer": "B",
+      "predicted_answer": "C",
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The question describes a new screening test for adrenal cancer that can detect cancer 2 years prior to developing clinical symptoms.\nStep 2: A new observational case-control study compares the median 5-year survival of patients who decline medical and surgical treatment between screened and unscreened populations.\nStep 3: The study finds that the screened population has statistically better outcomes.\nStep 4: However, there's a risk of bias in these conclusions, specifically lead-time ..."
+    },
+    {
+      "id": 166,
+      "question": "A 60-year-old man presents to the office for shortness of breath. The shortness of breath started a ...",
+      "correct_answer": "B",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient presents with shortness of breath exacerbated by physical activity, which suggests chronic obstructive pulmonary disease (COPD) or pulmonary fibrosis. His occupational history of working in the glass manufacturing industry is relevant.\nStep 2: The patient's chest radiograph shows interstitial fibrosis with reticulonodular infiltrate, indicating pulmonary fibrosis. He also has eggshell calcification of multiple lymph nodes, which is consistent with silicosis.\nStep 3: Silico..."
+    },
+    {
+      "id": 167,
+      "question": "A 43-year-old woman is brought to the emergency department by her brother for severe chest pain. The...",
+      "correct_answer": "D",
+      "predicted_answer": "D",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with severe chest pain, a heart rate of 96/min (tachycardia), and hypotension (blood pressure 105/67 mmHg) after experiencing a recent loss of her husband. She also has an S3 heart sound and rales in both lung lobes, indicating congestive heart failure (CHF).\nStep 2: The patient's recent loss of her husband may be contributing to her presentation of severe chest pain and tachycardia, which is consistent with stress-induced cardiomyopathy (Takotsubo cardiomyopathy)..."
+    },
+    {
+      "id": 168,
+      "question": "A 56-year-old man is brought to the emergency department. He was found unconscious on the street. Th...",
+      "correct_answer": "B",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with hematemesis (bloody vomiting) and melena (black tarry stool), indicating upper gastrointestinal bleeding. His vital signs show tachycardia (tachypulse) but stable blood pressure.\nStep 2: The patient has a history of alcoholism and is found unconscious with hematemesis, which is described as containing small clots and food particles (coffee grounds emesis). He smells of alcohol.\nStep 3: The patient's hematemesis is described as \"coffee grounds emesis,\" which i..."
+    },
+    {
+      "id": 169,
+      "question": "An 8-year-old girl comes to the physician because of a 2-day history of hematuria. Two weeks ago, sh...",
+      "correct_answer": "D",
+      "predicted_answer": "D",
+      "is_correct": true,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient presents with hematuria, proteinuria (3+), and pitting edema of the lower legs and ankles after a sore throat. Her antistreptolysin O titer is elevated, indicating poststreptococcal glomerulonephritis (PSGN) or poststreptococcal glomerulonephritis (PSGN) following strep throat.\nStep 2: The patient's symptoms of hematuria, proteinuria, and edema are consistent with nephritic syndrome.\nStep 3: PSGN is a known complication of strep throat caused by nephritogenic strains of Gr..."
+    },
+    {
+      "id": 170,
+      "question": "A 25-year-old man presents to the emergency department with altered mental status. He was found down...",
+      "correct_answer": "C",
+      "predicted_answer": "C",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with altered mental status after being found down in the street. His vital signs show a respiratory rate of 5/min, indicating respiratory depression.\nStep 2: Given the patient's respiratory depression, opioid overdose should be considered. Opioid overdose can cause respiratory depression, miosis (pupillary constriction), and coma.\nStep 3: Opioid overdose is often referred to as opioid intoxication or opioid overdose syndrome.\nStep 4: Opioid overdose can also cause..."
+    },
+    {
+      "id": 171,
+      "question": "A 38-year-old G4P3 presents to her obstetrician’s office for her 20-week anatomy ultrasound. She rep...",
+      "correct_answer": "D",
+      "predicted_answer": "D",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents for her 20-week anatomy ultrasound, and the technician notes a male fetus with intrauterine growth restriction (IUGR), microcephaly, convex-rounded feet (also known as rocker-bottom feet), clenched fists with overlapping fingers (also known as camptodactyly), and a ventricular septal defect (VSD).\nStep 2: The patient's fetus has been diagnosed with Potter syndrome, which is often associated with oligohydramnios due to renal failure. However, in this case, the amni..."
+    },
+    {
+      "id": 172,
+      "question": "An 83-year-old man is admitted to the hospital with fever, weakness, and decreased responsiveness. H...",
+      "correct_answer": "C",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient has been diagnosed with urosepsis and started on antibiotics. However, he has now developed delirium, which is characterized by acute onset of confusion, altered level of consciousness, and fluctuating course.\nStep 2: Delirium is a common complication of sepsis, especially in elderly patients. The patient's delirium is likely due to his sepsis-induced urosepsis.\nStep 3: The patient's delirium is causing him to become agitated and aggressive, which puts him at risk of falls..."
+    },
+    {
+      "id": 173,
+      "question": "A 26-year-old woman comes to the physician because of fatigue, weight loss, and muscle aches during ...",
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient presents with fatigue, weight loss, and muscle aches. She undergoes a metyrapone stimulation test to evaluate adrenal insufficiency.\nStep 2: Metyrapone inhibits cortisol production by blocking the conversion of 11-deoxycortisol to cortisol.\nStep 3: After administering metyrapone, a normal response would be an increase in ACTH secretion in an attempt to stimulate cortisol production.\nStep 4: The metyrapone test is used to diagnose adrenal insufficiency, particularly primary..."
+    },
+    {
+      "id": 174,
+      "question": "An investigator conducts a study to determine whether earlier detection of glioblastoma multiforme (...",
+      "correct_answer": "E",
+      "predicted_answer": "E",
+      "is_correct": true,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The study aims to determine whether earlier detection of glioblastoma multiforme (GBM) increases survival time. Participants were divided into two subsets: those diagnosed with GBM after undergoing a screening MRI of the brain (asymptomatic) and those diagnosed after developing symptoms.\nStep 2: The study found that asymptomatic patients diagnosed with screening MRI had an average survival time that was 6 weeks longer than those diagnosed after symptom onset.\nStep 3: The question asks..."
+    },
+    {
+      "id": 175,
+      "question": "A 23-year-old man is brought to the emergency department 25 minutes after being involved in a high-s...",
+      "correct_answer": "D",
+      "predicted_answer": "A",
+      "is_correct": false,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with severe chest pain, mild dyspnea, tachypnea, tachycardia, hypotension (shock), and an oxygen saturation of 88% after a high-speed motor vehicle collision. He has a wound at the left fifth intercostal space at the midclavicular line, which is consistent with a rib fracture (Traube's sign).\nStep 2: The patient's hypotension and tachypnea are consistent with traumatic cardiac tamponade (cardiac arrest) or tension pneumothorax, given his chest trauma. However, he ..."
+    },
+    {
+      "id": 176,
+      "question": "A novel type of PET radiotracer is being developed to evaluate patients with Parkinson’s disease. A ...",
+      "correct_answer": "E",
+      "predicted_answer": "E",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\n\n## Step 1: Understand the question\nThe question asks for the overall specificity of a PET radiotracer test for Parkinson’s disease. We need to calculate the specificity of the test.\n\n## Step 2: Define specificity\nSpecificity is the measure of a test's accuracy in determining true negatives. It is calculated as the number of true negatives divided by the sum of true negatives and false positives.\n\n## Step 3: Identify true negatives and false positives\nFrom the information provided, we know tha..."
+    },
+    {
+      "id": 177,
+      "question": "A 55-year-old man presents to a rheumatologist with bilateral wrist and knee pain that has been pres...",
+      "correct_answer": "D",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with bilateral wrist and knee pain, morning stiffness lasting approximately 50 minutes, and tenderness at the base of both thumbs. He also has nodules on his distal interphalangeal joints.\nStep 2: The patient's symptoms of bilateral wrist and knee pain, morning stiffness lasting 50 minutes, and nodules on his distal interphalangeal joints are consistent with rheumatoid arthritis (RA). However, he denies joint swelling and has a history of professional athletics, w..."
+    },
+    {
+      "id": 178,
+      "question": "A 40-year-old businessman who was previously well is brought into the emergency department by his as...",
+      "correct_answer": "D",
+      "predicted_answer": "D",
+      "is_correct": true,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient presents with left-sided weakness after a chiropractic neck manipulation, specifically after a cervical neck manipulation. He has a T2-weighted MRI showing a left C5 hemicord lesion.\nStep 2: The patient's symptoms are consistent with a cervical spinal cord injury, specifically a cervical spinal cord hemisection injury at the level of C5. This type of injury is known as Brown-Séquard syndrome.\nStep 3: Brown-Séquard syndrome involves hemisection of the spinal cord, resulting..."
+    },
+    {
+      "id": 179,
+      "question": "A previously healthy 19-year-old man comes to the physician with right-sided, dull, throbbing scrota...",
+      "correct_answer": "D",
+      "predicted_answer": "D",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with right-sided testicular pain, a burning sensation on urination (dysuria), and increased urinary frequency. He has epididymitis, which is indicated by tenderness of the epididymis (the epididymis is located behind the testicle).\nStep 2: Epididymitis can be caused by various pathogens, including bacteria and viruses. The patient's symptoms of dysuria and urinary frequency suggest urethritis.\nStep 3: The patient's age, sexual activity, and symptoms of epididymiti..."
+    },
+    {
+      "id": 180,
+      "question": "A 4-month-old infant is brought to the office by his parents due to sudden nose bleeding without tra...",
+      "correct_answer": "B",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient presents with sudden nose bleeding (epistaxis), bruising (petechiae), and tiny red spots (purpura) without any trauma. His physical exam reveals tachypnea and tachycardia (tachyarrhythmia), and his laboratory results show thrombocytopenia is not present, but his platelet count is significantly elevated at 450,000/mm^3.\nStep 2: The patient's platelet count is thrombocytopenic, but his platelet count is actually thrombocytopenic because his platelet count is elevated at 450,..."
+    },
+    {
+      "id": 181,
+      "question": "A 6-year-old boy is brought to the physician by his mother because of a 2-day history of dysuria and...",
+      "correct_answer": "E",
+      "predicted_answer": "E",
+      "is_correct": true,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient presents with dysuria and increased urinary frequency, which are symptoms of a urinary tract infection (UTI).\nStep 2: The urinalysis shows cloudy, red urine, indicating pyuria (pus in the urine).\nStep 3: The patient's age and symptoms suggest a urinary tract infection caused by a virus.\nStep 4: The virus causing cystitis in children is often referred to as the \"common cold of the bladder.\"\nStep 5: The virus causing cystitis in children is BK virus, but the question asks ab..."
+    },
+    {
+      "id": 182,
+      "question": "A 13-year-old boy is brought to his pediatrician due to a left breast lump under his nipple. He noti...",
+      "correct_answer": "B",
+      "predicted_answer": "B",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with a breast lump under his nipple, which he has noticed has increased slightly in size. He is a 13-year-old boy with a tender left breast lump.\nStep 2: The patient's breast lump is described as tender and has no overlying skin changes. He has a family history of breast fibroadenoma in his mother, but his primary concern is gynecomastia.\nStep 3: Gynecomastia in adolescent boys is common and often related to normal puberty. However, gynecomastia can also be caused..."
+    },
+    {
+      "id": 183,
+      "question": "A 35-year-old Caucasian female presents to the emergency room with unilateral leg swelling. She repo...",
+      "correct_answer": "E",
+      "predicted_answer": "E",
+      "is_correct": true,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient presents with unilateral leg swelling and erythema, which is consistent with deep vein thrombosis (DVT). She has a history of a previous DVT in the right femoral vein.\nStep 2: The patient's swelling is painful and erythematous, indicating phlebitis. Passive dorsiflexion of the ankle elicits pain in the calf, which is known as the Homan's sign.\nStep 3: The patient has a history of DVT at a young age, which raises the suspicion of a thrombophilic disorder.\nStep 4: She has be..."
+    },
+    {
+      "id": 184,
+      "question": "A 78-year-old man is brought to the physician by his daughter because of increasing forgetfulness ov...",
+      "correct_answer": "B",
+      "predicted_answer": "A",
+      "is_correct": false,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with increasing forgetfulness, difficulty performing daily activities, sleep disturbances, and a blunted affect. He has been diagnosed with dementia.\nStep 2: The patient's daughter reports that he has left the front door open and tap water running, indicating possible dementia-related cognitive impairment.\nStep 3: The patient's mental status examination shows impaired short- and long-term memory, attention, and concentration, with psychomotor retardation and a blu..."
+    },
+    {
+      "id": 185,
+      "question": "A previously healthy 18-month-old boy is brought to the physician by his parents for evaluation of a...",
+      "correct_answer": "D",
+      "predicted_answer": "D",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1:  The patient is an 18-month-old boy diagnosed with intermediate-risk neuroblastoma, and his parents have refused chemotherapy.\nStep 2:  Neuroblastoma is a type of cancer that requires prompt treatment, and chemotherapy is a standard part of the treatment for neuroblastoma.\nStep 3:  In this case, the patient's parents have refused chemotherapy, citing concerns about the side effects.\nStep 4:  However, chemotherapy is essential for treating neuroblastoma, especially for intermediate-ris..."
+    },
+    {
+      "id": 186,
+      "question": "A laboratory primarily involved with studying cellular proofreading mechanisms is investigating the ...",
+      "correct_answer": "C",
+      "predicted_answer": "C",
+      "is_correct": true,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1:  The laboratory is investigating whether the ribosome can recognize a mischarged amino acid and still incorporate it into the growing peptide.\nStep 2:  They have biochemically charged a Lys-tRNA with valine instead of lysine and want to insert the tRNA into the cell.\nStep 3:  To do this, they've designed an mRNA sequence that contains only codons for lysine.\nStep 4:  The question asks what will most likely occur when the mischarged tRNA with valine is inserted into the cell.\nStep 5:  ..."
+    },
+    {
+      "id": 187,
+      "question": "A 65-year-old man with metastatic lung cancer has been experiencing severe, unremitting pain. He has...",
+      "correct_answer": "B",
+      "predicted_answer": "B",
+      "is_correct": true,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient has metastatic lung cancer and severe pain despite being on oral morphine. He's experiencing dose-limiting side effects, so his pain management team wants to add a medication that can reduce his opioid need.\nStep 2: The medication they're looking for interacts with the NMDA receptor. NMDA receptor antagonists are used to treat opioid-induced hyperalgesia and tolerance.\nStep 3: The NMDA receptor antagonist used in opioid-induced hyperalgesia and tolerance is ketamine.\nStep ..."
+    },
+    {
+      "id": 188,
+      "question": "A 27-year-old man presents to the emergency room complaining of left shoulder pain for several weeks...",
+      "correct_answer": "E",
+      "predicted_answer": "E",
+      "is_correct": true,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient presents with left shoulder pain that worsens when he sleeps on his left side. He has tenderness localized to the greater tuberosity of his left shoulder joint and tenderness of his biceps tendon over the bicipital groove.\nStep 2: The patient's pain worsens when he sleeps on his left side, which is consistent with supraspinatus tendinitis, also known as rotator cuff tendinitis.\nStep 3: The patient's X-ray shows narrowing of the acromiohumeral space with sclerosis and spurr..."
+    },
+    {
+      "id": 189,
+      "question": "A 17-year-old woman presents to your office concerned that she has not had her menstrual period in 4...",
+      "correct_answer": "C",
+      "predicted_answer": "C",
+      "is_correct": true,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient presents with primary amenorrhea, having not had her menstrual period in 4 months. However, her menstrual periods began at age 13 and were regular until two months ago.\nStep 2: She denies sexual activity and her urine pregnancy test is negative.\nStep 3: Her physical exam reveals enlarged cheeks (buccal fat pads), which are indicative of mumps pseudomass or buccal fat pad hypertrophy, but in this case, they are likely related to her binge eating disorder.\nStep 4: She also h..."
+    },
+    {
+      "id": 190,
+      "question": "A 23-year-old college student presents to the clinic with a history of intermittent chest discomfort...",
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The patient presents with episodes of chest discomfort, shortness of breath, tremors, and heavy sweating, which are characteristic of panic attacks.\nStep 2: The patient's panic attacks are triggered by stress related to exams and school projects, and he has developed mounting anxiety about having another attack, leading to avoidance behaviors.\nStep 3: The patient's diagnosis is panic disorder with panic attacks.\nStep 4: For the long-term management of panic disorder, selective seroton..."
+    },
+    {
+      "id": 191,
+      "question": "A stillborn infant is delivered at 38 weeks' gestation to a 32-year-old woman. The mother had no pre...",
+      "correct_answer": "D",
+      "predicted_answer": "D",
+      "is_correct": true,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The infant was delivered stillborn at 38 weeks' gestation, and examination reveals a small pelvis, shallow intergluteal cleft (implying a coccygeal defect), and club feet. An x-ray shows the absence of the sacrum and lumbar vertebrae, indicating sacral agenesis (also known as sacral agenesis or caudal regression syndrome).\nStep 2: Sacral agenesis is associated with caudal regression syndrome, which can be part of the VACTERL association. However, in this case, the key issue is the sac..."
+    },
+    {
+      "id": 192,
+      "question": "Please refer to the summary above to answer this question\nThe authors of the study have decided to c...",
+      "correct_answer": "E",
+      "predicted_answer": "E",
+      "is_correct": true,
+      "meta_info": "step2&3",
+      "full_output": ".\n\nStep 1: The authors have decided to stratify their results by CD4+ T-lymphocyte count at the time of diagnosis.\nStep 2: They found that among patients with CD4+ cell counts below 200/mm^3, cART adherence was a significant predictor of DLBCL risk.\nStep 3: However, among patients with CD4+ cell counts above 200/mm^3, no relationship was found between DLBCL risk and cART adherence.\nStep 4: The question asks which of the following explains the difference observed between the two strata.\nStep 5: T..."
+    },
+    {
+      "id": 193,
+      "question": "During a Mycobacterium tuberculosis infection, Th1 cells secrete a factor capable of stimulating pha...",
+      "correct_answer": "C",
+      "predicted_answer": "C",
+      "is_correct": true,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1:  To answer this question, we need to understand the role of Th1 cells in Mycobacterium tuberculosis infections.\nStep 2:  Th1 cells are a subset of T helper cells that play a crucial role in cell-mediated immunity.\nStep 3:  During an M. tuberculosis infection, Th1 cells secrete cytokines that help activate macrophages to kill the bacteria.\nStep 4:  One of the key cytokines secreted by Th1 cells is interferon-gamma (IFN-γ), which is essential for activating macrophages to kill intracell..."
+    },
+    {
+      "id": 194,
+      "question": "A 3-year-old boy is brought to the pediatrician because of abdominal pain and constipation for 3 wee...",
+      "correct_answer": "C",
+      "predicted_answer": "C",
+      "is_correct": true,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient presents with abdominal pain, constipation, irritability, pale conjunctivae, and abdominal tenderness. His physical examination reveals signs of iron deficiency anemia, and his peripheral blood smear shows small, pale red blood cells with basophilic stippling, which is consistent with sideroblastic anemia.\nStep 2: The patient's age and symptoms of iron deficiency anemia are consistent with lead poisoning, given his constipation and irritability. Lead poisoning can cause si..."
+    },
+    {
+      "id": 195,
+      "question": "A group of researchers conducted a study to determine whether there is an association between folic ...",
+      "correct_answer": "C",
+      "predicted_answer": "C",
+      "is_correct": true,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The study in question is investigating the association between folic acid supplementation before pregnancy and autism spectrum disorder (ASD) in offspring.\nStep 2: The researchers conducted a retrospective survey of mothers with children diagnosed with ASD (cases) and mothers with healthy children (controls).\nStep 3: The study found an association between folic acid supplementation and lower rates of ASD in offspring.\nStep 4: The question asks about potential biases that may have infl..."
+    },
+    {
+      "id": 196,
+      "question": "A student studying pharmacology is a member of a team that is conducting research related to the eli...",
+      "correct_answer": "A",
+      "predicted_answer": "C",
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1:  The student is part of a research team studying the elimination of multiple anticoagulant medications. He's responsible for collecting serum samples every 4 hours to analyze serum drug levels.\nStep 2:  The student notices that one of the subjects is eliminating 0.5 mg of the drug every 4 hours. He needs to determine which anticoagulant the subject most likely consumed.\nStep 3:  Anticoagulant medications can be classified into two main categories: vitamin K antagonists (e.g., warfarin..."
+    },
+    {
+      "id": 197,
+      "question": "A 40-year-old woman presents to her primary care physician for a checkup. She has felt weaker lately...",
+      "correct_answer": "C",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient presents with weakness and weight loss, and her laboratory studies show a leukocytosis with a platelet count of 197,000/mm^3, indicating thrombocytopenia is not present, but thrombocytopenia is not the primary issue here. Her BUN has increased from 45 mg/dL to 59 mg/dL, and her creatinine has increased from 2.0 mg/dL to 2.3 mg/dL.\nStep 2: The patient's platelet count is significantly elevated, indicating thrombocytopenia is not present, but she has thrombocytopenia is not ..."
+    },
+    {
+      "id": 198,
+      "question": "A 28-year-old woman comes to the obstetrics and gynecology clinic because she has been unsuccessfull...",
+      "correct_answer": "E",
+      "predicted_answer": null,
+      "is_correct": false,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient presents with infertility and a history of abdominal surgery. She has a family history of endocrine abnormalities.\nStep 2: Given her history of infertility, a panel of tests should be obtained to evaluate for causes of infertility.\nStep 3: The patient's husband has already been tested for causes of male infertility.\nStep 4: The patient's history of abdominal surgery is relevant because she may have ovarian failure due to ovarian torsion or other complications of pelvic sur..."
+    },
+    {
+      "id": 199,
+      "question": "A 2-year-old girl with recurrent urinary tract infections is brought to the physician for a follow-u...",
+      "correct_answer": "D",
+      "predicted_answer": "D",
+      "is_correct": true,
+      "meta_info": "step1",
+      "full_output": ".\n\nStep 1: The patient is a 2-year-old girl with recurrent urinary tract infections (UTIs) and bilateral dilation of the renal pelvis on renal ultrasound. A voiding cystourethrography (VCUG) shows vesicoureteral reflux (VUR), which is the retrograde flow of urine into the ureters during micturition.\nStep 2: The patient's symptoms of recurrent UTIs and vesicoureteral reflux are consistent with reflux nephropathy (also known as pyelonephritis scars) and vesicoureteral reflux-associated kidney dama..."
+    }
+  ]
+}
