@@ -1,6 +1,6 @@
-source activate searchr1
+source activate /opt/conda/envs/searchr1-test
 
-pip install verl==0.1.0
+pip install verl==0.1.0 --index-url https://pypi.tuna.tsinghua.edu.cn/simple
 save_path=./data
 python scripts/download.py --save_path $save_path
 cat $save_path/part_* > $save_path/e5_Flat.index
