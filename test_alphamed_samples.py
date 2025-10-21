@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Test AlphaMed-3B-instruct-rl model on first 50 samples using the specified template
+Test AlphaMed-8B-instruct-rl model on all test samples
 """
 
 import json
@@ -81,11 +81,11 @@ def main():
     test_data = []
     with open(test_file, 'r') as f:
         for line in f:
-            test_data.append(json.loads(line.strip()))
+            if line.strip():  # 跳过空行
+                test_data.append(json.loads(line.strip()))
     
-    # Only test first 100 samples
-    test_data = test_data[:200]
-    print(f"📊 Testing on first {len(test_data)} samples")
+    # Test all samples
+    print(f"📊 Testing on all {len(test_data)} samples")
     
     results = []
     correct_count = 0
@@ -110,7 +110,8 @@ Options:
 Please reason step by step, and put the final answer in \\boxed{{}}"""
             
             # Generate output
-            max_new_tokens = 8196  # Reduced from 8196 for faster testing
+            # max_new_tokens = 8196  # Reduced from 8196 for faster testing
+            max_new_tokens = 2048
             output = pipe(prompt, max_new_tokens=max_new_tokens, do_sample=False)[0]["generated_text"]
             
             # Extract generated part (remove prompt)
@@ -135,10 +136,10 @@ Please reason step by step, and put the final answer in \\boxed{{}}"""
             }
             results.append(result)
             
-            # Print progress every 10 samples
-            if (i + 1) % 10 == 0:
+            # Print progress every 50 samples
+            if (i + 1) % 50 == 0:
                 current_accuracy = correct_count / (i + 1)
-                print(f"Progress: {i+1}/100, Accuracy: {current_accuracy:.3f}")
+                print(f"Progress: {i+1}/{len(test_data)}, Accuracy: {current_accuracy:.3f}")
                 
         except Exception as e:
             print(f"Error processing sample {i}: {e}")
@@ -167,8 +168,8 @@ Please reason step by step, and put the final answer in \\boxed{{}}"""
             meta_accuracy[meta]['correct'] += 1
     
     # Print results
-    print(f"\n🎯 Final Results (100 samples):")
-    print(f"Overall Accuracy: {accuracy:.3f} ({correct_count}/100)")
+    print(f"\n🎯 Final Results ({len(test_data)} samples):")
+    print(f"Overall Accuracy: {accuracy:.3f} ({correct_count}/{len(test_data)})")
     
     print(f"\n📊 Accuracy by Category:")
     for meta, stats in meta_accuracy.items():
@@ -184,10 +185,10 @@ Please reason step by step, and put the final answer in \\boxed{{}}"""
         print(f"     Correct: {result['correct_answer']}, Predicted: {result['predicted_answer']}")
     
     # Save results
-    output_file = "/home/li003968/Search-R1/alphamed_8b_200samples_results.json"
+    output_file = "/home/li003968/Search-R1/alphamed_8b_all_samples_results_2048.json"
     output_data = {
         'model_id': model_id,
-        'test_samples': 100,
+        'test_samples': len(test_data),
         'correct_count': correct_count,
         'accuracy': accuracy,
         'meta_accuracy': {k: v['correct']/v['total'] for k, v in meta_accuracy.items()},

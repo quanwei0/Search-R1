@@ -20,7 +20,7 @@ WAND_PROJECT='Search-R1'
 
 
 export BASE_MODEL='meta-llama/Meta-Llama-3-8B-Instruct'
-export EXPERIMENT_NAME=Medical-H100-search-r1-ppo-meta-llama-3-8b-it-em-gae-turn-IS-total-epoch-4-Minibatch256-saved-checkpoint-seed3-lr-warmup-600-valid-search-penalty-0.1-final-answer-penalty-0.3-no-varnacne-reduction
+export EXPERIMENT_NAME=Medical-H100-search-r1-ppo-meta-llama-3-8b-it-em-gae-turn-IS-total-epoch-4-Minibatch256-saved-checkpoint-seed1-lr-warmup-600-valid-search-penalty-0.1-final-answer-penalty-0.3-no-varnacne-reduction
 # export BASE_MODEL='Qwen/Qwen2.5-1.5B-Instruct'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-1.5b-it-em
 # export BASE_MODEL='Qwen/Qwen2.5-3B'

@@ -1,11 +1,13 @@
 {
   "model_id": "che111/AlphaMed-8B-instruct-rl",
-  "test_samples": 100,
+  "test_samples": 200,
   "correct_count": 120,
   "accuracy": 0.6,
+  "batch_size": 8,
+  "max_new_tokens": 2048,
   "meta_accuracy": {
-    "step1": 0.5428571428571428,
-    "step2&3": 0.6631578947368421
+    "step1": 0.580952380952381,
+    "step2&3": 0.6210526315789474
   },
   "results": [
     {
@@ -39,8 +41,8 @@
       "id": 3,
       "question": "A 39-year-old woman is brought to the emergency department because of fevers, chills, and left lower...",
       "correct_answer": "D",
-      "predicted_answer": "D",
-      "is_correct": true,
+      "predicted_answer": "E",
+      "is_correct": false,
       "meta_info": "step1",
       "full_output": ".\n\nStep 1: The patient presents with fever, chills, tachypnea, tachycardia, hypotension (septic shock), and thrombocytopenia (platelet count of 14,200/mm^3). She also has mucopurulent discharge from the cervical os and left adnexal tenderness, indicating pelvic inflammatory disease (PID) complicated by septic shock.\nStep 2: The patient's laboratory studies show a high D-dimer level, indicating disseminated intravascular coagulation (DIC). Her fibrinogen level is slightly low, but her platelet co..."
     },
@@ -96,7 +98,7 @@
       "predicted_answer": "A",
       "is_correct": true,
       "meta_info": "step1",
-      "full_output": ".\n\nStep 1: The patient presents with concerns about the appearance of her nails. A photograph of her nails shows nail pitting, which is consistent with psoriasis.\nStep 2: Psoriasis is a chronic inflammatory skin condition that can involve the nails, among other areas of the body. Nail pitting is a common finding in psoriasis.\nStep 3: Psoriasis can also involve other areas of the body, including the joints (psoriatic arthritis), skin (psoriatic plaques), and nails (nail pitting).\nStep 4: The pati..."
+      "full_output": ".\n\nStep 1: The patient presents with concerns about the appearance of her nails. A photograph of her nails shows nail pitting, which is consistent with alopecia areata.\nStep 2: Alopecia areata can be associated with other autoimmune conditions, including vitiligo.\nStep 3: Vitiligo can also be associated with nail changes, including pitting.\nStep 4: The patient's nails show nail pitting, which is a classic finding of alopecia areata.\nStep 5: Alopecia areata can be associated with other autoimmune..."
     },
     {
       "id": 10,
@@ -141,7 +143,7 @@
       "predicted_answer": "D",
       "is_correct": true,
       "meta_info": "step1",
-      "full_output": ".\n\nStep 1: The question describes a process called reassortment, where two viruses from the same family infect a cell and exchange genetic material to create a new virus.\nStep 2: Reassortment occurs in viruses that have segmented genomes.\nStep 3: The viruses that undergo reassortment are influenza viruses.\nStep 4: The question asks which virus is capable of undergoing reassortment.\nStep 5: Among the options provided, rotavirus is known to undergo reassortment.\nStep 6: Rotavirus has a segmented g..."
+      "full_output": ".\n\nStep 1: The question describes a process called reassortment, where two viruses from the same family infect a cell and exchange genetic material to create a new virus.\nStep 2: Reassortment occurs in viruses that have segmented genomes, such as influenza viruses.\nStep 3: The viruses listed in the options include cytomegalovirus (A), Epstein-Barr virus (B), human immunodeficiency virus (C), rotavirus (D), and vaccinia virus (E).\nStep 4: Reassortment is characteristic of segmented viruses, and a..."
     },
     {
       "id": 15,
@@ -150,7 +152,7 @@
       "predicted_answer": "A",
       "is_correct": false,
       "meta_info": "step2&3",
-      "full_output": ".\n\nStep 1: The patient presents with severe abdominal pain, nausea, vomiting, and a dull back pain. Her pain has no relation with food intake.\nStep 2: She has a history of cholelithiasis and is now presenting with severe abdominal pain. Her CT scan shows a calcified mass near her gallbladder.\nStep 3: A calcified mass near the gallbladder is indicative of gallstones causing gallbladder cancer (porcelain gallbladder). Porcelain gallbladder is a risk factor for gallbladder cancer.\nStep 4: The patie..."
+      "full_output": ".\n\nStep 1: The patient presents with severe abdominal pain, nausea, vomiting, and a dull back pain. Her pain has no relation with food intake.\nStep 2: She has a history of cholelithiasis and is now presenting with severe abdominal pain. Her CT scan shows a calcified mass near her gallbladder.\nStep 3: A calcified mass near the gallbladder is indicative of gallstones causing gallbladder cancer (porcelain gallbladder).\nStep 4: Porcelain gallbladder is a risk factor for gallbladder cancer.\nStep 5: T..."
     },
     {
       "id": 16,
@@ -183,8 +185,8 @@
       "id": 19,
       "question": "A 46-year-old man is brought to the emergency department for evaluation of altered mental status. He...",
       "correct_answer": "E",
-      "predicted_answer": "E",
-      "is_correct": true,
+      "predicted_answer": "A",
+      "is_correct": false,
       "meta_info": "step2&3",
       "full_output": ".\n\nStep 1: The patient presents with altered mental status, slurred speech, an alcoholic smell, and diminished deep tendon reflexes. He was found on the floor but is responsive when aroused.\nStep 2: His blood alcohol concentration is 0.04%, which is below the typical threshold for intoxication.\nStep 3: He has diminished deep tendon reflexes, which is consistent with Wernicke's sign or a nutritional deficiency, but his blood alcohol concentration is low.\nStep 4: His physical exam also shows an at..."
     },
@@ -228,8 +230,8 @@
       "id": 24,
       "question": "A 6-year-old boy is brought to the emergency department by his mother for worsening wheezing and sho...",
       "correct_answer": "A",
-      "predicted_answer": "A",
-      "is_correct": true,
+      "predicted_answer": "E",
+      "is_correct": false,
       "meta_info": "step2&3",
       "full_output": ".\n\nStep 1: The patient presents with worsening wheezing and shortness of breath after missing his asthma medications. He has a tachypneic respiratory distress syndrome with a pulse of 120/min (tachycardia) and respirations of 40/min (tachypnea). He is given nebulized albuterol and ipratropium, as well as intravenous methylprednisolone for a presumed asthma exacerbation.\nStep 2: After treatment, the child becomes limp and lethargic, with a pulse of 150/min (tachyarrhythmia). He has status asthmat..."
     },
@@ -309,7 +311,7 @@
       "id": 33,
       "question": "An otherwise healthy 50-year-old man comes to the physician because of a 6-month history of increasi...",
       "correct_answer": "B",
-      "predicted_answer": "E",
+      "predicted_answer": null,
       "is_correct": false,
       "meta_info": "step1",
       "full_output": ".\n\nStep 1: The patient presents with upper abdominal pain, nausea, vomiting, diarrhea, weight loss, and bilateral pitting pedal edema (edema of the legs). He has been diagnosed with Zollinger-Ellison syndrome (ZES), which is suggested by his symptoms of severe peptic ulcer disease and diarrhea.\nStep 2: Zollinger-Ellison syndrome is often associated with gastrinomas, which are gastrin-secreting tumors. Gastrinomas can lead to excessive gastrin secretion, causing peptic ulcers and diarrhea.\nStep 3..."
@@ -345,8 +347,8 @@
       "id": 37,
       "question": "A 3-month-old boy presents to his pediatrician with persistent diarrhea, oral candidiasis, and signs...",
       "correct_answer": "A",
-      "predicted_answer": null,
-      "is_correct": false,
+      "predicted_answer": "A",
+      "is_correct": true,
       "meta_info": "step1",
       "full_output": ".\n\nStep 1: The patient presents with persistent diarrhea, oral candidiasis, and RSV pneumonia. Oral candidiasis (thrush) is often seen in immunocompromised patients.\nStep 2: The patient's laboratory results show that his HIV PCR is negative. Therefore, we need to consider other immunodeficiencies.\nStep 3: The patient's symptoms include persistent diarrhea, oral candidiasis (thrush), and RSV pneumonia. Oral candidiasis is often seen in immunocompromised patients with cell-mediated immunity defect..."
     },
@@ -426,10 +428,10 @@
       "id": 46,
       "question": "A medical research study is evaluating an investigational novel drug (medication 1) compared with st...",
       "correct_answer": "C",
-      "predicted_answer": "A",
-      "is_correct": false,
+      "predicted_answer": "C",
+      "is_correct": true,
       "meta_info": "step2&3",
-      "full_output": ".\n\nStep 1:  To answer this question, we first need to understand the concept of the number needed to treat (NNT).\nStep 2:  The NNT is a measure of the efficacy of a treatment, specifically the number of patients who need to be treated with the intervention (in this case, medication 1) instead of the control (medication 2) to prevent one adverse outcome.\nStep 3:  The primary endpoint of the study is death from cardiac causes at 45 days post-myocardial infarction (MI).\nStep 4:  We're given that th..."
+      "full_output": ".\n\nStep 1:  To answer this question, we first need to understand the concept of the number needed to treat (NNT). The NNT is a measure of the efficacy of a treatment, calculated as the reciprocal of the absolute risk reduction (ARR).\nStep 2:  In this study, we're comparing the outcomes of patients treated with medication 1 (the investigational novel drug) versus medication 2 (standard therapy) after myocardial infarction (MI).\nStep 3:  The primary endpoint of interest is death from cardiac cause..."
     },
     {
       "id": 47,
@@ -456,7 +458,7 @@
       "predicted_answer": "D",
       "is_correct": true,
       "meta_info": "step1",
-      "full_output": ".\n\nStep 1: The patient has influenza A pneumonia complicated by Acute Respiratory Distress Syndrome (ARDS). He requires intubation and ICU care.\nStep 2: After several weeks of supportive therapy, the patient's lung function improves.\nStep 3: We're asked about the regeneration of alveolar lining after damage to alveoli occurs.\nStep 4: Alveolar regeneration involves the proliferation of type II pneumocytes, which are responsible for producing surfactant.\nStep 5: Type II pneumocytes are known to di..."
+      "full_output": ".\n\nStep 1: The patient has influenza A pneumonia complicated by Acute Respiratory Distress Syndrome (ARDS). He requires intubation and ICU care.\nStep 2: After several weeks of supportive therapy, the patient's lung function improves.\nStep 3: The question asks about the regeneration of alveolar lining after damage to alveoli occurs.\nStep 4: Alveolar regeneration involves the proliferation of type II pneumocytes, which secrete surfactant.\nStep 5: Type II pneumocytes are responsible for repairing d..."
     },
     {
       "id": 50,
@@ -510,7 +512,7 @@
       "predicted_answer": "B",
       "is_correct": true,
       "meta_info": "step2&3",
-      "full_output": ".\n\nStep 1: The patient presents with itching in his groin, which started during summer workouts. He has a physical examination revealing an erythematous, well-demarcated patch with peripheral scale on the left thigh, pubic region, and perineum. This description is consistent with jock itch, also known as tinea cruris.\nStep 2: Tinea cruris is a fungal infection of the groin area. The presence of an erythematous patch with peripheral scale is consistent with dermatophytosis.\nStep 3: To confirm the..."
+      "full_output": ".\n\nStep 1: The patient presents with itching in his groin, which started during summer workouts. He has a physical examination revealing an erythematous, well-demarcated patch with peripheral scale on the left thigh, pubic region, and perineum. This description is consistent with jock itch, also known as tinea cruris.\nStep 2: Tinea cruris is a fungal infection caused by dermatophytes. The diagnosis of tinea cruris can often be made based on clinical presentation.\nStep 3: To confirm the diagnosis..."
     },
     {
       "id": 56,
@@ -588,10 +590,10 @@
       "id": 64,
       "question": "A healthy 19-year-old man presents to his primary care provider complaining of painless “blisters” i...",
       "correct_answer": "A",
-      "predicted_answer": "D",
+      "predicted_answer": "C",
       "is_correct": false,
       "meta_info": "step1",
-      "full_output": ".\n\nStep 1: The patient presents with painless blisters in his mouth, a white film on his tongue and the sides of his mouth, and a bitter metallic taste. He has patches of white pseudomembranes that can be wiped away to reveal erythematous mucosa, which is consistent with oral candidiasis (thrush).\nStep 2: The patient's symptoms of oral candidiasis are likely due to his use of antibiotics, but he denies taking any medications. However, he is a competitive swimmer and has a history of multiple sex..."
+      "full_output": ".\n\nStep 1: The patient presents with painless blisters in his mouth, a white film on his tongue and the sides of his mouth, and a bitter metallic taste. He has patches of white pseudomembranes that can be wiped away to reveal erythematous mucosa, which is consistent with oral candidiasis (thrush).\nStep 2: The patient's symptoms of oral thrush include patches of white pseudomembranes that can be wiped away to reveal erythematous mucosa, known as pseudomembranous candidiasis.\nStep 3: The patient's..."
     },
     {
       "id": 65,
@@ -624,8 +626,8 @@
       "id": 68,
       "question": "A 57-year-old female with a past medical history of alcoholism presents to the emergency room vomiti...",
       "correct_answer": "D",
-      "predicted_answer": "B",
-      "is_correct": false,
+      "predicted_answer": "D",
+      "is_correct": true,
       "meta_info": "step1",
       "full_output": ".\n\nStep 1: The patient presents with hematemesis and black tarry stools (melena), and her vital signs reveal tachycardia (tachyarrhythmia) and hypotension (shock). She has a history of alcoholism and splenomegaly.\nStep 2: Given her hematemesis, melena, tachycardia, and hypotension, she has hemorrhagic shock due to upper gastrointestinal bleeding. Her splenomegaly suggests cirrhosis with portal hypertension.\nStep 3: The emergent upper endoscopy reveals bleeding from varices in the lower 1/3 of th..."
     },
@@ -651,8 +653,8 @@
       "id": 71,
       "question": "A 27-year-old man presents to the emergency department after a motor vehicle collision. The patient ...",
       "correct_answer": "A",
-      "predicted_answer": "A",
-      "is_correct": true,
+      "predicted_answer": null,
+      "is_correct": false,
       "meta_info": "step2&3",
       "full_output": ".\n\nStep 1: The patient presents after a motor vehicle collision and is found to have a pulse of 120/min (tachycardia) and a blood pressure of 107/58 mmHg (hypotension). He has been given 2 liters of Ringer lactate solution and morphine.\nStep 2: The patient's echocardiogram shows elevated pulmonary capillary wedge pressure (PCWP) and troponins, indicating cardiogenic shock. He has chest pain and bruising over his chest wall.\nStep 3: The patient's hypotension and tachycardia are consistent with ca..."
     },
@@ -681,7 +683,7 @@
       "predicted_answer": "C",
       "is_correct": true,
       "meta_info": "step2&3",
-      "full_output": ".\n\nStep 1: The patient presents with pruritus and a hypopigmented rash on his upper body after returning from a trip to the Bahamas. He has a history of type 1 diabetes mellitus.\nStep 2: The patient's symptoms of pruritus and hypopigmented rash are consistent with tinea versicolor, which is caused by Malassezia yeast. Tinea versicolor is often associated with pruritic patches of hypopigmentation or hyperpigmentation.\nStep 3: Tinea versicolor is typically diagnosed clinically, but a potassium hyd..."
+      "full_output": ".\n\nStep 1: The patient presents with pruritus and a hypopigmented rash on his upper body after returning from a trip to the Bahamas. He has a history of type 1 diabetes mellitus.\nStep 2: The patient's symptoms of pruritus and hypopigmented rash are consistent with tinea versicolor, also known as pityriasis versicolor. Tinea versicolor is often associated with Malassezia folliculitis.\nStep 3: Tinea versicolor is typically caused by Malassezia yeast, which is normally found on the skin. It can bec..."
     },
     {
       "id": 75,
@@ -714,7 +716,7 @@
       "id": 78,
       "question": "A newborn is found to be extremely cyanotic immediately after birth. He then develops progressive re...",
       "correct_answer": "D",
-      "predicted_answer": null,
+      "predicted_answer": "A",
       "is_correct": false,
       "meta_info": "step1",
       "full_output": ".\n\nStep 1: The newborn presents with cyanosis immediately after birth, progressive respiratory failure, a single loud S2 heart sound, and a machine-like murmur at the left upper sternal border. He has been diagnosed with hypoplastic left heart syndrome (HLHS) and has undergone a balloon atrial septostomy (Rashkind procedure).\nStep 2: The newborn's cyanosis is due to HLHS, which includes pulmonary atresia, hypoplastic left ventricle, aortic stenosis, and mitral stenosis. He has undergone a balloo..."
@@ -807,7 +809,7 @@
       "predicted_answer": "C",
       "is_correct": true,
       "meta_info": "step2&3",
-      "full_output": ".\n\nStep 1: The patient was involved in a high-speed motor vehicle collision and presents with severe injuries, including facial lacerations, respiratory distress, tachypnea (tachypnea is defined as a respiratory rate > 24 breaths/min), tachycardia (pulse of 130/min), hypotension (blood pressure of 90/58 mmHg), and an oxygen saturation of 70% on room air. She has a fractured left second rib, which is consistent with a blunt traumatic injury.\nStep 2: The patient's respiratory distress and hypotens..."
+      "full_output": ".\n\nStep 1: The patient was involved in a high-speed motor vehicle collision and presents with severe injuries, including facial lacerations, respiratory distress, tachypnea (respirations of 29/min), tachycardia (pulse of 130/min), hypotension (blood pressure of 90/58 mmHg), and an oxygen saturation of 70% on room air. She has a fractured left second rib, which is consistent with a blunt traumatic injury.\nStep 2: The patient's respiratory distress and hypotension are consistent with traumatic hem..."
     },
     {
       "id": 89,
@@ -858,10 +860,10 @@
       "id": 94,
       "question": "A 24-year-old man is brought to the emergency department 15 minutes after he sustained a stab wound ...",
       "correct_answer": "C",
-      "predicted_answer": "E",
+      "predicted_answer": "D",
       "is_correct": false,
       "meta_info": "step2&3",
-      "full_output": ".\n\nStep 1: The patient has sustained a stab wound to the left chest just below the clavicle, and he presents with signs of tension pneumothorax (tachypnea, tachycardia, hypotension) after being intubated and receiving fluid resuscitation.\nStep 2: The stab wound is located at the 5th intercostal space at the midclavicular line, which is consistent with a traumatic injury to the heart, specifically a cardiac tamponade.\nStep 3: The patient's hypotension is due to cardiac tamponade (cardiac arrest) ..."
+      "full_output": ".\n\nStep 1: The patient has sustained a stab wound to the left chest just below the clavicle, and he presents with signs of tension pneumothorax (tachypnea, tachycardia, hypotension) after being intubated and mechanically ventilated. He has a stab wound at the 5th intercostal space at the midclavicular line, which is consistent with a traumatic cardiac tamponade, also known as cardiac herniation through the wound, known as traumatic hemopericardium.\nStep 2: The patient's cardiovascular examinatio..."
     },
     {
       "id": 95,
@@ -894,8 +896,8 @@
       "id": 98,
       "question": "A 37-year-old man with no significant past medical history is rear-ended in a motor vehicle accident...",
       "correct_answer": "C",
-      "predicted_answer": "C",
-      "is_correct": true,
+      "predicted_answer": "A",
+      "is_correct": false,
       "meta_info": "step2&3",
       "full_output": ".\n\nStep 1: The patient presents with neck pain after a motor vehicle accident, which is consistent with cervical strain.\nStep 2: However, cervical spine injuries can occur after motor vehicle accidents, even without obvious trauma.\nStep 3: The patient's neck pain is significant enough that cervical spine clearance is necessary.\nStep 4: The National Emergency X-Radiography Utilization Study (NEXUS) criteria recommend cervical spine imaging for patients with neck pain after trauma if any of the fo..."
     },
@@ -915,7 +917,7 @@
       "predicted_answer": "C",
       "is_correct": false,
       "meta_info": "step2&3",
-      "full_output": ".\n\nStep 1: The newborn presents with jaundice (yellowing of the skin and sclerae) at 2 days old, which is consistent with physiologic jaundice. However, his jaundice is severe (total bilirubin of 11.3 mg/dL), and he has a mild splenomegaly (his spleen tip is palpated just below the left costal margin). His hemoglobin is normal, but his reticulocyte count is elevated at 9%, indicating hemolysis.\nStep 2: The newborn's mother has no medical insurance and did not receive prenatal care. His mother is..."
+      "full_output": ".\n\nStep 1: The newborn presents with jaundice (yellowing of the skin and sclerae) at 2 days old, which is consistent with physiologic jaundice. However, his jaundice is severe (total bilirubin of 11.3 mg/dL), and he has a mild splenomegaly (his spleen tip is palpated just below the left costal margin). He is also thrombocytopenic (platelets 244,000/mm^3), indicating hemolytic disease of the newborn (HDN).\nStep 2: The mother has no medical insurance and did not receive prenatal care, but she has ..."
     },
     {
       "id": 101,
@@ -924,7 +926,7 @@
       "predicted_answer": "A",
       "is_correct": true,
       "meta_info": "step1",
-      "full_output": ".\n\nStep 1: The patient presents with rigidity of his arms and legs, slowness in performing tasks (bradykinesia), and hand tremors that increase at rest and decrease with focused movements. He has Parkinson's disease-like symptoms, including parkinsonian tremors (also known as resting tremors) and parkinsonism.\nStep 2: The patient's gait is described as a shortened, shuffling gait, which is consistent with parkinsonian gait.\nStep 3: The patient's symptoms of parkinsonism are likely due to Parkins..."
+      "full_output": ".\n\nStep 1: The patient presents with rigidity of his arms and legs, slowness in performing tasks (bradykinesia), and hand tremors that increase at rest and decrease with focused movements. He has Parkinson's disease-like symptoms, including parkinsonian tremors (also known as resting tremors) and parkinsonian rigidity.\nStep 2: The patient's gait is described as shortened and shuffling, which is consistent with parkinsonian gait.\nStep 3: The patient has Parkinson's disease (PD) and is prescribed ..."
     },
     {
       "id": 102,
@@ -966,7 +968,7 @@
       "id": 106,
       "question": "A 50-year-old man presents to his primary care doctor following an inguinal hernia repair. The patie...",
       "correct_answer": "C",
-      "predicted_answer": "A",
+      "predicted_answer": "B",
       "is_correct": false,
       "meta_info": "step2&3",
       "full_output": ".\n\nStep 1: The patient has a calcified pulmonary nodule in his right middle lobe, which is described as 8 mm initially and 10 mm one year later. The nodule is described as having regular margins and appears calcified.\nStep 2: Calcified pulmonary nodules are often benign, and the management of pulmonary nodules depends on their size and characteristics.\nStep 3: The patient's nodule is 10 mm in size, which is considered a pulmonary nodule of a size that requires follow-up.\nStep 4: The patient's no..."
@@ -1029,10 +1031,10 @@
       "id": 113,
       "question": "A 67-year-old man with chronic kidney disease comes to the physician because of worsening fatigue an...",
       "correct_answer": "D",
-      "predicted_answer": "D",
-      "is_correct": true,
+      "predicted_answer": null,
+      "is_correct": false,
       "meta_info": "step1",
-      "full_output": ".\n\nStep 1: The patient presents with worsening fatigue, shortness of breath on exertion, tachycardia (pulse of 105/min), conjunctival pallor, and bounding pulses. His laboratory studies show hemolytic anemia (hemoglobin 8.6 g/dL), elevated ferritin (325 ng/mL), and acute kidney injury (urea nitrogen 45 mg/dL, creatinine 2.2 mg/dL). He has chronic kidney disease and is prescribed metformin and insulin.\nStep 2: The patient's tachycardia (pulse of 105/min) and bounding pulses suggest congestive hea..."
+      "full_output": ".\n\nStep 1: The patient presents with worsening fatigue, shortness of breath on exertion, tachycardia (pulse of 105/min), conjunctival pallor, and bounding pulses. His laboratory studies show hemolytic anemia (hemoglobin 8.6 g/dL), elevated ferritin (325 ng/mL), and acute kidney injury (urea nitrogen 45 mg/dL, creatinine 2.2 mg/dL). He has chronic kidney disease and is prescribed metformin and insulin.\nStep 2: The patient's tachycardia (tachyarrhythmia) and hemolytic anemia suggest hemolytic urem..."
     },
     {
       "id": 114,
@@ -1041,7 +1043,7 @@
       "predicted_answer": "C",
       "is_correct": false,
       "meta_info": "step1",
-      "full_output": ".\n\nStep 1: The patient presents with muscle cramping, diarrhea, decreased appetite, fast shallow breathing (Kussmaul breathing), and abdominal pain. His labs show a pH of 7.25 with a pCO2 of 22 mmHg, indicating respiratory alkalosis with metabolic acidosis (compensatory metabolic acidosis).\nStep 2: The patient's symptoms of muscle cramping, diarrhea, and abdominal pain are consistent with hyperchloremic metabolic acidosis (HAGMA) due to gastroenteritis.\nStep 3: The patient's diarrhea is likely c..."
+      "full_output": ".\n\nStep 1: The patient presents with muscle cramping, diarrhea, decreased appetite, fast shallow breathing (Kussmaul breathing), and abdominal pain. His labs show a pH of 7.25 with a pCO2 of 22 mmHg, indicating respiratory alkalosis with a compensatory metabolic acidosis.\nStep 2: The patient's symptoms of muscle cramping, diarrhea, and abdominal pain are consistent with hyperchloremic metabolic acidosis (HAGMA) due to gastroenteritis.\nStep 3: The patient's diarrhea is likely causing his metaboli..."
     },
     {
       "id": 115,
@@ -1056,8 +1058,8 @@
       "id": 116,
       "question": "A 16-year-old boy with a seizure disorder and cognitive delay is brought to the physician because of...",
       "correct_answer": "D",
-      "predicted_answer": null,
-      "is_correct": false,
+      "predicted_answer": "D",
+      "is_correct": true,
       "meta_info": "step1",
       "full_output": ".\n\nStep 1: The patient presents with progressively worsening right lower extremity weakness, a seizure disorder, cognitive delay, and a holosystolic murmur at the cardiac apex. He also has retinal lesions consistent with retinitis pigmentosa.\nStep 2: The patient's seizure disorder and cognitive delay suggest tuberous sclerosis complex (TSC), neurofibromatosis type 1 (NF1), or other neurocutaneous disorders. However, his physical examination also reveals holosystolic murmurs consistent with mitra..."
     },
@@ -1146,8 +1148,8 @@
       "id": 126,
       "question": "An 81-year-old woman is brought to the emergency room by her son after witnessing the patient fall a...",
       "correct_answer": "A",
-      "predicted_answer": "C",
-      "is_correct": false,
+      "predicted_answer": "A",
+      "is_correct": true,
       "meta_info": "step1",
       "full_output": ".\n\nStep 1: The patient presents with hypertension-induced hypertensive emergency (hypertensive urgency) after falling down the stairs after experiencing palpitations. Her blood pressure is significantly elevated at 152/96 mmHg.\nStep 2: She has a history of atrial fibrillation and was taking warfarin. Her physical examination reveals a left pupil that is dilated and non-reactive to light (pupillary dilation is a sign of a third cranial nerve palsy), which is consistent with a subarachnoid hemorrh..."
     },
@@ -1176,14 +1178,14 @@
       "predicted_answer": "A",
       "is_correct": true,
       "meta_info": "step2&3",
-      "full_output": ".\n\nStep 1: The patient presents with sudden onset blurry vision, double vision seeing two images on top of each other (diplopia), nausea, vomiting, and watery diarrhea after eating food at a picnic. He also has fixed pupillary dilation (mydriasis) and difficulty depressing both eyes (paralysis of downward gaze), indicating bilateral third nerve palsy.\nStep 2: The patient's symptoms of nausea, vomiting, watery diarrhea, and bilateral third nerve palsy are consistent with botulism. However, botuli..."
+      "full_output": ".\n\nStep 1: The patient presents with sudden onset blurry vision, double vision seeing two images on top of each other (diplopia), nausea, vomiting, and watery diarrhea after eating food at a picnic. He also has fixed pupillary dilation (mydriasis) and difficulty depressing both eyes (paralysis of downward gaze), indicating bilateral third nerve palsy.\nStep 2: The patient's symptoms of nausea, vomiting, watery diarrhea, and bilateral third nerve palsy are consistent with botulism. Botulism can ca..."
     },
     {
       "id": 130,
       "question": "A 4-week-old female newborn is brought to the physician because of increasing yellowing of her eyes ...",
       "correct_answer": "B",
-      "predicted_answer": "B",
-      "is_correct": true,
+      "predicted_answer": null,
+      "is_correct": false,
       "meta_info": "step2&3",
       "full_output": ".\n\nStep 1: The patient is a 4-week-old newborn presenting with jaundice, also known as neonatal jaundice. Her jaundice is described as scleral icterus and jaundice, and her bilirubin levels show a total bilirubin of 15 mg/dL with a direct bilirubin of 12.3 mg/dL.\nStep 2: The patient's jaundice started at 2 weeks of age, and her stools have become pale over the past week. She was breastfed until recently but was switched to formula feeds after her parents read online that breastfeeding could be c..."
     },
@@ -1203,7 +1205,7 @@
       "predicted_answer": null,
       "is_correct": false,
       "meta_info": "step1",
-      "full_output": ".\n\nStep 1: The patient presents with left lower quadrant pain that worsens with defecation, which is consistent with diverticulitis. However, her leukocytosis and thrombocytopenia suggest diverticulitis complicated by diverticulitis-related bleeding, also known as hemorrhage, and possibly diverticulitis-related bleeding with thrombocytopenia, known as thrombocytopenic purpura (TTP) or thrombotic thrombocytopenic purpura (TTP), but her thrombocytopenia is likely due to thrombocytopenia associated..."
+      "full_output": ".\n\nStep 1: The patient presents with left lower quadrant pain that worsens with defecation, which is consistent with diverticulitis. However, her leukocytosis and thrombocytopenia suggest diverticulitis complicated by diverticulitis-related bleeding, also known as hemorrhage, and possibly diverticulitis-related bleeding with thrombocytopenia, known as thrombocytopenic purpura (TTP) or thrombotic thrombocytopenic purpura (TTP) due to diverticular disease-related immune thrombocytopenic purpura (I..."
     },
     {
       "id": 133,
@@ -1263,19 +1265,19 @@
       "id": 139,
       "question": "A 52-year-old man with a history of gastric cancer that was treated with subtotal gastrectomy dies i...",
       "correct_answer": "D",
-      "predicted_answer": "A",
-      "is_correct": false,
+      "predicted_answer": "D",
+      "is_correct": true,
       "meta_info": "step1",
-      "full_output": ".\n\nStep 1:  The patient had gastric cancer treated with subtotal gastrectomy and died in a motor vehicle collision. At autopsy, there's unilateral atrophy of the neurons in the area indicated by the arrow, which is the pyramidal decussation (also known as the decussation of the pyramids).\nStep 2:  The pyramidal decussation is located in the medulla oblongata, and damage to this area can result in a condition known as hemiplegia due to the loss of corticospinal tract fibers.\nStep 3:  The corticos..."
+      "full_output": ".\n\nStep 1:  The patient had gastric cancer treated with subtotal gastrectomy and died in a motor vehicle collision. At autopsy, there's unilateral atrophy of the neurons in the area indicated by the arrow, which is the corticospinal tract in the spinal cord.\nStep 2:  The corticospinal tract runs through the lateral corticospinal tract in the spinal cord. A lesion in the corticospinal tract can result in hemiparesis or hemiplegia.\nStep 3:  The question asks about the neurological examination find..."
     },
     {
       "id": 140,
       "question": "A 24-year-old pregnant woman at 28 weeks gestation presents to the emergency department with complai...",
       "correct_answer": "D",
-      "predicted_answer": "B",
-      "is_correct": false,
+      "predicted_answer": "D",
+      "is_correct": true,
       "meta_info": "step1",
-      "full_output": ".\n\nStep 1: The patient presents with fever, chills, joint pain (arthritis), headaches, and difficulty moving her neck (meningismus). She also has a tick bite and an erythematous rash on her arm.\nStep 2: The patient's symptoms of fever, chills, arthritis (knee and ankle joints), headaches, and meningismus are consistent with Lyme disease (Lyme borreliosis) and Rocky Mountain spotted fever (RMSF). However, she also has a tick bite.\nStep 3: The patient is pregnant at 28 weeks gestation, and she has..."
+      "full_output": ".\n\nStep 1: The patient presents with fever, chills, joint pain (arthritis), headaches, and difficulty moving her neck (meningismus). She also has a tick bite and an erythematous rash on her arm.\nStep 2: The patient's symptoms of fever, chills, arthritis (knee and ankle joints), headaches, and meningismus are consistent with Lyme disease (Lyme borreliosis) and Rocky Mountain spotted fever (RMSF). However, she also has a tick bite.\nStep 3: The patient is pregnant at 28 weeks gestation. Lyme diseas..."
     },
     {
       "id": 141,
@@ -1437,7 +1439,7 @@
       "predicted_answer": "C",
       "is_correct": false,
       "meta_info": "step2&3",
-      "full_output": ".\n\nStep 1: The patient presents with nausea, abdominal discomfort, diarrhea, perioral numbness, upper-extremity muscle cramping, and fatigue after undergoing a total thyroidectomy. He has a history of Roux-en-Y gastric bypass surgery and recently underwent thyroidectomy for a Hurthle cell lesion.\nStep 2: The patient's symptoms of nausea, abdominal discomfort, diarrhea, perioral numbness, and muscle cramping are consistent with hypocalcemia and hypoparathyroidism, which is a known complication of..."
+      "full_output": ".\n\nStep 1: The patient presents with nausea, abdominal discomfort, diarrhea, perioral numbness, upper-extremity muscle cramping, and fatigue after undergoing a total thyroidectomy for a Hurthle cell lesion. He has a history of Roux-en-Y gastric bypass surgery for obesity.\nStep 2: The patient's symptoms of nausea, abdominal discomfort, diarrhea, perioral numbness, and muscle cramping are consistent with hypocalcemia and hypoparathyroidism, which is a known complication of thyroid surgery.\nStep 3:..."
     },
     {
       "id": 159,
@@ -1473,7 +1475,7 @@
       "predicted_answer": "D",
       "is_correct": true,
       "meta_info": "step2&3",
-      "full_output": ".\n\nStep 1: The patient presents with fatigue, cough with flecks of blood (hemoptysis), shortness of breath, and dark urine. He has a history of smoking and hypertension. His laboratory results show positive anti-glomerular basement membrane (anti-GBM) serologies.\nStep 2: Anti-GBM antibodies are associated with Goodpasture syndrome, which is a pulmonary-renal syndrome characterized by glomerulonephritis and pulmonary hemorrhage.\nStep 3: Goodpasture syndrome can be associated with rapidly progress..."
+      "full_output": ".\n\nStep 1: The patient presents with fatigue, cough with flecks of blood (hemoptysis), shortness of breath, and dark urine. He has a history of smoking and hypertension. His laboratory results show positive anti-glomerular basement membrane (anti-GBM) serologies.\nStep 2: Anti-GBM antibodies are associated with Goodpasture syndrome, which is characterized by pulmonary hemorrhage and rapidly progressive glomerulonephritis.\nStep 3: Goodpasture syndrome can be associated with pulmonary hemorrhage, r..."
     },
     {
       "id": 163,
@@ -1563,7 +1565,7 @@
       "predicted_answer": null,
       "is_correct": false,
       "meta_info": "step2&3",
-      "full_output": ".\n\nStep 1: The patient has been diagnosed with urosepsis and started on antibiotics. However, he has now developed delirium, which is characterized by acute onset of confusion, altered level of consciousness, and fluctuating course.\nStep 2: Delirium is a common complication of sepsis, especially in elderly patients. The patient's delirium is likely due to his sepsis-induced urosepsis.\nStep 3: The patient's delirium is causing him to become agitated and aggressive, which puts him at risk of falls..."
+      "full_output": ".\n\nStep 1: The patient has been diagnosed with urosepsis and started on antibiotics. However, he has now developed delirium, which is characterized by acute onset of confusion, altered level of consciousness, and fluctuating course.\nStep 2: Delirium is a common complication of sepsis, especially in elderly patients. The patient's delirium is likely due to his sepsis-induced urosepsis.\nStep 3: The patient's delirium is causing him to become agitated and aggressive, which puts him at risk for fall..."
     },
     {
       "id": 173,
@@ -1734,7 +1736,7 @@
       "predicted_answer": "D",
       "is_correct": true,
       "meta_info": "step1",
-      "full_output": ".\n\nStep 1: The infant was delivered stillborn at 38 weeks' gestation, and examination reveals a small pelvis, shallow intergluteal cleft (implying a coccygeal defect), and club feet. An x-ray shows the absence of the sacrum and lumbar vertebrae, indicating sacral agenesis (also known as sacral agenesis or caudal regression syndrome).\nStep 2: Sacral agenesis is associated with caudal regression syndrome, which can be part of the VACTERL association. However, in this case, the key issue is the sac..."
+      "full_output": ".\n\nStep 1: The infant was delivered stillborn at 38 weeks' gestation, and examination reveals a small pelvis, shallow intergluteal cleft, and club feet. An x-ray shows the absence of the sacrum and lumbar vertebrae, indicating sacral agenesis (also known as sacral agenesis or caudal regression syndrome).\nStep 2: Sacral agenesis is associated with caudal regression syndrome, which can be part of the VACTERL association. However, in this case, the key finding is the absence of the sacrum.\nStep 3: ..."
     },
     {
       "id": 192,
