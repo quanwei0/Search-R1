@@ -1,7 +1,7 @@
 # Set shared configuration parameters
 export CUDA_VISIBLE_DEVICES=0,1,2,3
 export RETRIEVAL_PORT=8001
-export DATA_DIR='./data/alphamed_search_test'
+export DATA_DIR='./data/MedMCQA'
 
 # source activate retriever
 # # Pass GPU devices and port to retrieval script
@@ -16,8 +16,9 @@ export WANDB_ENTITY="rl_agent"
 WAND_PROJECT='Search-R1'
 
 
-export BASE_MODEL='/mnt/data1/li003968/verl_checkpoints/Medical-H200-search-r1-ppo-meta-llama-3-8b-it-em-gae-turn-IS-total-epoch-4-Minibatch256-saved-checkpoint-seed3-lr-warmup-200-valid-search-penalty-0.1-final-answer-penalty-0.3/actor/global_step_150'
-export EXPERIMENT_NAME=Medical-H200-8B-eval
+# export BASE_MODEL='/mnt/data1/li003968/verl_checkpoints/Medical-H200-search-r1-ppo-meta-llama-3-8b-it-em-gae-turn-IS-total-epoch-4-Minibatch256-saved-checkpoint-seed3-lr-warmup-200-valid-search-penalty-0.1-final-answer-penalty-0.3/actor/global_step_150'
+export BASE_MODEL='/mnt/data1/li003968/verl_checkpoints/Medical-H200-search-r1-ppo-meta-llama-3-8b-total-epoch-2-adaptive-prompt-lr-warmup-0.600-mini-batch-128-micro-batch-32/actor/global_step_125'
+export EXPERIMENT_NAME=Medical-H200-8B-eval-MedMCQA
 # export BASE_MODEL='Qwen/Qwen2.5-1.5B-Instruct'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-1.5b-it-em
 # export BASE_MODEL='Qwen/Qwen2.5-3B'
