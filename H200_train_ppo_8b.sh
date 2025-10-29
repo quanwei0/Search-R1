@@ -1,17 +1,14 @@
 # Set shared configuration parameters
-export RETRIEVAL_CUDA_VISIBLE_DEVICES=0,1,2,3
+export CUDA_VISIBLE_DEVICES=0,1,2,3
 export RETRIEVAL_PORT=8001
-export DATA_DIR='./data/alphamed_search_split'
+export DATA_DIR='./data/alphamed_search'
 
-source activate /opt/conda/envs/retriever
-# # Pass GPU devices and port to retrieval script
-bash retrieval_launch.sh "$RETRIEVAL_CUDA_VISIBLE_DEVICES" "$RETRIEVAL_PORT"
-sleep 60
-conda activate /opt/conda/envs/searchr1-test
 # source activate retriever
 # # Pass GPU devices and port to retrieval script
 # bash retrieval_launch.sh "$CUDA_VISIBLE_DEVICES" "$RETRIEVAL_PORT"
 # sleep 60
+
+source activate searchr1
 
 export WANDB_API_KEY="810f91e58aa0fd1d03b11c60b0d1cffbb1d941f4"
 export WANDB_ENTITY="rl_agent"
@@ -20,7 +17,8 @@ WAND_PROJECT='Search-R1'
 
 
 export BASE_MODEL='meta-llama/Meta-Llama-3-8B-Instruct'
-export EXPERIMENT_NAME=Medical-H100-search-r1-SPPO-meta-llama-3-8b-it-em-gae-turn-IS-total-epoch-4-Minibatch256-saved-checkpoint-seed1-lr-warmup-600-valid-search-penalty-0.1-final-answer-penalty-0.3-no-varnacne-reduction
+# export BASE_MODEL='Qwen/Qwen2.5-7B-Instruct'
+export EXPERIMENT_NAME=Medical-H200-PPO-Meta-Llama-3-8B-Instruct
 # export BASE_MODEL='Qwen/Qwen2.5-1.5B-Instruct'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-1.5b-it-em
 # export BASE_MODEL='Qwen/Qwen2.5-3B'
@@ -58,7 +56,7 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     actor_rollout_ref.actor.optim.lr=1e-6 \
     actor_rollout_ref.model.enable_gradient_checkpointing=True \
     actor_rollout_ref.model.use_remove_padding=True \
-    actor_rollout_ref.actor.optim.lr_warmup_steps_ratio=0.600 \
+    actor_rollout_ref.actor.optim.lr_warmup_steps_ratio=0.300 \
     actor_rollout_ref.actor.ppo_mini_batch_size=128 \
     actor_rollout_ref.actor.ppo_micro_batch_size=32 \
     actor_rollout_ref.actor.fsdp_config.param_offload=True \
@@ -92,10 +90,10 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     +trainer.val_only=False \
     +trainer.val_before_train=False \
     trainer.default_hdfs_dir=null \
-    trainer.n_gpus_per_node=8 \
+    trainer.n_gpus_per_node=4 \
     trainer.nnodes=1 \
-    trainer.save_freq=-1 \
-    trainer.test_freq=20 \
+    trainer.save_freq=25 \
+    trainer.test_freq=25 \
     trainer.project_name=$WAND_PROJECT \
     trainer.experiment_name=$EXPERIMENT_NAME \
     trainer.total_epochs=4 \

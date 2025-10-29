@@ -5,14 +5,28 @@ echo "🚀 Starting model comparison tests"
 echo "=================================="
 echo ""
 
+# Define test file (can be changed via command line argument)
+TEST_FILE="/home/li003968/Search-R1/baseline_test/mmlu_pro_health_test.jsonl"
+
+# Check if test file exists
+if [ ! -f "$TEST_FILE" ]; then
+    echo "❌ Error: Test file not found: $TEST_FILE"
+    exit 1
+fi
+
+echo "📁 Test file: $TEST_FILE"
+echo "📊 Total samples: $(wc -l < $TEST_FILE)"
+echo ""
+
 # Define models to test
 MODELS=(
+    "che111/AlphaMed-8B-instruct-rl"
     "meta-llama/Meta-Llama-3-8B-Instruct"
     "Qwen/Qwen2.5-7B-Instruct"
 )
 
 # Define max_new_tokens settings
-MAX_TOKENS=(2048 4096)
+MAX_TOKENS=(2048)
 
 # Test each combination
 for model in "${MODELS[@]}"; do
@@ -23,7 +37,7 @@ for model in "${MODELS[@]}"; do
         
         # Adjust batch size based on max_tokens
         if [ $tokens -eq 2048 ]; then
-            BATCH_SIZE=64
+            BATCH_SIZE=128
         else
             BATCH_SIZE=32
         fi
@@ -33,7 +47,8 @@ for model in "${MODELS[@]}"; do
             --model_id "$model" \
             --batch_size $BATCH_SIZE \
             --max_new_tokens $tokens \
-            --cuda_devices "0,1,2,3"
+            --cuda_devices "0,1,2,3" \
+            --test_file "$TEST_FILE"
         
         if [ $? -eq 0 ]; then
             echo "✅ Test completed successfully!"

@@ -11,26 +11,38 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 from tqdm import tqdm
 import torch
 
-def extract_answer_from_output(output_text):
-    """Extract answer from model output"""
+def extract_answer_from_output(output_text, valid_options=None):
+    """Extract answer from model output
+    
+    Args:
+        output_text: The generated text from model
+        valid_options: List of valid option letters (e.g., ['A', 'B', 'C', 'D'])
+                      If None, defaults to A-J
+    """
+    if valid_options is None:
+        valid_options = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
+    
+    # Create regex pattern based on valid options
+    options_pattern = '|'.join(valid_options)
+    
     # Look for \\boxed{} format first
-    boxed_pattern = r'\\boxed\{([A-E])\}'
+    boxed_pattern = rf'\\boxed\{{({options_pattern})\}}'
     boxed_match = re.search(boxed_pattern, output_text)
     if boxed_match:
         return boxed_match.group(1)
     
     # Look for <answer> tags
-    answer_pattern = r'<answer>([A-E])</answer>'
+    answer_pattern = rf'<answer>({options_pattern})</answer>'
     answer_match = re.search(answer_pattern, output_text, re.IGNORECASE)
     if answer_match:
         return answer_match.group(1).upper()
     
     # Look for other common answer patterns
     patterns = [
-        r'[Aa]nswer[:\s]*([A-E])',
-        r'[Tt]he answer is[:\s]*([A-E])',
-        r'[Cc]orrect answer[:\s]*([A-E])',
-        r'[Ff]inal answer[:\s]*([A-E])',
+        rf'[Aa]nswer[:\s]*({options_pattern})',
+        rf'[Tt]he answer is[:\s]*({options_pattern})',
+        rf'[Cc]orrect answer[:\s]*({options_pattern})',
+        rf'[Ff]inal answer[:\s]*({options_pattern})',
     ]
     
     for pattern in patterns:
@@ -38,8 +50,8 @@ def extract_answer_from_output(output_text):
         if match:
             return match.group(1).upper()
     
-    # Look for last occurrence of A-E
-    last_letters = re.findall(r'\b([A-E])\b', output_text)
+    # Look for last occurrence of valid options
+    last_letters = re.findall(rf'\b({options_pattern})\b', output_text)
     if last_letters:
         return last_letters[-1]
     
@@ -124,7 +136,7 @@ def main():
     # Auto-generate output filename if not specified
     if args.output_file is None:
         model_name = args.model_id.replace('/', '_').replace('-', '_')
-        args.output_file = f"/home/li003968/Search-R1/results_{model_name}_{args.max_new_tokens}tokens.json"
+        args.output_file = f"/home/li003968/Search-R1/results_{args.test_file.split('/')[-1].split('.')[0]}_{model_name}_{args.max_new_tokens}tokens.json"
     
     print(f"🚀 Configuration:")
     print(f"   Model: {args.model_id}")
@@ -214,7 +226,10 @@ def main():
     
     for i, (item, generated_text) in enumerate(zip(test_data, generated_outputs)):
         correct_answer = item['answer_idx']
-        predicted_answer = extract_answer_from_output(generated_text)
+        
+        # Get valid options for this question
+        valid_options = list(item['options'].keys())
+        predicted_answer = extract_answer_from_output(generated_text, valid_options)
         
         is_correct = predicted_answer == correct_answer
         if is_correct:

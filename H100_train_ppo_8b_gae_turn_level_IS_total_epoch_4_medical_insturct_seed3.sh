@@ -16,7 +16,7 @@ WAND_PROJECT='Search-R1'
 
 
 export BASE_MODEL='meta-llama/Meta-Llama-3-8B-Instruct'
-export EXPERIMENT_NAME=Medical-H100-search-r1-ppo-meta-llama-3-8b-it-em-gae-turn-IS-total-epoch-4-Minibatch256-saved-checkpoint-seed3-lr-warmup-600-valid-search-penalty-0.1-final-answer-penalty-0.3-max-response-length-500-no-varnacne-reduction
+export EXPERIMENT_NAME=Medical-H100-search-r1-SPPO-meta-llama-3-8b-it-em-gae-turn-IS-total-epoch-4-Minibatch256-saved-checkpoint-seed3-lr-warmup-600-valid-search-penalty-0.1-final-answer-penalty-0.3-max-response-length-500-no-varnacne-reduction
 # export BASE_MODEL='Qwen/Qwen2.5-1.5B-Instruct'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-1.5b-it-em
 # export BASE_MODEL='Qwen/Qwen2.5-3B'
@@ -38,8 +38,8 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     data.val_files=$DATA_DIR/test.parquet \
     data.train_data_num=null \
     data.val_data_num=null \
-    data.train_batch_size=256 \
-    data.val_batch_size=128 \
+    data.train_batch_size=512 \
+    data.val_batch_size=256 \
     data.max_prompt_length=4096 \
     data.max_response_length=500 \
     data.max_start_length=2048 \
@@ -70,6 +70,7 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     actor_rollout_ref.rollout.temperature=1 \
     actor_rollout_ref.actor.state_masking=True \
     +actor_rollout_ref.actor.importance_sampling_level=token \
+    +actor_rollout_ref.actor.detach_ratio=variance_reduction \
     critic.optim.lr=1e-5 \
     critic.model.use_remove_padding=True \
     critic.optim.lr_warmup_steps_ratio=0.015 \
