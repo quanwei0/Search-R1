@@ -551,7 +551,7 @@ class RayPPOTrainer(object):
                     format_reward_tensor = reward_dict['format_correctness']
                     retrieval_reward_tensor = reward_dict['retrieval_correctness']
                     mixed_reward_tensor = reward_dict['mixed_outcome_reward']
-                    mixed_reward_with_search_penalty_tensor = reward_dict.get('mixed_outcome_reward_with_search_penalty', mixed_reward_tensor)
+                    # mixed_reward_with_search_penalty_tensor = reward_dict.get('mixed_outcome_reward_with_search_penalty', mixed_reward_tensor)
                     
                     answer_reward_tensor_lst.append(answer_reward_tensor)
                     format_reward_tensor_lst.append(format_reward_tensor)
@@ -835,11 +835,11 @@ class RayPPOTrainer(object):
                         format_reward_tensor = reward_dict['format_correctness']
                         retrieval_reward_tensor = reward_dict['retrieval_correctness']
                         mixed_reward_tensor = reward_dict['mixed_outcome_reward']
-                        mixed_reward_with_search_penalty_tensor = reward_dict.get('mixed_outcome_reward_with_search_penalty', mixed_reward_tensor)
+                        # mixed_reward_with_search_penalty_tensor = reward_dict.get('mixed_outcome_reward_with_search_penalty', mixed_reward_tensor)
                         
-                        if getattr(self.config.algorithm, 'use_mixed_outcome_reward_with_search_penalty', False):
-                            batch.batch['token_level_scores'] = mixed_reward_with_search_penalty_tensor
-                        elif self.config.algorithm.use_mixed_outcome_reward:
+                        # if getattr(self.config.algorithm, 'use_mixed_outcome_reward_with_search_penalty', False):
+                        #     batch.batch['token_level_scores'] = mixed_reward_with_search_penalty_tensor
+                        if self.config.algorithm.use_mixed_outcome_reward:
                             batch.batch['token_level_scores'] = mixed_reward_tensor
                         else:
                             batch.batch['token_level_scores'] = answer_reward_tensor
@@ -854,12 +854,12 @@ class RayPPOTrainer(object):
                         train_metric_dict.update(self._track_reward_metrics(format_reward_tensor, train_data_sources, prefix="train/format_reward"))
                         train_metric_dict.update(self._track_reward_metrics(retrieval_reward_tensor, train_data_sources, prefix="train/retrieval_reward"))
                         train_metric_dict.update(self._track_reward_metrics(mixed_reward_tensor, train_data_sources, prefix="train/mixed_outcome_reward"))
-                        if 'mixed_outcome_reward_with_search_penalty' in reward_dict:
-                            train_metric_dict.update(self._track_reward_metrics(mixed_reward_with_search_penalty_tensor, train_data_sources, prefix="train/mixed_outcome_reward_with_search_penalty"))
-                            
-                            # Add detailed search penalty metrics to wandb
-                            search_penalty_metrics = self._compute_search_penalty_metrics()
-                            train_metric_dict.update(search_penalty_metrics)
+                        # if 'mixed_outcome_reward_with_search_penalty' in reward_dict:
+                        #     train_metric_dict.update(self._track_reward_metrics(mixed_reward_with_search_penalty_tensor, train_data_sources, prefix="train/mixed_outcome_reward_with_search_penalty"))
+                        #     
+                        #     # Add detailed search penalty metrics to wandb
+                        #     search_penalty_metrics = self._compute_search_penalty_metrics()
+                        #     train_metric_dict.update(search_penalty_metrics)
 
                         metrics.update(train_metric_dict)
                         logger.log(data=train_metric_dict, step=self.global_steps)
