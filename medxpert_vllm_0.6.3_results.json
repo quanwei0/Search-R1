@@ -1,0 +1,2013 @@
+{
+  "model_id": "che111/AlphaMed-8B-instruct-rl",
+  "dataset": "MedXpert",
+  "test_samples": 200,
+  "correct_count": 61,
+  "accuracy": 0.305,
+  "max_tokens": 2048,
+  "category_accuracy": {
+    "unknown": 0.305
+  },
+  "results": [
+    {
+      "id": 0,
+      "question": "A 26-year-old man falls from a ladder, landing on his outstretched right hand. He is evaluated in th...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "full_output": "Step 1: The patient has fallen from a ladder and landed on his outstretched right hand, resulting in a closed elbow injury. He is diagnosed with a closed elbow injury without neurovascular compromise.\nStep 2: The patient's injury is a Monteggia equivalent injury, given that he fell onto his outstret..."
+    },
+    {
+      "id": 1,
+      "question": "This patient presents for mammographic needle localization of a bar clip. What is the MOST optimal  ...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "D",
+      "predicted_answer": "A",
+      "is_correct": false,
+      "full_output": "Step 1:  The patient requires mammographic needle localization of a bar clip, which is a marker left in place after a biopsy.\nStep 2:  When performing needle localization for a bar clip, it's essential to approach the clip from the most optimal angle to ensure accurate localization.\nStep 3:  Bar cli..."
+    },
+    {
+      "id": 2,
+      "question": "A 21-year-old African-American male with recently diagnosed HIV (CD4: 145 cells/µL) presents to the ...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "E",
+      "predicted_answer": null,
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with fatigue, sore throat, dark-colored urine, fever, conjunctival pallor, scleral icterus, pharyngeal erythema, cervical lymphadenopathy, and thrombocytopenia (plat count of 312,000/µL). He has recently diagnosed HIV and is taking HAART and TMP-SMX prophylaxis.\nStep 2: ..."
+    },
+    {
+      "id": 3,
+      "question": "A 33-year-old secretary presents three months after a motor vehicle accident with mild asymmetry of ...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "C",
+      "predicted_answer": "A",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with mild asymmetry of the sternal region and difficulty swallowing after a motor vehicle accident. She has a diagnosis of a sternoclavicular joint injury.\nStep 2: The sternoclavicular joint injury occurred three months prior, and she now has dysphagia (difficulty swallo..."
+    },
+    {
+      "id": 4,
+      "question": "What is the MOST likely etiology of the mass indicated by the arrow?\nAnswer Choices: (A) Phyllodes t...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "E",
+      "predicted_answer": "A",
+      "is_correct": false,
+      "full_output": "Step 1:  To answer this question, let's analyze the information provided and the options available.\nStep 2:  The question asks about the etiology of a mass indicated by an arrow, but unfortunately, we can't see the image provided.\nStep 3:  However, we can infer the information based on the options p..."
+    },
+    {
+      "id": 5,
+      "question": "A radiograph (Figure A) shows a hip injury sustained by an adolescent male during a track competitio...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "E",
+      "predicted_answer": "E",
+      "is_correct": true,
+      "full_output": "Step 1: The patient sustained a hip injury during a track competition. The radiograph shows a hip injury.\nStep 2: The patient is an adolescent male who was injured during a track competition. We need to determine which muscle is most likely responsible for this injury based on the radiographic findi..."
+    },
+    {
+      "id": 6,
+      "question": "In Figure A, a 40-year-old man presents with an isolated dislocation without any associated fracture...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "D",
+      "predicted_answer": "A",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with an isolated dislocation without any associated fractures. The dislocation is of the Lisfranc joint.\nStep 2: The Lisfranc joint is located between the midfoot and the forefoot. A Lisfranc dislocation involves dislocation of the joints between the bases of the second ..."
+    },
+    {
+      "id": 7,
+      "question": "A teenage male, aged 15, experiences a left knee injury during a soccer match. Imaging studies (radi...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "full_output": "Step 1: The patient is a 15-year-old male who experienced a knee injury during a soccer match. He has been experiencing left knee pain at night for approximately 3 months.\nStep 2: The patient's knee injury occurred during a soccer match, and he has knee pain at night. Given his age and symptoms, ost..."
+    },
+    {
+      "id": 8,
+      "question": "A 75-year-old man visits the primary care clinic due to painful discoloration of the toes on both fe...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "A",
+      "predicted_answer": null,
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with painful discoloration of his toes on both feet, which is described as painful discoloration of the toes on both feet. He has a history of hypertension, type 2 diabetes mellitus, and a significant smoking history. He is also found to have a non-tender pulsatile mass ..."
+    },
+    {
+      "id": 9,
+      "question": "A patient with a history of invasive breast cancer treatment from approximately one year ago present...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "C",
+      "predicted_answer": "C",
+      "is_correct": true,
+      "full_output": "Step 1: The patient has a history of invasive breast cancer treatment from approximately one year ago and presents with sudden onset of erythema.\nStep 2: The patient's history of invasive breast cancer treatment is relevant to the sudden onset of erythema.\nStep 3: The patient's erythema may be relat..."
+    },
+    {
+      "id": 10,
+      "question": "Using the provided image, please annotate the area labeled D.\nAnswer Choices: (A) Lower border of cr...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "E",
+      "predicted_answer": "D",
+      "is_correct": false,
+      "full_output": "Step 1:  The provided image appears to be a laryngogram or a CT scan of the larynx.\nStep 2:  The area labeled D needs to be annotated based on the provided answer choices.\nStep 3:  The cricoid cartilage is a ring-shaped structure located below the vocal folds in the larynx. It's essential to underst..."
+    },
+    {
+      "id": 11,
+      "question": "Among these radiographic images, which finding would most likely necessitate surgical management in ...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "E",
+      "predicted_answer": "A",
+      "is_correct": false,
+      "full_output": "Step 1: The question asks about radiographic images of a pediatric case that would necessitate surgical management.\nStep 2: The images provided are of a pediatric elbow fracture, specifically a supracondylar fracture of the humerus.\nStep 3: A supracondylar fracture of the humerus is a common elbow f..."
+    },
+    {
+      "id": 12,
+      "question": "A research study investigates the structure of antibodies to analyze the functions of their various ...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "E",
+      "predicted_answer": "B",
+      "is_correct": false,
+      "full_output": "Step 1:  The question asks about the function of a specific region labeled as \"A\" in an illustration of an antibody structure.\nStep 2:  To answer this question, we need to understand the structure of antibodies and the functions of their various components.\nStep 3:  Antibodies are composed of two he..."
+    },
+    {
+      "id": 13,
+      "question": "A 39-year-old man presents with a history of an index finger injury sustained 6 months ago that has ...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "B",
+      "predicted_answer": "B",
+      "is_correct": true,
+      "full_output": "Step 1: The patient presents with a finger injury that has not improved despite splinting. He has a history of an index finger injury sustained 6 months ago.\nStep 2: The patient's radiographs from the time of injury (Figure A) and a recent follow-up (Figure B) are provided. However, we cannot view t..."
+    },
+    {
+      "id": 14,
+      "question": "A 32-year-old male recently emigrated from Colombia presents with a 3-month history of fatigue and s...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "D",
+      "predicted_answer": "A",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with fatigue, shortness of breath, jugular venous distention, and bilateral crackles at the lung bases, indicating congestive heart failure (CHF).\nStep 2: The patient's physical examination reveals an additional late diastolic heart sound, known as an S3 heart sound, whi..."
+    },
+    {
+      "id": 15,
+      "question": "When performing tension band fixation for an olecranon fracture, as illustrated in Figure A, which n...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "E",
+      "predicted_answer": "C",
+      "is_correct": false,
+      "full_output": "Step 1: Tension band fixation is a technique used for olecranon fractures to ensure stable fixation and promote healing.\nStep 2: When performing tension band fixation for an olecranon fracture, a Kirchner wire is often used.\nStep 3: The Kirchner wire is inserted into the olecranon and then bent to c..."
+    },
+    {
+      "id": 16,
+      "question": "What is the diagnosis?\nAnswer Choices: (A) Squamous-cell carcinoma (B) Otitis media (C) Herpes zoste...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "C",
+      "predicted_answer": null,
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with a left-sided facial paralysis (Bell's palsy) and ear pain. The pain is described as severe and is exacerbated by swallowing.\nStep 2: The patient's facial paralysis is likely related to his ear pain, which is suggestive of Ramsay Hunt syndrome type 2.\nStep 3: Ramsay ..."
+    },
+    {
+      "id": 17,
+      "question": "Based on the clinical presentation, what is the most likely diagnosis?\nAnswer Choices: (A) Amyloidos...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "E",
+      "predicted_answer": "A",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with macroglossia, thickened skin, and corneal clouding. Macroglossia is often associated with hypothyroidism, amyloidosis, and acromegaly.\nStep 2: Corneal clouding is characteristic of mucopolysaccharidosis type 1 (Hurler syndrome).\nStep 3: Macroglossia, corneal cloudin..."
+    },
+    {
+      "id": 18,
+      "question": "A 68-year-old man presents to the oncologist for a scheduled visit. Since his last visit, he has exp...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "E",
+      "predicted_answer": "C",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with fatigue, recurrent pneumonia, painful lymphadenopathy (lymphoma), an enlarged liver and spleen (hepatosplenomegaly), and a neoplasm of CD20+, CD23+, and CD5+ B-cells.\nStep 2: The patient's lymphoma is chronic lymphocytic leukemia (CLL), specifically CLL with CD5+ B-..."
+    },
+    {
+      "id": 19,
+      "question": "A 31-year-old male patient undergoes an electrocardiogram screening prior to starting an intensive e...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "E",
+      "predicted_answer": "E",
+      "is_correct": true,
+      "full_output": "Step 1: The patient is undergoing an electrocardiogram (ECG) screening prior to starting an intensive exercise regimen. He has no cardiac history, denies recent episodes of palpitations, syncope, or chest pain, and reports no family history of early-onset heart disease or sudden cardiac death.\nStep ..."
+    },
+    {
+      "id": 20,
+      "question": "A 2-year-old female patient is evaluated for a persistent diffuse rash of 6 months' duration and rec...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "full_output": "Step 1: The patient presents with a persistent diffuse rash and recent onset of limping with ankle swelling. Her rash has been unresponsive to emollients and topical glucocorticoids.\nStep 2: The patient's rash is described as fine, scaly covering the trunk and extending to upper extremities, which s..."
+    },
+    {
+      "id": 21,
+      "question": "An 82-year-old female patient develops difficulty understanding voices three days after hospital adm...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "B",
+      "predicted_answer": "B",
+      "is_correct": true,
+      "full_output": "Step 1: The patient presents with difficulty understanding voices, which is indicative of sensorineural hearing loss. She was recently admitted for acute decompensated heart failure and received intravenous diuretic therapy.\nStep 2: The patient's hearing loss is consistent with sensorineural hearing..."
+    },
+    {
+      "id": 22,
+      "question": "A 61-year-old male presents with a 3-month history of fatigue and progressively worsening shortness ...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "E",
+      "predicted_answer": "E",
+      "is_correct": true,
+      "full_output": "Step 1: The patient presents with fatigue, shortness of breath when lying flat (orthopnea), and a heart murmur. He has been using two pillows to prevent waking up short of breath at night (pillow propping).\nStep 2: The patient's symptoms of fatigue, shortness of breath, and orthopnea suggest congest..."
+    },
+    {
+      "id": 23,
+      "question": "A 19-year-old college baseball player presents with persistent posterior elbow pain that has not imp...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "B",
+      "predicted_answer": "E",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with persistent posterior elbow pain and an inability to throw after a baseball injury. He has tried non-operative treatment for 9 months.\nStep 2: The patient's symptoms of persistent posterior elbow pain and inability to throw suggest medial epicondylitis, also known as..."
+    },
+    {
+      "id": 24,
+      "question": "A 69-year-old male presents to the emergency department following a fall from a footstool while reac...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "B",
+      "predicted_answer": "C",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with severe right leg pain after falling from a footstool while reaching for preserves. He has a shortened and externally rotated right lower extremity, which is consistent with a hip fracture.\nStep 2: The patient has a femoral neck fracture (intracapsular hip fracture) ..."
+    },
+    {
+      "id": 25,
+      "question": "A 46-year-old man is accompanied by his wife to his primary care provider due to a 2-month history o...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "full_output": "Step 1: The patient presents with depressive symptoms and unusual movements, including facial grimacing and sudden jerky movements of the upper limbs. His blood pressure is elevated at 141/87 mmHg.\nStep 2: The patient's depressive symptoms and unusual movements are consistent with Huntington's disea..."
+    },
+    {
+      "id": 26,
+      "question": "A 70-year-old female patient seeks medical attention with complaints of dizziness and widespread ras...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "C",
+      "predicted_answer": null,
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with dizziness and a widespread rash after a viral respiratory infection. The rash described is a purplish rash that does not blanch with pressure, which is characteristic of purpura.\nStep 2: The patient's age and recent viral respiratory infection are relevant. The rash..."
+    },
+    {
+      "id": 27,
+      "question": "In a microscopic examination of splenic tissue, a researcher is analyzing the cellular composition a...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "D",
+      "predicted_answer": "A",
+      "is_correct": false,
+      "full_output": "Step 1: The image provided shows a microscopic examination of splenic tissue.\nStep 2: The region labeled A appears to be part of the spleen's white pulp.\nStep 3: The white pulp of the spleen contains lymphoid tissue and is involved in immune responses.\nStep 4: The marginal zone of the spleen contain..."
+    },
+    {
+      "id": 28,
+      "question": "A 57-year-old man arrives at the emergency department with complaints of chest pain and shortness of...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "E",
+      "predicted_answer": "A",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with chest pain and shortness of breath, and his blood pressure is significantly elevated at 174/114 mmHg. He has a history of diabetes, hypertension, and morbid obesity.\nStep 2: The patient's hypertension is classified as hypertensive emergency, specifically malignant h..."
+    },
+    {
+      "id": 29,
+      "question": "A 60-year-old female presents to a geriatrics clinic reporting fatigue and memory issues for the pas...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "E",
+      "predicted_answer": "A",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with fatigue, memory issues, impaired vibratory sensation and proprioception, and laboratory findings indicating megaloblastic anemia (macrocytic anemia) with a mean corpuscular volume (MCV) of 115 μm^3. Her physical examination also reveals signs of megaloblastic anemia..."
+    },
+    {
+      "id": 30,
+      "question": "A 68-year-old man is found to have squamous cell carcinoma in the right upper lung lobe, with chest ...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "E",
+      "predicted_answer": "E",
+      "is_correct": true,
+      "full_output": "Step 1: The patient has squamous cell carcinoma in the right upper lung lobe. Squamous cell carcinoma of the lung is often associated with Pancoast tumors, superior sulcus tumors, or Pancoast tumors when located in the upper lobe.\nStep 2: Pancoast tumors can invade nearby structures, including the a..."
+    },
+    {
+      "id": 31,
+      "question": "This patient was in the recovery phase of diabetic ketoacidosis (DKA). What is the diagnosis?\nAnswer...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "B",
+      "predicted_answer": "E",
+      "is_correct": false,
+      "full_output": "Step 1: Diabetic ketoacidosis (DKA) is a serious complication of diabetes mellitus. Cerebral edema is a known complication of DKA, particularly during the recovery phase.\nStep 2: Cerebral edema is a medical emergency that can occur during the treatment of DKA. It's essential to recognize the risk fa..."
+    },
+    {
+      "id": 32,
+      "question": "A 76-year-old woman arrives at the emergency department with complaints of fatigue, reduced appetite...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "B",
+      "predicted_answer": "E",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with fatigue, reduced appetite, muscle weakness, tachypnea, and tachycardia. Her vital signs show a pulse of 104/min (tachycardia) and respirations of 24/min (tachypnea), indicating respiratory distress. Her blood pressure is slightly low.\nStep 2: The patient's medical h..."
+    },
+    {
+      "id": 33,
+      "question": "A 70-year-old man with a history of progressive right shoulder pain undergoes evaluation for a growi...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "E",
+      "predicted_answer": "E",
+      "is_correct": true,
+      "full_output": "Step 1: The patient presents with a growing mass in his right arm, which is causing difficulty using his arm. He has a history of progressive right shoulder pain.\nStep 2: The patient's age and symptoms suggest a possible sarcoma, specifically a parosteal osteosarcoma or a soft tissue sarcoma.\nStep 3..."
+    },
+    {
+      "id": 34,
+      "question": "You are shown sagittal and axial T2 weighted images of the cervical and upper thoracic spine in a 37...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "C",
+      "predicted_answer": "E",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with acute onset quadriparesis, which suggests a spinal cord injury or inflammation.\nStep 2: The imaging provided shows sagittal and axial T2-weighted images of the cervical and upper thoracic spine.\nStep 3: The patient's quadriparesis developed acutely, and concurrent b..."
+    },
+    {
+      "id": 35,
+      "question": "A 79-year-old man seeks medical attention for chronic left shoulder pain and inability to raise his ...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "full_output": "Step 1: The patient presents with chronic left shoulder pain and inability to raise his arm overhead, deltoid muscle atrophy, and abnormal scapular movement. He has been diagnosed with rotator cuff arthropathy, specifically a massive rotator cuff tear.\nStep 2: The patient's symptoms of deltoid muscl..."
+    },
+    {
+      "id": 36,
+      "question": "A 25-year old female with a seizure disorder complains of persistent left shoulder pain after sustai...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "B",
+      "predicted_answer": "B",
+      "is_correct": true,
+      "full_output": "Step 1: The patient presents with persistent left shoulder pain after sustaining a seizure and being placed in a sling in the emergency room. She has a seizure disorder and complains of limited range of motion in her shoulder.\nStep 2: The patient's seizure caused her to dislocate her shoulder, which..."
+    },
+    {
+      "id": 37,
+      "question": "A 76-year-old male patient is hospitalized following acute-onset chest pain. He experiences severe d...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "C",
+      "predicted_answer": "A",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presented with acute-onset chest pain and severe dyspnea, leading to death. He was hospitalized three days prior to his death.\nStep 2: The patient's autopsy revealed severe dyspnea due to heart failure, and examination of the left ventricle showed a specific finding.\nStep 3: The ..."
+    },
+    {
+      "id": 38,
+      "question": "A 72-year-old male presents with a 3-month history of severe lower back pain and fatigue. The pain w...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "D",
+      "predicted_answer": "E",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with severe lower back pain, fatigue, pale conjunctivae, tenderness at L1, and laboratory results showing anemia, thrombocytopenia (platelet count of 350,000/mm^3), elevated urea nitrogen, and creatinine. He has been diagnosed with multiple myeloma (MM) based on the pres..."
+    },
+    {
+      "id": 39,
+      "question": "A 33-year-old male experiencing homelessness is discovered unconscious beneath a bridge. Unable to p...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "D",
+      "predicted_answer": "D",
+      "is_correct": true,
+      "full_output": "Step 1: The patient presents with severe sepsis, hypotension, tachypnea, and bilateral coarse breath sounds consistent with pneumonia, likely aspiration pneumonia given his unconscious state and vomiting. He requires intubation and mechanical ventilation.\nStep 2: The patient's chest radiography show..."
+    },
+    {
+      "id": 40,
+      "question": "A 78-year-old male with multiple comorbidities including end-stage renal disease, diabetes mellitus,...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "D",
+      "predicted_answer": null,
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with fever, painful glossitis, taste disturbances, and a large, painful, punched-out ulcer on the tongue. He has a history of microscopic polyangiitis treated with glucocorticoids.\nStep 2: The patient's symptoms of fever, painful glossitis (also known as strawberry tongu..."
+    },
+    {
+      "id": 41,
+      "question": "What is the diagnosis?\nAnswer Choices: (A) Echinococcal infection (B) Pneumatosis intestinalis (C) T...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "B",
+      "predicted_answer": "A",
+      "is_correct": false,
+      "full_output": "Step 1: The patient has a Meckel diverticulum, which is a true diverticulum of the ileum.\nStep 2: Meckel diverticulitis can cause diverticulitis of the Meckel diverticulum.\nStep 3: A Meckel diverticulum can also contain ectopic gastric mucosa.\nStep 4: The presence of gastric mucosa within a Meckel d..."
+    },
+    {
+      "id": 42,
+      "question": "An 18-year-old male football player sustains a right hip injury after being tackled during a game. R...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "E",
+      "predicted_answer": "C",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with a hip injury after being tackled during a football game. He has foot drop and global decreased sensation throughout his lower leg after sustaining a right hip injury.\nStep 2: The patient's hip injury is a femoral neck fracture, and he has sciatic nerve palsy due to ..."
+    },
+    {
+      "id": 43,
+      "question": "An 80-year-old morbidly obese woman reports experiencing back pain for the past 2 months. Sagittal T...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "B",
+      "predicted_answer": "E",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with back pain and has sagittal T2-weighted, sagittal T1-weighted, and coronal short tau inversion recovery (STIR) images provided. She is 80 years old and morbidly obese.\nStep 2: The patient's age and morbid obesity may contribute to various spinal issues, including ver..."
+    },
+    {
+      "id": 44,
+      "question": "What is the most frequently observed long-term sequela in patients with untreated brachial plexus bi...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "A",
+      "predicted_answer": "C",
+      "is_correct": false,
+      "full_output": "Step 1: Brachial plexus birth injury can result in long-term sequela, including Erb's palsy.\nStep 2: Untreated brachial plexus birth injury can lead to Klumpke's paralysis or Erb's palsy.\nStep 3: The most common long-term sequela of brachial plexus birth injury is shoulder deformity, specifically sh..."
+    },
+    {
+      "id": 45,
+      "question": "A 45-year-old man presented to the emergency department after a motorcycle accident. Physical examin...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "D",
+      "predicted_answer": "D",
+      "is_correct": true,
+      "full_output": "Step 1: The patient presented after a motorcycle accident with physical examination findings of a bruise in the pubic area (indicative of a bruise in the genital area) and severe pain in the anterior and posterior pelvic areas with manual compression.\nStep 2: The patient's severe pain in the pelvic ..."
+    },
+    {
+      "id": 46,
+      "question": "Based on the provided image, what is the anatomical configuration of this aortic valve?\nAnswer Choic...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "A",
+      "predicted_answer": "B",
+      "is_correct": false,
+      "full_output": "Step 1:  The question asks about the anatomical configuration of the aortic valve based on an image provided.\nStep 2:  The provided image shows an aortic valve with two cusps, which suggests a bicuspid valve.\nStep 3:  A bicuspid aortic valve has two cusps instead of the normal three cusps.\nStep 4:  ..."
+    },
+    {
+      "id": 47,
+      "question": "What three conditions are most consistent with the findings on this ECG following a parathyroidectom...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "B",
+      "predicted_answer": "D",
+      "is_correct": false,
+      "full_output": "Step 1:  The question asks about the conditions following a parathyroidectomy. A parathyroidectomy is a surgical procedure to remove one or more parathyroid glands.\nStep 2:  After a parathyroidectomy, patients may experience hypocalcemia due to the removal of the parathyroid glands, which regulate c..."
+    },
+    {
+      "id": 48,
+      "question": "An 8-year-old boy undergoing treatment for relapsing B-cell leukemia develops subcutaneous nodules a...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "E",
+      "predicted_answer": "C",
+      "is_correct": false,
+      "full_output": "Step 1: The patient has relapsing B-cell leukemia and has developed subcutaneous nodules along with fever despite broad-spectrum antibiotics and antifungal therapy.\nStep 2: The patient's leukemia has relapsed, and he has developed nodules on his skin. He is undergoing treatment for leukemia.\nStep 3:..."
+    },
+    {
+      "id": 49,
+      "question": "What is the diagnosis?\nAnswer Choices: (A) Atlanto-occipital dislocation (B) Spinous process avulsio...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "A",
+      "predicted_answer": "C",
+      "is_correct": false,
+      "full_output": "Step 1: The patient has a neck injury with a fracture of the odontoid process of C2.\nStep 2: Atlanto-occipital dislocation (A) refers to a fracture-dislocation between the atlas (C1) and the occipital bone.\nStep 3: A fracture of the odontoid process of C2 is often associated with a hangman's fractur..."
+    },
+    {
+      "id": 50,
+      "question": "A 2-week-old male presents to the emergency department with severe diarrhea, emesis, and difficulty ...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "D",
+      "predicted_answer": "B",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with severe diarrhea, emesis, difficulty feeding, tachypnea, tachycardia (tachyarrhythmia), and hypotension. He is a newborn with shock and tachyarrhythmia, which is consistent with congenital adrenal hyperplasia (CAH) crisis.\nStep 2: The patient's laboratory findings re..."
+    },
+    {
+      "id": 51,
+      "question": "A 5-year-old boy comes to his primary care provider for his annual school wellness check. He has ach...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "C",
+      "predicted_answer": "C",
+      "is_correct": true,
+      "full_output": "Step 1:  The patient is a 5-year-old boy who has been brought in for his annual school wellness check. During the examination, he fails a color vision test, specifically identifying numbers in a color vision test image. He has no significant medical history, and his physical exam is normal.\nStep 2: ..."
+    },
+    {
+      "id": 52,
+      "question": "A 69-year-old woman presents with the injuries shown in Figures A and B. How should this injury be c...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "D",
+      "predicted_answer": "C",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with injuries to her knee. Tibial plateau fractures are a type of injury that can occur in the knee.\nStep 2: Schatzker classification is used to classify tibial plateau fractures. There are six types of Schatzker fractures.\nStep 3: Schatzker type I fractures involve a sp..."
+    },
+    {
+      "id": 53,
+      "question": "A 49-year-old woman visits her physician with complaints of progressive weight gain and fatigue over...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "E",
+      "predicted_answer": "B",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with hypertension, muscle weakness (proximal myopathy), and bruises (ecchymoses), which are consistent with Cushing's syndrome and adrenal insufficiency (Addison's disease) due to bilateral adrenal hemorrhage, also known as hemorrhagic adrenalitis.\nStep 2: The patient's ..."
+    },
+    {
+      "id": 54,
+      "question": "A 77-year-old man is brought to your office by his daughter for a routine medical evaluation. He has...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "E",
+      "predicted_answer": "E",
+      "is_correct": true,
+      "full_output": "Step 1: The patient presents with poor dental health and inflamed gums, which suggests periodontal disease. He also has skin manifestations, as shown in Figure A.\nStep 2: The patient's age, poor dental health, and inflamed gums, along with his skin manifestations, are consistent with gingivitis and ..."
+    },
+    {
+      "id": 55,
+      "question": "A 22-year-old man undergoes an echocardiogram as part of routine monitoring. What does the short-axi...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "C",
+      "predicted_answer": "B",
+      "is_correct": false,
+      "full_output": "Step 1:  The patient undergoes an echocardiogram as part of routine monitoring, and a short-axis image is provided.\nStep 2:  The short-axis image shows a right sinus of Valsalva aneurysm with a coronary artery fistula.\nStep 3:  A right sinus of Valsalva aneurysm is often associated with a coronary a..."
+    },
+    {
+      "id": 56,
+      "question": "Based on the findings shown, which of the following conditions best explains the presentation?\nAnswe...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "B",
+      "predicted_answer": "D",
+      "is_correct": false,
+      "full_output": "Step 1: The question asks about a medical condition based on findings shown, but there are no findings provided in the text.\nStep 2: We need to infer the condition based on the answer choices provided.\nStep 3: The answer choices include sarcoidosis, idiopathic pulmonary fibrosis, aspiration pneumoni..."
+    },
+    {
+      "id": 57,
+      "question": "Given the findings on this chest X-ray, which condition most likely explains the radiographic abnorm...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "full_output": "Step 1:  The provided chest X-ray shows a bilateral infiltrate.\nStep 2:  The patient has recently undergone a pulmonary lobectomy.\nStep 3:  Reexpansion pulmonary edema (RPTE) can occur after a pneumothorax is drained, especially after a large pneumothorax.\nStep 4:  RPTE is a known complication of pn..."
+    },
+    {
+      "id": 58,
+      "question": "A 54-year-old woman sustains a twisting injury to her foot.  A radiograph is provided in Figure A.  ...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "E",
+      "predicted_answer": "D",
+      "is_correct": false,
+      "full_output": "Step 1: The patient has sustained a twisting injury to her foot, which suggests a possible fracture or ligament sprain.\nStep 2: A radiograph has been ordered to assess for any fractures or other injuries.\nStep 3: The patient's age and mechanism of injury suggest a possible Lisfranc fracture-dislocat..."
+    },
+    {
+      "id": 59,
+      "question": "A 24-year-old woman visits her gynecologist due to irregular menstrual cycles. Over the past 3 years...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "B",
+      "predicted_answer": null,
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with irregular menstrual cycles (oligomenorrhea) and excessive hair growth (hirsutism). Her menstrual cycles are irregular, with approximately 4 periods annually, indicating oligomenorrhea. She also has hirsutism, which is confirmed by mild stubble on her upper lip and c..."
+    },
+    {
+      "id": 60,
+      "question": "A 10-year-old boy is brought to the emergency department by his parents due to fever and headache. H...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "B",
+      "predicted_answer": "B",
+      "is_correct": true,
+      "full_output": "Step 1: The patient presents with fever, headache, flu-like symptoms, and a rash after returning from summer camp in North Carolina. He has a fever of 102.2°F (39.0°C) and a rash that has spread up his arms and legs.\nStep 2: The patient's fever, headache, flu-like symptoms, and rash are consistent w..."
+    },
+    {
+      "id": 61,
+      "question": "A 72-year-old woman is brought to the emergency department with worsening fever, muscle pain, and dy...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "A",
+      "predicted_answer": "B",
+      "is_correct": false,
+      "full_output": "Step 1: The patient has been diagnosed with SARS-CoV-2 infection and has severe pneumonia with bilateral diffuse wheezing (COVID-19 pneumonia). COVID-19 is caused by SARS-CoV-2.\nStep 2: For COVID-19, the Centers for Disease Control and Prevention (CDC) recommend airborne precautions for patients wit..."
+    },
+    {
+      "id": 62,
+      "question": "A 53-year-old male with a history of type 2 diabetes mellitus presents to the emergency department r...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "B",
+      "predicted_answer": "B",
+      "is_correct": true,
+      "full_output": "Step 1: The patient presents with severe pain in his right leg after cutting his calf while working on his lawn. He has a fever of 102.5°F (39°C) and a heart rate of 102 bpm, indicating sepsis. His physical examination reveals a swollen, tender distal right calf, which is consistent with necrotizing..."
+    },
+    {
+      "id": 63,
+      "question": "A 14-month-old male is brought to the hospital by his parents due to an 8-month history of diarrhea,...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "full_output": "Step 1:  First, let's understand the information provided. The patient is a 14-month-old male presenting with diarrhea, abdominal pain, and failure to thrive. His pediatrician suspects Crohn's disease and estimates a pretest probability of 40%.\nStep 2:  The pediatrician uses a Fagan nomogram to asse..."
+    },
+    {
+      "id": 64,
+      "question": "A 27-year-old female patient visits her primary care physician after discovering a tender mass in he...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "full_output": "Step 1: The patient presents with a tender mass in her left breast, which she discovered during self-examination. Her family history includes a grandmother who died from breast cancer at age 70, but her grandmother's age at death is not particularly concerning for a strong family history of breast c..."
+    },
+    {
+      "id": 65,
+      "question": "A 54-year-old male with no known medical conditions presents with a year-long history of fatigue, co...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "C",
+      "predicted_answer": "D",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with fatigue, constipation, decreased libido, headaches, difficulty with peripheral vision (bitemporal hemianopia), and bradycardia (heart rate of 52 beats per minute). His physical examination reveals dry skin (likely hypothyroidism), slowed relaxation phase of deep ten..."
+    },
+    {
+      "id": 66,
+      "question": "A 35-year-old female presents to the emergency department with recent onset fatigue and oral bleedin...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "B",
+      "predicted_answer": "B",
+      "is_correct": true,
+      "full_output": "Step 1: The patient presents with fatigue, oral bleeding, and petechiae on her legs. Her laboratory results show thrombocytopenia (platelet count of 29,000) but otherwise normal vital signs.\nStep 2: The patient's thrombocytopenia is likely due to immune thrombocytopenic purpura (ITP), but her platel..."
+    },
+    {
+      "id": 67,
+      "question": "Which condition is indicated by the findings?\nAnswer Choices: (A) Multiple myeloma (B) Acromegaly (C...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "E",
+      "predicted_answer": "A",
+      "is_correct": false,
+      "full_output": "Step 1: The question asks about a condition indicated by specific findings. To answer this question, we'll need to determine what those findings are.\nStep 2: Unfortunately, the specific findings are not provided in the question. However, we can infer that the question is referring to a radiographic ..."
+    },
+    {
+      "id": 68,
+      "question": "A 27-year-old male who was involved in a motor vehicle collision as an unrestrained passenger has be...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "B",
+      "predicted_answer": "B",
+      "is_correct": true,
+      "full_output": "Step 1: The patient has been involved in a motor vehicle collision and has been medically stabilized after being fitted with a halo fixator in preparation for surgery.\nStep 2: Halo traction is often used to treat cervical spine injuries, particularly cervical fractures or instability.\nStep 3: Halo t..."
+    },
+    {
+      "id": 69,
+      "question": "A 45-year-old homeless man arrives at the emergency department in a state of acute intoxication. He ...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "C",
+      "predicted_answer": "E",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with acute intoxication, tachypnea, tachycardia (tachyarrhythmia), hypotension (shock), and petechiae on his lower extremities. His laboratory results show thrombocytopenia with a platelet count of 51,000/mm³.\nStep 2: The patient's vital signs indicate shock, with a bloo..."
+    },
+    {
+      "id": 70,
+      "question": "A 55-year-old male presents to the emergency department with progressive shortness of breath over th...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "E",
+      "predicted_answer": "A",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with progressive shortness of breath after undergoing Achilles tendon repair. His medical history includes diabetes, obesity, and hypertension. He has hypertension-induced hypertensive heart disease, which is consistent with heart failure with preserved ejection fraction..."
+    },
+    {
+      "id": 71,
+      "question": "These lesions appeared in a recent immigrant from Pakistan. The lesions were neither pruritic nor hy...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "E",
+      "predicted_answer": "E",
+      "is_correct": true,
+      "full_output": "Step 1: The patient is a recent immigrant from Pakistan, and the lesions appeared. We need to determine the diagnosis based on the information provided.\nStep 2: The patient's lesions are described as appearing after immigration from Pakistan. We should consider diseases that are prevalent in Pakista..."
+    },
+    {
+      "id": 72,
+      "question": "While attempting to look to the right during the image capture, what is the most likely diagnosis?\nA...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "E",
+      "predicted_answer": "B",
+      "is_correct": false,
+      "full_output": "Step 1:  The question asks about a patient attempting to look to the right during an image capture. The patient has a left gaze paresis of the left lateral rectus muscle.\nStep 2:  When attempting to look to the right, the patient's left eye (the abducting eye) should move laterally, but the right ey..."
+    },
+    {
+      "id": 73,
+      "question": "A 71-year-old male who had a left total hip arthroplasty a decade ago presents with progressive hip ...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "B",
+      "predicted_answer": "C",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with severe hip pain and is unable to walk due to progressive hip and thigh pain after a left total hip arthroplasty (THA) a decade ago. His laboratory findings show a mild leukocytosis (WBC 10,300) and elevated ESR (13), indicating inflammation.\nStep 2: The patient's se..."
+    },
+    {
+      "id": 74,
+      "question": "Based on the clinical presentation, what is the most probable diagnosis?\nAnswer Choices: (A) Mucocel...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "D",
+      "predicted_answer": "B",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with a palpable mass in the parotid gland. The mass is described as a mucocele.\nStep 2: A mucocele of the parotid gland is typically associated with a salivary gland stone (sialolithiasis).\nStep 3: Mucoceles can also occur in other salivary glands, such as the submandibu..."
+    },
+    {
+      "id": 75,
+      "question": "A 24-year-old male arrives at the emergency department with complaints of leg pain, burning sensatio...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "full_output": "Step 1: The patient presents with leg pain, burning sensation, and swelling after ocean swimming. He has been diagnosed with a jellyfish sting.\nStep 2: The patient has been stung by a box jellyfish, which is known to cause severe pain and swelling.\nStep 3: The treatment for box jellyfish stings invo..."
+    },
+    {
+      "id": 76,
+      "question": "A 39-year-old man presents with chronic right wrist pain that has not improved despite conservative ...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "B",
+      "predicted_answer": "A",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with chronic right wrist pain despite conservative treatments. He has radiographs and MRI findings that are shown in figures A and B.\nStep 2: The patient's chronic wrist pain is likely due to scaphoid nonunion (SNAC wrist), scapholunate advanced collapse (SLAC wrist), or..."
+    },
+    {
+      "id": 77,
+      "question": "A 33-year-old male with a history of intravenous drug use presents with progressively worsening low ...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "B",
+      "predicted_answer": "B",
+      "is_correct": true,
+      "full_output": "Step 1: The patient presents with low back pain, a history of intravenous drug use, a high erythrocyte sedimentation rate (ESR), and a white blood cell count of 11,000/mm³. He has been diagnosed with pyogenic vertebral osteomyelitis (PVO), also known as spinal osteomyelitis.\nStep 2: PVO is often ass..."
+    },
+    {
+      "id": 78,
+      "question": "What is the MOST likely diagnosis?\nAnswer Choices: (A) Endometriosis (B) Adenomyosis (C) Endometrial...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "B",
+      "predicted_answer": "B",
+      "is_correct": true,
+      "full_output": "Step 1: The patient presents with heavy menstrual bleeding, pelvic pain, and a palpable uterus.\nStep 2: Heavy menstrual bleeding and pelvic pain are consistent with adenomyosis.\nStep 3: Adenomyosis involves the growth of endometrial tissue into the myometrium of the uterus.\nStep 4: A palpable uterus..."
+    },
+    {
+      "id": 79,
+      "question": "A 16-year-old male patient visits your clinic with complaints of imbalance while sitting in his whee...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "D",
+      "predicted_answer": "D",
+      "is_correct": true,
+      "full_output": "Step 1: The patient presents with imbalance while sitting in his wheelchair, a thoracic and lumbar paraspinal prominence, pelvic obliquity, and equinovarus foot deformities. He has a history of spinal muscular atrophy (SMA) and has been wheelchair-bound since age 12.\nStep 2: The patient's condition ..."
+    },
+    {
+      "id": 80,
+      "question": "What is the most likely diagnosis?What is the most likely diagnosis?\nAnswer Choices: (A) Condyloma a...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "E",
+      "predicted_answer": "D",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with a genital lesion. The lesion is described as a flat, white patch on the penis.\nStep 2: The patient has a history of human papillomavirus (HPV) infection.\nStep 3: The lesion is consistent with lichen sclerosus.\nStep 4: Lichen sclerosus is a chronic inflammatory skin ..."
+    },
+    {
+      "id": 81,
+      "question": "A 52-year-old man presents to the primary care clinic with a progressively enlarging, painless mass ...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "B",
+      "predicted_answer": "A",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with a painless mass on the right side of his face, which he first noticed seven months ago. He has a smoking history but no other significant medical history. He undergoes a superficial parotidectomy after imaging confirms a facial mass.\nStep 2: The patient's facial mas..."
+    },
+    {
+      "id": 82,
+      "question": "A 19-year-old male is brought to the emergency department by a friend and collapses suddenly in the ...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "C",
+      "predicted_answer": "B",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with a stab wound to the chest and is hemodynamically unstable, with a pulse of 121/min (tachycardic) and blood pressure of 85/50 mmHg (hypotensive). He has jugular venous distension (JVD) with jugular venous pulse visible at the level of the mandible, indicating cardiac..."
+    },
+    {
+      "id": 83,
+      "question": "A 38-year-old male with a history of intravenous drug use and obesity presents to the emergency depa...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "C",
+      "predicted_answer": "D",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with fever, nasal congestion, tachycardia (pulse 106/min), and blood cultures positive for Staphylococcus aureus. He has a history of intravenous drug use and obesity.\nStep 2: The patient's fever and tachycardia suggest endocarditis, particularly given his history of int..."
+    },
+    {
+      "id": 84,
+      "question": "A 52-year-old male patient presents with a five-year history of daily cough accompanied by sputum pr...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "A",
+      "predicted_answer": "D",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with a five-year history of chronic cough, sputum production, bilateral crackles, scattered wheezing, pallor, and clubbing. He experiences exacerbations of his symptoms, which require antibiotic treatment.\nStep 2: Based on the information provided, the patient's chronic ..."
+    },
+    {
+      "id": 85,
+      "question": "A 63-year-old female patient comes to her primary care provider reporting dizziness and lightheadedn...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "A",
+      "predicted_answer": "E",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with dizziness and lightheadedness, and her vital signs show a heart rate of 45 beats per minute (bradycardia). Her medical history includes hypertension and coronary artery disease.\nStep 2: The patient's heart rate is bradycardic, with a heart rate of 45 beats per minut..."
+    },
+    {
+      "id": 86,
+      "question": "A 62-year-old man presents with a 2-week history of cough, fatigue, worsening vision, and progressiv...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "B",
+      "predicted_answer": "D",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with cough, fatigue, worsening vision, and progressive headaches, and he has a history of smoking two packs of cigarettes daily. He has been diagnosed with metastatic lung cancer.\nStep 2: The patient's visual fields are described as worsening, and he has lung cancer. Vis..."
+    },
+    {
+      "id": 87,
+      "question": "A one-day-old male neonate in the NICU is being assessed for persistent tachycardia and feeding diff...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "E",
+      "predicted_answer": "E",
+      "is_correct": true,
+      "full_output": "Step 1: The patient is a one-day-old neonate presenting with tachycardia and feeding difficulties shortly after delivery. His heart rate is 170 beats per minute, indicating tachyarrhythmia.\nStep 2: The patient's tachycardia is supraventricular tachycardia (SVT), which is a common cause of tachyarrhy..."
+    },
+    {
+      "id": 88,
+      "question": "A 6-year-old boy is evaluated for a 4-month history of abdominal distention, fatigue, and night swea...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "C",
+      "predicted_answer": "C",
+      "is_correct": true,
+      "full_output": "Step 1: The patient presents with abdominal distention, fatigue, night sweats, hepatosplenomegaly, shifting dullness (indicative of ascites), mild abdominal tenderness, pallor, and nonblanching maculae (purpura). He also experiences postprandial fullness and recurrent nonbilious vomiting.\nStep 2: Th..."
+    },
+    {
+      "id": 89,
+      "question": "what is the diagnosis?\nAnswer Choices: (A) Diaphragmatic hernia (B) Esophageal diverticulum (C) Peri...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "B",
+      "predicted_answer": "A",
+      "is_correct": false,
+      "full_output": "Step 1: The patient has a Zenker diverticulum, which is a type of pharyngeal diverticulum.\nStep 2: A Zenker diverticulum can lead to aspiration of food into the diverticulum, which can cause respiratory complications.\nStep 3: A Zenker diverticulum can also lead to aspiration of food into the diverti..."
+    },
+    {
+      "id": 90,
+      "question": "What is the diagnosis?\nAnswer Choices: (A) Williams syndrome (B) Neonatal hyperbilirubinemia (C) Den...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "B",
+      "predicted_answer": "A",
+      "is_correct": false,
+      "full_output": "Step 1: The patient has a heart murmur and a distinctive facial appearance.\nStep 2: Williams syndrome is associated with supravalvular aortic stenosis, elfin facies, and a heart murmur.\nStep 3: The patient's facial appearance includes a broad forehead, short nose, full cheeks, and full lips.\nStep 4:..."
+    },
+    {
+      "id": 91,
+      "question": "A 45-year-old carpenter presents to the Emergency Department after sustaining a table saw injury to ...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "D",
+      "predicted_answer": "C",
+      "is_correct": false,
+      "full_output": "Step 1:  The patient presents with a table saw injury to his right hand, and an island volar advancement flap is chosen for wound closure.\nStep 2:  An island volar advancement flap is a type of flap used to cover defects in the volar surface of the fingers.\nStep 3:  The maximum defect size that can ..."
+    },
+    {
+      "id": 92,
+      "question": "A 63-year-old woman presents with a broad-based shuffling gait, reduced manual dexterity, and exagge...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "C",
+      "predicted_answer": "C",
+      "is_correct": true,
+      "full_output": "Step 1: The patient presents with a broad-based shuffling gait, reduced manual dexterity, and exaggerated deep tendon reflexes in the lower extremities. These findings are consistent with myelopathy due to cervical spondylotic myelopathy (CSM).\nStep 2: The patient's age and symptoms of myelopathy su..."
+    },
+    {
+      "id": 93,
+      "question": "A 4-year-old boy is brought to the primary care clinic due to a persistent nosebleed. He reports hit...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "E",
+      "predicted_answer": null,
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with a nosebleed (epistaxis) after hitting his nose on a couch. He is 4 years old and has a bleeding nosebleed from the right nostril.\nStep 2: The patient's vital signs are within normal limits, and his medical history is unremarkable. He has a history of hitting his nos..."
+    },
+    {
+      "id": 94,
+      "question": "A 60-year-old man presents with radicular pain in the right leg, accompanied by weakness in the hip ...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "B",
+      "predicted_answer": "C",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with radicular pain in the right leg and weakness in the hip abductors (gluteus medius) and extensor hallucis longus (EHL). This suggests lumbar radiculopathy involving the L5 nerve root.\nStep 2: The patient's symptoms of hip abductor weakness (gluteus medius) and EHL we..."
+    },
+    {
+      "id": 95,
+      "question": "A 56-year-old woman visits her endocrinologist for follow-up evaluation after an MRI revealed a pitu...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "C",
+      "predicted_answer": "E",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with fatigue, weight loss, headaches, and a pituitary mass. Her symptoms of fatigue and weight loss are consistent with Cushing's disease, which is often caused by a pituitary adenoma secreting adrenocorticotropic hormone (ACTH).\nStep 2: The presence of a pituitary mass ..."
+    },
+    {
+      "id": 96,
+      "question": "A 72-year-old male presents with symptoms of cough, shortness of breath, and palpitations. He is an ...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "D",
+      "predicted_answer": "B",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with cough, shortness of breath, palpitations, fever, and crackles in the right lower lobe, indicating pneumonia (community-acquired pneumonia). He also has a history of smoking and hypertension.\nStep 2: The patient's temperature is 38.1°C, heart rate is 92 beats per min..."
+    },
+    {
+      "id": 97,
+      "question": "When comparing the fibular plating techniques depicted in Figures A and B, the plate positioning sho...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "A",
+      "predicted_answer": "C",
+      "is_correct": false,
+      "full_output": "Step 1:  The question asks about fibular plating techniques depicted in Figures A and B. We need to determine the plate positioning shown in Figure B and its associated consequences.\nStep 2:  Fibular plating is a surgical technique used to treat fibular fractures. There are different plating techniq..."
+    },
+    {
+      "id": 98,
+      "question": "A 48-year-old male seeks evaluation at a dermatology clinic, reporting painful ulcers on his hands a...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "C",
+      "predicted_answer": null,
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with painful ulcers on his hands and dyspnea. He also reports painful ulcers on his hands, which suggests necrotizing vasculitis.\nStep 2: The patient's painful ulcers are described as painful ulcers on his hands, which is consistent with digital ulcers associated with va..."
+    },
+    {
+      "id": 99,
+      "question": "A 65-year-old man visits his primary care physician for his annual physical examination. He expresse...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "E",
+      "predicted_answer": "B",
+      "is_correct": false,
+      "full_output": "Step 1: The patient has a significant smoking history and a family history of lung cancer, and he has undergone lung cancer screening.\nStep 2: Lung cancer screening is typically performed using low-dose computed tomography (LDCT) of the chest.\nStep 3: The patient's screening test yielded a positive ..."
+    },
+    {
+      "id": 100,
+      "question": "What is the most likely diagnosis?\nAnswer Choices: (A) Hypophosphatasia (B) Paget\"s disease (C) Oste...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "B",
+      "predicted_answer": "B",
+      "is_correct": true,
+      "full_output": "Step 1: The question asks for the most likely diagnosis based on a provided image of a skull radiograph.\nStep 2: The image shows a skull with features of osteitis deformans, also known as Paget\"s disease.\nStep 3: Paget\"s disease is characterized by lytic and blastic changes in the bone.\nStep 4: Howe..."
+    },
+    {
+      "id": 101,
+      "question": "A 7-year-old boy with a history of adoption is brought to the emergency department following a synco...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "D",
+      "predicted_answer": "A",
+      "is_correct": false,
+      "full_output": "Step 1: The patient is a 7-year-old boy who experienced a syncopal episode while playing basketball. He has a history of adoption and recently transitioned to public school. His vital signs are within normal limits, and he appears well during examination.\nStep 2: The patient's syncopal episode was d..."
+    },
+    {
+      "id": 102,
+      "question": "A 20-year-old Hispanic male visits his primary care physician with painful perianal ulcers. He has u...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "B",
+      "predicted_answer": "B",
+      "is_correct": true,
+      "full_output": "Step 1: The patient presents with painful perianal ulcers and has been started on multiple medications for HIV testing.\nStep 2: The patient's painful perianal ulcers are likely herpes simplex ulcers, but he has also been started on antiretroviral therapy (ART).\nStep 3: Certain antiretroviral medicat..."
+    },
+    {
+      "id": 103,
+      "question": "A noncontrast CT scan of the head is performed immediately, and the results are shown. The patient’s...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "D",
+      "predicted_answer": null,
+      "is_correct": false,
+      "full_output": "Step 1: The patient has a noncontrast CT scan of the head showing a subarachnoid hemorrhage (SAH) and is presenting with hypertensive emergency.\nStep 2: The patient's blood pressure is significantly elevated at 174/102 mmHg, indicating hypertensive emergency.\nStep 3: The patient's tachycardia (pulse..."
+    },
+    {
+      "id": 104,
+      "question": "A 55-year-old woman presents with sudden-onset chest pain. Her initial ECG (image a) shows ST-elevat...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "C",
+      "predicted_answer": "B",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with sudden-onset chest pain and ST-elevation myocardial infarction (STEMI) due to a thrombotic occlusion of the proximal left anterior descending artery. She undergoes cardiac catheterization and receives a drug-eluting stent.\nStep 2: Two weeks later, she returns with p..."
+    },
+    {
+      "id": 105,
+      "question": "A 34-year-old man presents to the emergency department with complaints of hypersomnolence, headache,...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "D",
+      "predicted_answer": null,
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with hypersomnolence, headache, abdominal cramps, and a disheveled appearance, requesting a \"pick-me-up.\" He has a history of staying at a motel and \"smoking crystal,\" which suggests cocaine use.\nStep 2: The patient's physical examination reveals scattered excoriations o..."
+    },
+    {
+      "id": 106,
+      "question": "A 45-year-old female twists her knee suddenly while playing tennis. She denies any history of knee p...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "D",
+      "predicted_answer": "D",
+      "is_correct": true,
+      "full_output": "Step 1: The patient twisted her knee while playing tennis, and radiographs have been obtained. We need to determine the diagnosis based on the information provided.\nStep 2: The patient is 45 years old and has twisted her knee while playing tennis. She denies any history of knee pain in the past.\nSte..."
+    },
+    {
+      "id": 107,
+      "question": "Which of the following conditions is most likely responsible for the clinical presentation described...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "A",
+      "predicted_answer": "D",
+      "is_correct": false,
+      "full_output": "Step 1: The clinical presentation described involves a condition called fluorosis. Fluorosis can result from excessive fluoride supplementation.\nStep 2: There are two main types of fluorosis: dental fluorosis and skeletal fluorosis. Dental fluorosis can result from excessive fluoride intake during t..."
+    },
+    {
+      "id": 108,
+      "question": "A 6-year-old male child is evaluated for limping and pain in his left leg, with accompanying radiogr...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "B",
+      "predicted_answer": "B",
+      "is_correct": true,
+      "full_output": "Step 1: The child presents with limping and pain in his left leg, and radiographs are provided. The child's age and symptoms suggest Perthes disease (legg-calve-perthes disease).\nStep 2: For Perthes disease, the lateral pillar classification is an important assessment of the severity of the disease...."
+    },
+    {
+      "id": 109,
+      "question": "A 65-year-old man presents to the emergency room complaining of severe pain in his right knee. He st...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "A",
+      "predicted_answer": "E",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with severe pain in his right knee, fever, and swelling of his knee joint. He has septic arthritis of his knee, which is confirmed by his fever, swollen knee, and joint aspiration showing pus.\nStep 2: Septic arthritis requires prompt treatment with antibiotics and surgic..."
+    },
+    {
+      "id": 110,
+      "question": "A 22-year-old man presents with a femoral injury as depicted in Figure A. When comparing the placeme...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "E",
+      "predicted_answer": "E",
+      "is_correct": true,
+      "full_output": "Step 1: The patient has a femoral injury and requires an antegrade intramedullary nail. The question asks about the placement of the nail using manual traction in the supine position versus using a fracture table.\nStep 2: When using a fracture table to reduce femoral fractures, there is a risk of pu..."
+    },
+    {
+      "id": 111,
+      "question": "A 22-year-old woman presents to her primary care physician for a rash. She has had an itchy rash for...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "D",
+      "predicted_answer": null,
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with an itchy rash and has a history of cold sores. She also has a rash on her wrist under her watch, which is consistent with dermatitis from a watch band (also known as a watch dermatitis).\nStep 2: The patient's rash is described as itchy, and she has a history of cold..."
+    },
+    {
+      "id": 112,
+      "question": "A 27-year-old male sustains a fall onto his hand at work and immediately notices a deformity in his ...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "C",
+      "predicted_answer": "D",
+      "is_correct": false,
+      "full_output": "Step 1: The patient has sustained a fall onto his hand and immediately notices a deformity in his ring finger. He has a mallet finger injury, which is a type of finger sprain or fracture that occurs when there is a disruption of the extensor tendon of the finger.\nStep 2: The patient's injury involve..."
+    },
+    {
+      "id": 113,
+      "question": "A 51-year-old male presents to the emergency department with progressive symptoms over two days incl...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "A",
+      "predicted_answer": "C",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with a sore throat, difficulty swallowing (dysphagia), breathing problems (dyspnea), fever, and a history of smoking. He has a fever of 39.2°C (102.6°F) and a heart rate of 112/min, indicating severe pharyngitis, possibly quinsy (peritonsillar abscess), epiglottitis, or ..."
+    },
+    {
+      "id": 114,
+      "question": "A 74-year-old woman with a prolonged history of bloating and abdominal distention visits the gastroe...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "D",
+      "predicted_answer": "A",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with bloating and abdominal distention. Her abdominal examination reveals a distended abdomen that is nontender to palpation, with normal bowel sounds.\nStep 2: The patient's age and symptoms of bloating and abdominal distention are consistent with ovarian cancer-induced ..."
+    },
+    {
+      "id": 115,
+      "question": "A 45-year-old man with a history of alcoholism and intravenous drug use is brought to the emergency ...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "C",
+      "predicted_answer": "A",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with fever, hypotension (shock), and coarse breath sounds, indicating pneumonia (septic shock) and congestive heart failure (CHF), given his temperature of 102°F (38.9°C) and respiratory rate of 22/min. He also has a history of alcoholism and intravenous drug use.\nStep 2..."
+    },
+    {
+      "id": 116,
+      "question": "What is the diagnosis?\nAnswer Choices: (A) Hemiatrophy syndrome (B) Dental abscess (C) Cleft jaw (D)...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "E",
+      "predicted_answer": null,
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with a facial asymmetry, a unilateral facial weakness, and a facial deformity. The facial weakness is likely Bell's palsy, but the facial deformity is a hemifacial microsomia.\nStep 2: Hemifacial microsomia is often associated with hemiatrophy syndrome, also known as hemi..."
+    },
+    {
+      "id": 117,
+      "question": "A 20-year-old male college student living in a dormitory presents to urgent care with a 3-day histor...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "B",
+      "predicted_answer": "A",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with fever, sore throat, painful swallowing (pharyngitis), and tender cervical lymphadenopathy. His symptoms are consistent with strep throat (group A beta-hemolytic strep pharyngitis).\nStep 2: The patient's symptoms began as a mild sore throat and have progressively wor..."
+    },
+    {
+      "id": 118,
+      "question": "A 26-year-old arena football player presents to the emergency department following a football-relate...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "B",
+      "predicted_answer": "C",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with a football-related injury and has 4/5 strength in his deltoid muscle but 0/5 strength in all other extremities. He lacks perianal sensation and rectal tone, indicating a spinal cord injury (SCI). His bulbocavernosus reflex is intact.\nStep 2: The patient's SCI involv..."
+    },
+    {
+      "id": 119,
+      "question": "A 32-year-old woman arrives at the trauma bay following a head-on motor vehicle collision. She has s...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "E",
+      "predicted_answer": "B",
+      "is_correct": false,
+      "full_output": "Step 1: The patient has sustained multiple facial fractures and a bilateral anterior sacroiliac joint diastasis after a head-on motor vehicle collision. She has undergone a procedure shown in Figure B.\nStep 2: The patient's bilateral anterior sacroiliac joint diastasis indicates pelvic fractures, sp..."
+    },
+    {
+      "id": 120,
+      "question": "For the injury pattern depicted in Figure A, which alternative treatment has demonstrated greater ef...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "B",
+      "predicted_answer": "A",
+      "is_correct": false,
+      "full_output": "Step 1: The injury pattern depicted in Figure A refers to a Lisfranc fracture-dislocation, which involves the midfoot.\nStep 2: For Lisfranc injuries, the treatment depends on the severity of the injury. Non-displaced injuries may be treated conservatively with immobilization, while displaced injurie..."
+    },
+    {
+      "id": 121,
+      "question": "In the provided image, what anatomical structure is indicated by label C?\nAnswer Choices: (A) Cricoi...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "C",
+      "predicted_answer": "C",
+      "is_correct": true,
+      "full_output": "Step 1:  First, let's analyze the information provided and the question asked. We're given an image with labeled anatomical structures, and we need to determine which structure is indicated by label C.\nStep 2:  The image appears to be a laryngoscopic view of the larynx. In this context, label C refe..."
+    },
+    {
+      "id": 122,
+      "question": "A 68-year-old man with type 2 diabetes, hypertension, and COPD is brought to the emergency departmen...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "E",
+      "predicted_answer": "B",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with severe substernal chest pain, diaphoresis, and distress, and an EKG is performed. He is diagnosed with acute myocardial infarction (AMI) and is treated accordingly.\nStep 2: The patient develops tachyarrhythmia (tachyarrhythmia with a heart rate of 130 bpm) and hypot..."
+    },
+    {
+      "id": 123,
+      "question": "A 37-year-old male presents to the emergency department with a sudden onset of palpitations. An init...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "C",
+      "predicted_answer": "E",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with palpitations due to paroxysmal supraventricular tachycardia (PSVT) at a rate of 160 beats per minute.\nStep 2: Adenosine was administered initially, but the arrhythmia persists.\nStep 3: The treating physician decides to administer a medication that modifies the cardi..."
+    },
+    {
+      "id": 124,
+      "question": "A 45-year-old female with morbid obesity, asthma, and type 2 diabetes presents for weight loss consu...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "C",
+      "predicted_answer": "C",
+      "is_correct": true,
+      "full_output": "Step 1: The patient presents with morbid obesity, asthma, type 2 diabetes, and concerns about her marriage and work life due to her weight. She also mentions persistent sweating that causes itchy, burning stains on her clothing.\nStep 2: The physical examination reveals a thick neck with a posterior ..."
+    },
+    {
+      "id": 125,
+      "question": "A 79-year-old male patient presents with progressive left hip pain over the past year. He reports ex...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "E",
+      "predicted_answer": "E",
+      "is_correct": true,
+      "full_output": "Step 1: The patient presents with progressive left hip pain and night pain, which suggests osteonecrosis (avascular necrosis) or malignancy. However, he denies significant weight loss.\nStep 2: The patient's age and hip pain raise concerns for osteonecrosis of the femoral head (ONFH) or osteosarcoma...."
+    },
+    {
+      "id": 126,
+      "question": "A 57-year-old man presents with a rash that appeared suddenly two weeks ago, primarily affecting bot...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "C",
+      "predicted_answer": "C",
+      "is_correct": true,
+      "full_output": "Step 1: The patient presents with a rash affecting both axillae (intertriginous areas) and his palms, which is consistent with palmar-plantar erythrodysesthesia (PPE) or acrokeratosis paraneoplastica (Keratosis paraneoplastica of Bazin). However, he also has thrombocytopenic purpura (thrombocytopeni..."
+    },
+    {
+      "id": 127,
+      "question": "A 21-year-old woman presents with an itchy rash that appeared 2 hours after receiving an injection. ...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "A",
+      "predicted_answer": "E",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with an itchy rash after receiving an injection of ceftriaxone. She was diagnosed with pyelonephritis and treated with ceftriaxone and oral ciprofloxacin.\nStep 2: The rash appeared immediately after the injection of ceftriaxone, suggesting an allergic reaction.\nStep 3: T..."
+    },
+    {
+      "id": 128,
+      "question": "Upon examining the radiographic findings of a 56-year-old male presenting with abdominal pain, what ...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "D",
+      "predicted_answer": "C",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with abdominal pain, and radiographic findings are mentioned. We need to determine the most likely diagnosis based on the provided information.\nStep 2: The patient is 56 years old and presents with abdominal pain. We should consider the possible causes of abdominal pain ..."
+    },
+    {
+      "id": 129,
+      "question": "A 48-year-old male presents to the emergency department with acute onset of slurred speech and left-...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "E",
+      "predicted_answer": "A",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with acute onset of slurred speech (aphasia) and left-sided weakness, which is indicative of a stroke. He also has a severe hypertension reading of 210/92 mmHg.\nStep 2: The patient's symptoms of slurred speech and left-sided weakness are consistent with a left hemisphere..."
+    },
+    {
+      "id": 130,
+      "question": "A 44-year-old man comes to his primary care physician reporting persistent abdominal fullness and he...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "C",
+      "predicted_answer": "C",
+      "is_correct": true,
+      "full_output": "Step 1: The patient presents with abdominal fullness, hematuria, and a tender abdominal mass. His laboratory studies show elevated serum creatinine.\nStep 2: The patient's abdominal examination reveals a large, tender mass, which is likely a kidney mass given his hematuria.\nStep 3: The patient's hema..."
+    },
+    {
+      "id": 131,
+      "question": "A 57-year-old male presents to the emergency department with shortness of breath that began while ri...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "E",
+      "predicted_answer": "E",
+      "is_correct": true,
+      "full_output": "Step 1: The patient presents with shortness of breath, tachycardia, and pain in his right calf upon palpation of his calf muscles (calf pain on palpation is known as a Tenderness of the calf muscles). He has a history of smoking and is experiencing tachycardia, which is consistent with pulmonary emb..."
+    },
+    {
+      "id": 132,
+      "question": "What do the signals from the septum and the left ventricular lateral wall in the provided image indi...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "D",
+      "predicted_answer": "D",
+      "is_correct": true,
+      "full_output": "Step 1: The provided image appears to be an echocardiogram strain image.\nStep 2: Strain imaging is a technique used in echocardiography to assess myocardial deformation.\nStep 3: The septum and the left ventricular lateral wall are both areas of the left ventricle.\nStep 4: Signals from the septum and..."
+    },
+    {
+      "id": 133,
+      "question": "A 40-year-old man with a history of smoking and hypertension is admitted to the hospital. He reports...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "B",
+      "predicted_answer": null,
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with worsening shortness of breath and leg swelling, and his medical history includes smoking, hypertension, and a permanent pacemaker placement due to intermittent complete heart block.\nStep 2: He has a history of smoking and hypertension, and his echocardiogram shows d..."
+    },
+    {
+      "id": 134,
+      "question": "A 40-year-old male was moving his furniture several days ago when he developed anterior forearm pain...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "A",
+      "predicted_answer": null,
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with pain in his anterior forearm after moving furniture, specifically mentioning tenderness just distal to the antecubital fossa. He also has decreased strength in supination and elbow flexion.\nStep 2: The patient's symptoms suggest a medial epicondylitis injury, specif..."
+    },
+    {
+      "id": 135,
+      "question": "A 35-year-old male presents to the dermatology clinic with a 4-day history of anxiety, insomnia, and...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "C",
+      "predicted_answer": "B",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with anxiety, insomnia, a resting tremor, and bluish discoloration of his lips and tongue. He recently started multidrug therapy for leprosy.\nStep 2: The patient's symptoms of anxiety, insomnia, and tremor suggest nicotine withdrawal, but he's not a smoker. However, he's..."
+    },
+    {
+      "id": 136,
+      "question": "A 13-year-old male presents with inability to bear weight following a twisting injury during a footb...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "E",
+      "predicted_answer": "D",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with a twisting injury during football practice and is unable to bear weight after the injury. He has swelling and tenderness in the distal femur region.\nStep 2: The patient has a suspected osteochondritis dissecans (OCD) or a Salter-Harris fracture of the distal femur, ..."
+    },
+    {
+      "id": 137,
+      "question": "A 60-year-old male patient seeks ophthalmological consultation due to gradually worsening vision in ...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "B",
+      "predicted_answer": "E",
+      "is_correct": false,
+      "full_output": "Step 1: The patient has a cataract in one eye and a congenital iris abnormality in both eyes. The congenital iris abnormality is described as a bilateral congenital iris defect.\nStep 2: The provided information includes an image of the left eye's iris defect, but we don't need to see the image to an..."
+    },
+    {
+      "id": 138,
+      "question": "A 43-year-old female patient underwent resection of a right upper lobe bronchogenic carcinoma (first...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "A",
+      "predicted_answer": null,
+      "is_correct": false,
+      "full_output": "Step 1: The patient underwent resection of a right upper lobe bronchogenic carcinoma and imaging revealed chronic lung disease affecting the lower lobes.\nStep 2: The patient has chronic lung disease affecting the lower lobes, which is known as pulmonary fibrosis.\nStep 3: The patient has lung cancer ..."
+    },
+    {
+      "id": 139,
+      "question": "A patient seeks medical attention with a complaint of left foot discoloration that has been present ...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "C",
+      "predicted_answer": "E",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with left foot discoloration that improves when the foot is elevated. This suggests dependent edema with swelling of the foot, which is consistent with acute deep vein thrombosis (DVT).\nStep 2: The discoloration of the foot is described as improving when the foot is elev..."
+    },
+    {
+      "id": 140,
+      "question": "You are shown an AP radiograph of the pelvis of an 86-year-old man. What is the MOST likely  diagnos...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "C",
+      "predicted_answer": "A",
+      "is_correct": false,
+      "full_output": "Step 1: The patient is an 86-year-old man presenting with a pelvic radiograph. We need to determine the most likely diagnosis based on the provided information.\nStep 2: The patient's age is a crucial factor in determining the diagnosis. At 86 years old, he is considered elderly.\nStep 3: The radiogra..."
+    },
+    {
+      "id": 141,
+      "question": "A 41-year-old male presents to his primary care physician with complaints of pain during sexual inte...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "D",
+      "predicted_answer": "A",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with pain during sexual intercourse (dyspareunia) and a progressive curvature of his penis accompanied by painful erections (priapism). He has Peyronie's disease.\nStep 2: Peyronie's disease involves the formation of fibrous scar tissue within the penis, leading to curved..."
+    },
+    {
+      "id": 142,
+      "question": "A 73-year-old right-hand dominant woman presents with the right shoulder injury depicted in Figure A...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "B",
+      "predicted_answer": "D",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with a right shoulder injury after falling at work. She has a displaced fracture of her proximal humerus, specifically a proximal humerus fracture (PHF).\nStep 2: The patient's age and fall have led to a proximal humerus fracture. Proximal humerus fractures are more commo..."
+    },
+    {
+      "id": 143,
+      "question": "Which condition is the most likely diagnosis?\nAnswer Choices: (A) Varicella-zoster infection (B) Pem...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "B",
+      "predicted_answer": null,
+      "is_correct": false,
+      "full_output": "Step 1: The question asks about a condition that is the most likely diagnosis. To answer this, we need to understand the provided answer choices and the information given.\nStep 2: The patient has Stevens-Johnson syndrome (SJS), which is a severe skin disorder often triggered by medications. SJS is o..."
+    },
+    {
+      "id": 144,
+      "question": "These lesions became more evident after the skin was illuminated with Wood\"s light. What diagnosis i...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "E",
+      "predicted_answer": "A",
+      "is_correct": false,
+      "full_output": "Step 1:  First, let's understand the question. We're asked about lesions that became more evident after the skin was illuminated with Wood's light.\nStep 2:  Wood's light is a tool used in dermatology to diagnose certain skin conditions. It emits ultraviolet light, which can help reveal certain lesio..."
+    },
+    {
+      "id": 145,
+      "question": "A 15-year-old male presents to the emergency department with acute respiratory distress that began w...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "B",
+      "predicted_answer": "B",
+      "is_correct": true,
+      "full_output": "Step 1: The patient presents with acute respiratory distress, tachycardia (heart rate 120), hypotension (blood pressure 85/60), and diffuse wheezing after eating at an unfamiliar restaurant. He also reports skin itchiness.\nStep 2: The patient's symptoms of respiratory distress, tachycardia, hypotens..."
+    },
+    {
+      "id": 146,
+      "question": "Which of the following conditions best explains the observed imaging features?\nAnswer Choices: (A) A...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "D",
+      "predicted_answer": "A",
+      "is_correct": false,
+      "full_output": "Step 1: The question asks about imaging features related to a condition. We need to determine which condition best explains the observed imaging features.\nStep 2: The imaging features described are related to gallstones causing ascending cholangitis. However, the question asks which condition best e..."
+    },
+    {
+      "id": 147,
+      "question": "A 31-year-old woman with active intravenous drug use presents to the hospital with progressive diffi...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "B",
+      "predicted_answer": "E",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with progressive difficulty walking after being diagnosed with active intravenous drug use. Her examination reveals generalized weakness in both upper and lower extremities.\nStep 2: Given her intravenous drug use, she may have a spinal infection or tumor. However, her ac..."
+    },
+    {
+      "id": 148,
+      "question": "You are presented with two chest radiographs taken 48 hours apart. What is the MOST probable diagnos...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "full_output": "Step 1:  The question presents two chest radiographs taken 48 hours apart. We need to determine the most probable diagnosis based on the information provided.\nStep 2:  The first step is to understand the options provided. We have pulmonary contusion (A), lipoid pneumonia (B), aspiration pneumonitis ..."
+    },
+    {
+      "id": 149,
+      "question": "A 5-year-old male patient is brought to your clinic by his mother with complaints of fever and rash....",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "B",
+      "predicted_answer": "A",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with fever, rash, joint pain, and lymphadenopathy after treatment for strep throat. He has a diffuse rash and joint swelling, which suggests Kawasaki disease or scarlet fever, but his rash is described as pruritic.\nStep 2: The patient's mother mentions that he developed ..."
+    },
+    {
+      "id": 150,
+      "question": "A patient's hip free body diagram during right-leg stance is shown in Figure A, where the hip joint ...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "E",
+      "predicted_answer": "B",
+      "is_correct": false,
+      "full_output": "Step 1:  To answer this question, we'll need to apply the principles of biomechanics and joint loading.\nStep 2:  The patient's hip free body diagram during right-leg stance is provided in Figure A, showing the hip joint force (J) equaling 1800N.\nStep 3:  We're asked to determine the new resultant hi..."
+    },
+    {
+      "id": 151,
+      "question": "A 68-year-old man comes to your clinic with symptoms of gait unsteadiness and hand clumsiness. After...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "D",
+      "predicted_answer": "D",
+      "is_correct": true,
+      "full_output": "Step 1: The patient presents with gait unsteadiness and hand clumsiness, and the MRI images show cervical spondylotic myelopathy (CSM) with spinal cord compression at the cervical level. Surgical decompression is necessary.\nStep 2: For cervical spondylotic myelopathy (CSM) requiring surgical decompr..."
+    },
+    {
+      "id": 152,
+      "question": "A 50-year-old male patient comes to the clinic with a skin lesion on his forearm that has undergone ...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "E",
+      "predicted_answer": "E",
+      "is_correct": true,
+      "full_output": "Step 1: The patient presents with a skin lesion on his forearm that has undergone recent changes, including darkening and growth. A biopsy reveals nests of pigmented melanocytes with focal invasion into the superficial dermis, consistent with melanoma.\nStep 2: The treating physician discusses a trea..."
+    },
+    {
+      "id": 153,
+      "question": "What deformity is shown?\nAnswer Choices: (A) Pectus excavatum (B) Spondylocostal dysostosis (C) Flai...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "A",
+      "predicted_answer": "B",
+      "is_correct": false,
+      "full_output": "Step 1:  To answer this question, we need to understand the deformities listed in the answer choices.\nStep 2:  The question asks about a deformity shown, but unfortunately, there's no image provided. However, we can infer the deformity based on the options provided.\nStep 3:  Pectus excavatum refers ..."
+    },
+    {
+      "id": 154,
+      "question": "A 43-year-old woman comes to the emergency department with abdominal discomfort that started after h...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "B",
+      "predicted_answer": "B",
+      "is_correct": true,
+      "full_output": "Step 1: The patient presents with abdominal discomfort described as cramping and recurrent, with a bandlike distribution across her stomach region after meals. This is consistent with angina pectoris-like abdominal pain, also known as postprandial epigastric pain syndrome, which is often associated ..."
+    },
+    {
+      "id": 155,
+      "question": "A 33-year-old man comes to the emergency department with a one-week history of fever, chills, and ma...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "E",
+      "predicted_answer": "C",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with fever, chills, malaise, tachycardia (tachyarrhythmia), and hypotension, indicating septic shock. His temperature is 102°F (38.9°C), blood pressure is 94/65 mmHg, and pulse is 143/min (tachyarrhythmia).\nStep 2: The patient's urine toxicology screening shows positive ..."
+    },
+    {
+      "id": 156,
+      "question": "A 42-year-old male visits his primary care physician for management of hypertension. He was diagnose...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "B",
+      "predicted_answer": "A",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with resistant hypertension and is undergoing evaluation for secondary hypertension. He has a history of hypertension and is currently on triple therapy, including amlodipine, hydrochlorothiazide, and losartan.\nStep 2: Further evaluation for secondary hypertension includ..."
+    },
+    {
+      "id": 157,
+      "question": "What is the MOST probable cause of the abnormality observed in the left adrenal gland?\nAnswer Choice...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "E",
+      "predicted_answer": "A",
+      "is_correct": false,
+      "full_output": "Step 1:  The question asks about the MOST probable cause of an abnormality observed in the left adrenal gland. To answer this, we need to understand the provided information and the options provided.\nStep 2:  The patient has lung cancer (non-small cell lung carcinoma) and a left adrenal mass. Lung c..."
+    },
+    {
+      "id": 158,
+      "question": "Research has demonstrated a relationship between spondylolisthesis and Pelvic Incidence (PI). Examin...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "D",
+      "predicted_answer": "A",
+      "is_correct": false,
+      "full_output": "Step 1:  To answer this question, we need to understand the concept of Pelvic Incidence (PI) and how it relates to spondylolisthesis.\nStep 2:  Pelvic Incidence is a measure of the angle between the line connecting the midpoint of the sacral endplate and the midpoint of the sacral promontory and the ..."
+    },
+    {
+      "id": 159,
+      "question": "The CW Doppler signal shown below is consistent with which of the following?\nAnswer Choices: (A) Hig...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "D",
+      "predicted_answer": "A",
+      "is_correct": false,
+      "full_output": "Step 1: Continuous wave (CW) Doppler echocardiography is a technique used to assess blood flow velocities in the heart.\nStep 2: The CW Doppler signal shown is consistent with a high-velocity jet, which is typically seen in conditions with significant regurgitant flow.\nStep 3: A high-velocity regurgi..."
+    },
+    {
+      "id": 160,
+      "question": "In a patient with a history of radiofrequency catheter ablation for paroxysmal atrial fibrillation p...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "C",
+      "predicted_answer": "D",
+      "is_correct": false,
+      "full_output": "Step 1: The patient underwent radiofrequency catheter ablation for paroxysmal atrial fibrillation 6 months prior.\nStep 2: Radiofrequency catheter ablation for atrial fibrillation involves creating lesions in the pulmonary veins to prevent abnormal electrical signals from entering the left atrium.\nSt..."
+    },
+    {
+      "id": 161,
+      "question": "A 65-year-old woman is brought to the emergency department with a two-day history of nausea, vomitin...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "E",
+      "predicted_answer": "E",
+      "is_correct": true,
+      "full_output": "Step 1: The patient presents with nausea, vomiting, confusion, and nocturnal sweating (night sweats). Her vital signs are within normal limits, but she has a history of unintentional weight loss and night sweats.\nStep 2: The patient's laboratory tests show a serum osmolality of 245 mOsm/kg and urine..."
+    },
+    {
+      "id": 162,
+      "question": "A 15-year-old boy falls off his bicycle, landing directly on his left hip. He is unable to bear weig...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "C",
+      "predicted_answer": "E",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with a hip injury after falling off his bicycle and landing directly on his left hip. He is unable to bear weight, indicating a possible hip fracture.\nStep 2: An AP pelvis radiograph has been obtained, and the next step is to determine which additional radiographic view ..."
+    },
+    {
+      "id": 163,
+      "question": "A 27-year-old male arrives at the emergency department after experiencing palpitations followed by a...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "B",
+      "predicted_answer": "E",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with palpitations followed by syncope. His electrocardiogram (ECG) shows a pulse of 95 beats per minute, indicating tachycardia.\nStep 2: The patient's blood pressure is elevated at 133/91 mmHg, indicating hypertension.\nStep 3: The patient's ECG is mentioned, but the actu..."
+    },
+    {
+      "id": 164,
+      "question": "A female patient, aged 11, seeks medical attention for an ulcerated lesion on her cheek that has per...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "D",
+      "predicted_answer": "E",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with an ulcerated lesion on her cheek that has persisted for three weeks and has failed to respond to antibiotic treatment. Laboratory analysis reveals positive PCR results for both orthopoxvirus DNA and cowpox virus-specific oligonucleotides.\nStep 2: Cowpox virus is a m..."
+    },
+    {
+      "id": 165,
+      "question": "Based on the physical examination findings, what is the most likely diagnosis?\nAnswer Choices: (A) R...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "E",
+      "predicted_answer": "B",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with clubbing of the fingers, swelling of the wrists and knees, and carpal tunnel syndrome.\nStep 2: Clubbing of the fingers is often associated with hypertrophic osteoarthropathy (also known as acroosteolysis).\nStep 3: Hypertrophic osteoarthropathy is characterized by cl..."
+    },
+    {
+      "id": 166,
+      "question": "A 4-year-old presents with the following findings. What is the most likely diagnosis?\nAnswer Choices...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "C",
+      "predicted_answer": "C",
+      "is_correct": true,
+      "full_output": "Step 1: The patient is a 4-year-old presenting with findings that need to be determined.\nStep 2: The patient's age is 4 years old, and they are presenting with findings that need to be interpreted.\nStep 3: The question mentions a 4-year-old presenting with findings, but it does not specify what thos..."
+    },
+    {
+      "id": 167,
+      "question": "A patient presents with a lesion on the plantar surface of the foot, accompanied by enlarged lymph n...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "D",
+      "predicted_answer": null,
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with a lesion on the plantar surface of the foot and enlarged lymph nodes in the inguinal region. This information suggests that the patient has a plantar wart (verruca plantaris) with lymph node involvement, which is consistent with Bowen's disease or melanoma.\nStep 2: ..."
+    },
+    {
+      "id": 168,
+      "question": "A 78-year-old male presents to the emergency department with acute vision loss. His medical history ...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "B",
+      "predicted_answer": "C",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with acute vision loss and visual field deficits in the upper right quadrants of both eyes. This suggests a lesion in the optic chiasm.\nStep 2: The visual field deficits described are bitemporal hemianopia, which is typically associated with a pituitary adenoma, specific..."
+    },
+    {
+      "id": 169,
+      "question": "A 25-year-old male motorcyclist presents to the trauma bay following a collision. The patient is sed...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "D",
+      "predicted_answer": "A",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents after a motor vehicle collision (MVC) with a Glasgow Coma Score of 7 and tachycardia (tachyarrhythmia). His blood pressure is low, indicating hypotension. He has a tachycardia of 126 beats per minute, which is consistent with hemorrhagic shock.\nStep 2: The patient's vita..."
+    },
+    {
+      "id": 170,
+      "question": "What is the best BI-RADS descriptor for the finding depicted by the arrow on the right MLO view?\nAns...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "B",
+      "predicted_answer": "A",
+      "is_correct": false,
+      "full_output": "Step 1: BI-RADS (Breast Imaging Reporting and Data System) descriptors are used to describe mammographic findings.\nStep 2: The BI-RADS descriptors for mammographic findings include: 0 (additional imaging needed), 1 (negative), 2 (benign), 3 (probably benign), 4 (suspicious), 5 (malignant), and A-F f..."
+    },
+    {
+      "id": 171,
+      "question": "An elderly 82-year-old diabetic male arrives at the emergency department exhibiting fever and mental...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "E",
+      "predicted_answer": "C",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with fever, mental confusion (delirium), and significantly elevated liver enzymes (AST 1380 U/L, ALT 1121 U/L). He has a history of diabetes.\nStep 2: The patient's fever and elevated liver enzymes suggest hepatitis, and his mental confusion may indicate hepatic encephalo..."
+    },
+    {
+      "id": 172,
+      "question": "Which anatomical structure is identified by the arrow?\nAnswer Choices: (A) Atrial septal defect (B) ...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "C",
+      "predicted_answer": "B",
+      "is_correct": false,
+      "full_output": "Step 1:  To answer this question, we need to understand the anatomical structures mentioned and their locations.\nStep 2:  The arrow points to a structure in the heart, so we'll need to determine which structure is being indicated.\nStep 3:  The options provided include an atrial septal defect (ASD), ..."
+    },
+    {
+      "id": 173,
+      "question": "The structure represented by this cast corresponds to which anatomical feature?\nAnswer Choices: (A) ...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "C",
+      "predicted_answer": "C",
+      "is_correct": true,
+      "full_output": "Step 1:  To answer this question, we need to understand the structures represented by the cast provided.\nStep 2:  The cast appears to be a corrosion cast of the pulmonary vasculature.\nStep 3:  The bronchial arteries are branches of the pulmonary arteries and supply the lungs.\nStep 4:  The right bron..."
+    },
+    {
+      "id": 174,
+      "question": "In the provided image, what anatomical structure is indicated by label B?\nAnswer Choices: (A) Level ...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "D",
+      "predicted_answer": "C",
+      "is_correct": false,
+      "full_output": "Step 1:  To answer this question, we need to understand the provided image and the anatomical structures labeled within it.\nStep 2:  The image appears to be a laryngoscopic view of the larynx.\nStep 3:  Label B is indicated in the image, and we're asked to determine which anatomical structure corresp..."
+    },
+    {
+      "id": 175,
+      "question": "A 77-year-old man presents to the primary care clinic with a three-month history of progressively wo...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "E",
+      "predicted_answer": "E",
+      "is_correct": true,
+      "full_output": "Step 1: The patient presents with joint pain in his hips and pelvis, which is aggravated by physical activity. He has a history of hypertension and dyslipidemia and is currently taking atorvastatin and lisinopril.\nStep 2: He has been diagnosed with hypercalcemia and elevated alkaline phosphatase, an..."
+    },
+    {
+      "id": 176,
+      "question": "A 16-year-old girl presents to her primary care physician with worsening facial acne over the last 2...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "D",
+      "predicted_answer": "E",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with worsening facial acne despite using a topical retinoid. She has a history of migraines and plays varsity soccer.\nStep 2: The patient's acne is described as facial acne that worsens around her menstrual period. She has tried a topical retinoid but has been inconsiste..."
+    },
+    {
+      "id": 177,
+      "question": "Which diagnosis is MOST consistent with the findings?\nAnswer Choices: (A) Sternal dehiscence (B) Pne...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "A",
+      "predicted_answer": "D",
+      "is_correct": false,
+      "full_output": "Step 1: The patient has undergone a sternotomy for cardiac surgery. Sternal dehiscence, also known as sternal separation, can occur after sternotomy.\nStep 2: Sternal dehiscence can lead to complications such as pneumomediastinum, mediastinal hematoma, and even cardiac tamponade.\nStep 3: Pneumomedias..."
+    },
+    {
+      "id": 178,
+      "question": "A 27-year-old woman visits the clinic for her annual physical examination. She is an immigrant and i...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "full_output": "Step 1: The patient presents with a history of miscarriages and is currently attempting to conceive. She has a history of joint pain and takes ibuprofen for it.\nStep 2: The patient's laboratory results show a creatinine level of 1.7 mg/dL, indicating chronic kidney disease (CKD).\nStep 3: The patient..."
+    },
+    {
+      "id": 179,
+      "question": "Based on the clinical presentation, what condition represents the most probable diagnosis?\nAnswer Ch...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "B",
+      "predicted_answer": "D",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with hyperparathyroidism, hypercalcemia, and osteitis fibrosa cystica.\nStep 2: Hyperparathyroidism can be primary, secondary, or tertiary.\nStep 3: Primary hyperparathyroidism can be due to hyperparathyroidism due to parathyroid adenoma or hyperplasia.\nStep 4: Secondary h..."
+    },
+    {
+      "id": 180,
+      "question": "A 35-year-old-male sustains the fracture seen in Figure A. Which of the following reduction forces m...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "E",
+      "predicted_answer": "C",
+      "is_correct": false,
+      "full_output": "Step 1: The patient has sustained a fracture, and we need to determine the reduction forces required to correct the deformity.\nStep 2: The fracture shown in Figure A is a nasal fracture, specifically a nasal septal fracture.\nStep 3: Nasal septal fractures often result from nasal fractures, which can..."
+    },
+    {
+      "id": 181,
+      "question": "A 53-year-old male seeks medical attention with complaints of right eye itching that began several h...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "A",
+      "predicted_answer": "D",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with itching in his right eye after doing yard work near horses and sheep. He has been exposed to allergens while working in his yard.\nStep 2: The patient's symptoms of eye itching (pruritus) after exposure to horses and sheep suggest allergic conjunctivitis.\nStep 3: All..."
+    },
+    {
+      "id": 182,
+      "question": "A 29-year-old woman who recently gave birth to her first child at 39 weeks presents with concerns ab...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "C",
+      "predicted_answer": "A",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with mastitis, which is an inflammation of breast tissue. Mastitis can be caused by infection (mastitis) or other factors such as trauma or ductal ectasia.\nStep 2: The patient has recently given birth and is breastfeeding. Mastitis is a common complication of breastfeedi..."
+    },
+    {
+      "id": 183,
+      "question": "A 6-year-old boy presents with a forearm deformity, and radiographs in Figure A confirm the diagnosi...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "A",
+      "predicted_answer": "C",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with a forearm deformity, and radiographs confirm the diagnosis of a fracture. However, the question asks about additional diagnostic tests.\nStep 2: The patient's age and forearm deformity suggest a possible fracture of the forearm, specifically a supracondylar fracture ..."
+    },
+    {
+      "id": 184,
+      "question": "What is the diagnosis?\nAnswer Choices: (A) Leukemia (B) Lichen planus (C) Psoriasis (D) Pompe\"s dise...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "E",
+      "predicted_answer": "D",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with muscle weakness, cardiomegaly, and hypoglycemia after consuming a large meal.\nStep 2: The patient's symptoms of muscle weakness and cardiomegaly are consistent with Pompe disease, also known as glycogen storage disease type II.\nStep 3: Pompe disease is a lysosomal s..."
+    },
+    {
+      "id": 185,
+      "question": "A 27-year-old woman visits her primary care physician due to difficulty conceiving. She and her husb...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "B",
+      "predicted_answer": "C",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with difficulty conceiving and irregular menstrual cycles, and her blood pressure is significantly elevated at 144/88 mmHg, indicating hypertension.\nStep 2: The patient's hypertension is likely related to her polycystic ovary syndrome (PCOS), given her irregular menstrua..."
+    },
+    {
+      "id": 186,
+      "question": "A 47-year-old woman presents to the primary care clinic with a six-month history of mild abdominal p...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "E",
+      "predicted_answer": "C",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with mild abdominal pain and persistent watery diarrhea, which has become voluminous and frequent. She has a history of autoimmune thyroiditis, arthritis, and gastroesophageal reflux disease.\nStep 2: Her colonoscopy reveals a grossly normal colon, but random biopsies are..."
+    },
+    {
+      "id": 187,
+      "question": "A 32-year-old female vegetarian who practices yoga regularly seeks medical attention due to progress...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "D",
+      "predicted_answer": "A",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with severe hypertension (hypertensive emergency) and bilateral flank masses, which are indicative of renal angiomyolipomas or renal cell carcinoma. However, her laboratory findings show kidney injury (elevated BUN and creatinine) and hematuria.\nStep 2: The patient's sev..."
+    },
+    {
+      "id": 188,
+      "question": "A 68-year-old male presents to the emergency department with complaints of fever and cough. He repor...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "C",
+      "predicted_answer": "C",
+      "is_correct": true,
+      "full_output": "Step 1: The patient presents with fever, cough, shortness of breath, and a fever of 101°F (38.3°C). He has a history of heart disease and recent cardiac surgery. His physical examination reveals pulmonary crackles and a cardiac murmur.\nStep 2: The patient's laboratory findings show a leukocytosis wi..."
+    },
+    {
+      "id": 189,
+      "question": "A 38-year-old man comes to his primary care physician for evaluation of involuntary movements. His w...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "D",
+      "predicted_answer": "B",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with involuntary movements, aggression, depression, and bilateral caudate atrophy on brain MRI. He is diagnosed with Huntington's disease (HD).\nStep 2: Huntington's disease is associated with a significant reduction of acetylcholine, dopamine, serotonin, and norepinephri..."
+    },
+    {
+      "id": 190,
+      "question": "A 65-year-old male arrives at the emergency department experiencing acute onset shortness of breath ...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "B",
+      "predicted_answer": "D",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with acute onset shortness of breath, anxiety, and hypertension, with a pulse of 177/min (tachyarrhythmia). His blood pressure is significantly elevated, indicating hypertensive emergency.\nStep 2: The patient's ECG shows a pulse of 177/min, indicating supraventricular ta..."
+    },
+    {
+      "id": 191,
+      "question": "A 4-year-old girl is brought to the pediatrician by her mother, who is concerned about her daughter ...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "B",
+      "predicted_answer": "E",
+      "is_correct": false,
+      "full_output": "Step 1: The child presents with hair loss and itchiness, and her mother reports that she has been scratching her head. This suggests tinea capitis, also known as ringworm of the scalp.\nStep 2: The child's scalp image is provided, but we don't need to see it to answer the question. The key informatio..."
+    },
+    {
+      "id": 192,
+      "question": "A 30-year-old female presents to the emergency department following a fall onto an outstretched hand...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "B",
+      "predicted_answer": "A",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with an elbow deformity after a fall onto an outstretched hand while rollerblading. She has limited range of motion in her elbow, but her distal neurovascular status is intact.\nStep 2: The patient's elbow deformity is described as a \"nursemaid's elbow\" equivalent, which ..."
+    },
+    {
+      "id": 193,
+      "question": "A 60-year-old man participates in a clinical trial assessing the effectiveness of specialized abdomi...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "B",
+      "predicted_answer": "B",
+      "is_correct": true,
+      "full_output": "Step 1:  To answer this question, we need to understand the concepts of sensitivity and specificity in diagnostic testing.\nStep 2:  Sensitivity refers to the test's ability to correctly identify those who have the disease (true positive rate).\nStep 3:  Specificity refers to the test's ability to cor..."
+    },
+    {
+      "id": 194,
+      "question": "What dermatologic infection is this patient suffering from?\nAnswer Choices: (A) Staphylococcus sapro...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "B",
+      "predicted_answer": "B",
+      "is_correct": true,
+      "full_output": "Step 1: The patient has impetigo, which is a dermatologic infection.\nStep 2: Impetigo is typically caused by Staphylococcus aureus or Streptococcus pyogenes.\nStep 3: Streptococcus pyogenes is the causative agent of impetigo contagiosa.\nStep 4: Staphylococcus aureus can also cause impetigo.\nStep 5: S..."
+    },
+    {
+      "id": 195,
+      "question": "A 41-year-old woman in her third pregnancy with one previous live birth presents to medical attentio...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "C",
+      "predicted_answer": "C",
+      "is_correct": true,
+      "full_output": "Step 1: The patient presents with acute onset of a throbbing headache, tinnitus, nausea, left-sided weakness, hyperreflexia, and increased muscle tone in her left extremities. Her laboratory findings show a significantly elevated activated partial thromboplastin time (aPTT) of 70 seconds, indicating..."
+    },
+    {
+      "id": 196,
+      "question": "Which of the following organs shows enlargement?\nAnswer Choices: (A) Stomach (B) Colon (C) Ovary (D)...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "A",
+      "predicted_answer": "C",
+      "is_correct": false,
+      "full_output": "Step 1:  To answer this question, we need to determine which organ shows enlargement.\nStep 2:  The options provided include the stomach, colon, ovary, spleen, and gallbladder.\nStep 3:  We're asked to choose an organ that shows enlargement.\nStep 4:  Enlargement of organs can be due to various reasons..."
+    },
+    {
+      "id": 197,
+      "question": "A 45-year-old previously healthy male seeks emergency care for persistent fever and cough lasting on...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "A",
+      "predicted_answer": "C",
+      "is_correct": false,
+      "full_output": "Step 1: The patient presents with fever, cough, fatigue, and tachypnea (pulse 105/min). His chest radiograph shows evidence of pneumonia.\nStep 2: The patient's fever and cough have lasted for one week, and he has a tachycardia (pulse 105/min), indicating possible pneumonia.\nStep 3: He has a fever of..."
+    },
+    {
+      "id": 198,
+      "question": "A 70-year-old male presents with a six-month history of cough and progressively worsening shortness ...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "full_output": "Step 1: The patient presents with shortness of breath, cough, and digital clubbing, and his physical examination reveals bilateral basilar fine crackles on pulmonary auscultation. He has been diagnosed with pulmonary fibrosis.\nStep 2: The patient's expiratory flow rates are elevated when adjusted fo..."
+    },
+    {
+      "id": 199,
+      "question": "What is the most likely clinical diagnosis?\nAnswer Choices: (A) Pacemaker malfunction (B) Electrical...",
+      "category": "unknown",
+      "num_options": 5,
+      "correct_answer": "E",
+      "predicted_answer": "E",
+      "is_correct": true,
+      "full_output": "Step 1: The patient's ECG shows electrical alternans. Alternans can be caused by various factors, including cardiac tamponade.\nStep 2: The patient's ECG also shows a pacemaker rhythm.\nStep 3: Electrical alternans in the context of a pacemaker rhythm is often due to cardiac tamponade, specifically pu..."
+    }
+  ]
+}

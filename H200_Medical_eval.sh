@@ -1,7 +1,7 @@
 # Set shared configuration parameters
-export CUDA_VISIBLE_DEVICES=0,1,2,3
+export CUDA_VISIBLE_DEVICES=6,7
 export RETRIEVAL_PORT=8001
-export DATA_DIR='./data/MedMCQA'
+export DATA_DIR='./data/MedXpertQA'
 
 # source activate retriever
 # # Pass GPU devices and port to retrieval script
@@ -18,8 +18,11 @@ WAND_PROJECT='Search-R1'
 
 # export BASE_MODEL='/mnt/data1/li003968/verl_checkpoints/Medical-H200-search-r1-ppo-meta-llama-3-8b-it-em-gae-turn-IS-total-epoch-4-Minibatch256-saved-checkpoint-seed3-lr-warmup-200-valid-search-penalty-0.1-final-answer-penalty-0.3/actor/global_step_150'
 # export BASE_MODEL='/mnt/data1/li003968/verl_checkpoints/Medical-H200-search-r1-ppo-meta-llama-3-8b-total-epoch-2-adaptive-prompt-lr-warmup-0.600-mini-batch-128-micro-batch-32/actor/global_step_125'
-export BASE_MODEL='/mnt/data1/li003968/verl_checkpoints/Medical-H200-PPO-Meta-Llama-3-8B-Instruct/actor/global_step_150'
-export EXPERIMENT_NAME=Medical-H200-8B-eval-MedMCQA
+# export BASE_MODEL='/mnt/data1/li003968/verl_checkpoints/Medical-H200-PPO-Meta-Llama-3-8B-Instruct/actor/global_step_150' 
+# export BASE_MODEL='/mnt/data1/li003968/verl_checkpoints/Medical-H200-PPO-Meta-Llama-3-8B-Instruct/actor/global_step_150' # SPPO
+# export BASE_MODEL='/mnt/data1/li003968/verl_checkpoints/Medical-H200-search-r1-ppo-meta-llama-3-8b-total-epoch-4-adaptive-prompt-lr-warmup-0.600-mini-batch-128-micro-batch-32-continue/actor/global_step_100' 
+export BASE_MODEL='meta-llama/Meta-Llama-3-8B-Instruct'
+export EXPERIMENT_NAME=Medical-H200-8B-Instruct-eval-MedXpertQA
 # export BASE_MODEL='Qwen/Qwen2.5-1.5B-Instruct'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-1.5b-it-em
 # export BASE_MODEL='Qwen/Qwen2.5-3B'
@@ -64,7 +67,7 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     actor_rollout_ref.actor.fsdp_config.grad_offload=True \
     actor_rollout_ref.actor.fsdp_config.optimizer_offload=True \
     actor_rollout_ref.rollout.log_prob_micro_batch_size=128 \
-    actor_rollout_ref.rollout.tensor_model_parallel_size=4 \
+    actor_rollout_ref.rollout.tensor_model_parallel_size=2 \
     actor_rollout_ref.rollout.name=vllm \
     actor_rollout_ref.rollout.gpu_memory_utilization=0.6 \
     actor_rollout_ref.ref.log_prob_micro_batch_size=128 \
@@ -91,7 +94,7 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     +trainer.val_only=True \
     +trainer.val_before_train=True \
     trainer.default_hdfs_dir=null \
-    trainer.n_gpus_per_node=4 \
+    trainer.n_gpus_per_node=2 \
     trainer.nnodes=1 \
     trainer.save_freq=50 \
     trainer.test_freq=-1 \

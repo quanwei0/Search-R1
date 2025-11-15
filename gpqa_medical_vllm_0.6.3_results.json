@@ -1,0 +1,716 @@
+{
+  "model_id": "johnsnowlabs/JSL-MedLlama-3-8B-v1.0",
+  "dataset": "GPQA Medical (Molecular Biology + Genetics)",
+  "test_samples": 78,
+  "correct_count": 42,
+  "accuracy": 0.5384615384615384,
+  "max_tokens": 2048,
+  "subdomain_accuracy": {
+    "Molecular Biology": 0.5806451612903226,
+    "Genetics": 0.375
+  },
+  "results": [
+    {
+      "id": 0,
+      "question": "A large gene has dozens of exons, of which the central ones code for folded triple helical repeats t...",
+      "subdomain": "Molecular Biology",
+      "correct_answer": "A",
+      "predicted_answer": "C",
+      "is_correct": false,
+      "full_output": "answer:C. polyA tail"
+    },
+    {
+      "id": 1,
+      "question": "To investigate the causes of a complex genetic disease, you culture patient cells and carry out DNA ...",
+      "subdomain": "Molecular Biology",
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "full_output": "Answer: \\boxed{A}"
+    },
+    {
+      "id": 2,
+      "question": "Scientist 1 is studying linkage maps in Drosophila. Specifically, Scientist 1 is working out the lin...",
+      "subdomain": "Genetics",
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "full_output": "Answer: \\boxed{A}"
+    },
+    {
+      "id": 3,
+      "question": "You perform a high-throughput experiment on white lupine to find genes contributing to resistance to...",
+      "subdomain": "Genetics",
+      "correct_answer": "A",
+      "predicted_answer": null,
+      "is_correct": false,
+      "full_output": "Hint: Epistasis is a phenomenon where the effect of one gene is dependent on the presence of another gene. In this case, the effect of G1 is dependent on the presence of G3. Pleiotropy is a phenomenon where a gene has multiple effects on different traits. In this case, G2 has an effect on anthracnos..."
+    },
+    {
+      "id": 4,
+      "question": "The experimental proof for the chromosomal theory was obtained from….....",
+      "subdomain": "Genetics",
+      "correct_answer": "A",
+      "predicted_answer": "C",
+      "is_correct": false,
+      "full_output": "Answer: \\boxed{C}"
+    },
+    {
+      "id": 5,
+      "question": "\"Scientist aims to analyze 200 nucleotides that are surrounding rs113993960 and got four results. Wh...",
+      "subdomain": "Molecular Biology",
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "full_output": "The correct answer is:\nA. 5'GATGATAATT GGAGGCAAGT GAATCCTGAG CGTGATTTGA\nTAATGACCTA GTTTTATTTC CAGACTTCAC TTCTAATGGT\nGATTATGGGA GAACTGGAGC CTTCAGAGGG TAAAATTAAG\nCACAGTGGAA GAATTTCATT CTGTTCTCAG TTTTCCTGGA\nTTATGCCTGG CACCATTAAA GAAAATATCA 3'\n\nA"
+    },
+    {
+      "id": 6,
+      "question": "All the following statements about the molecular biology of Severe Acute Respiratory Syndrome Corona...",
+      "subdomain": "Molecular Biology",
+      "correct_answer": "A",
+      "predicted_answer": "D",
+      "is_correct": false,
+      "full_output": "Answer: \\boxed{D}"
+    },
+    {
+      "id": 7,
+      "question": "You are interested in studying a rare type of breast cancer in a mouse model. Your research up until...",
+      "subdomain": "Molecular Biology",
+      "correct_answer": "A",
+      "predicted_answer": "D",
+      "is_correct": false,
+      "full_output": "Answer: \\boxed{D}"
+    },
+    {
+      "id": 8,
+      "question": "ChIP-seq on a PFA-fixed sample with an antibody to the IKAROS transcription factor in human B cells ...",
+      "subdomain": "Molecular Biology",
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "full_output": "Answer: \\boxed{A}"
+    },
+    {
+      "id": 9,
+      "question": "v-FLIPS are viral proteins that were first identified as modulators of apoptosis, they contain two d...",
+      "subdomain": "Molecular Biology",
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "full_output": "Answer: A"
+    },
+    {
+      "id": 10,
+      "question": "Which of the following statements about enhancers in embryonic stem cells is most accurate? ...",
+      "subdomain": "Molecular Biology",
+      "correct_answer": "A",
+      "predicted_answer": "B",
+      "is_correct": false,
+      "full_output": "Answer: B"
+    },
+    {
+      "id": 11,
+      "question": "A series of experiments are conducted to unravel the function of a novel kinase X in cell survival. ...",
+      "subdomain": "Molecular Biology",
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "full_output": "Answer:\nThe best explanation of these results is that the kinase activity of kinase X is not required for cell survival. A n-terminally truncated variant of kinase X has alternative functions that are essential for cell survival. This is demonstrated by the rescue of the n-terminal sgRNAs. The kinas..."
+    },
+    {
+      "id": 12,
+      "question": "Which of the following issues are the most common sources of difficult-to-spot erroneous results gen...",
+      "subdomain": "Genetics",
+      "correct_answer": "A",
+      "predicted_answer": "D",
+      "is_correct": false,
+      "full_output": "Answer: \\boxed{D}"
+    },
+    {
+      "id": 13,
+      "question": "Enya and John are of normal phenotype but they have a son with a genetic condition that is caused by...",
+      "subdomain": "Genetics",
+      "correct_answer": "A",
+      "predicted_answer": "C",
+      "is_correct": false,
+      "full_output": "Answer: C"
+    },
+    {
+      "id": 14,
+      "question": "You want to cultivate a population of mouse embryonic stem cells that closely resemble the pre-impla...",
+      "subdomain": "Molecular Biology",
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "full_output": "Answer: \\boxed{A}"
+    },
+    {
+      "id": 15,
+      "question": "\"Oh, I know you,\" the ribonucleoprotein particle says to the nascent chain as they meet. \"Pause ther...",
+      "subdomain": "Molecular Biology",
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "full_output": "Answer: \\boxed{A}"
+    },
+    {
+      "id": 16,
+      "question": "A research group is investigating the production of a candidate recombinant protein to treat an auto...",
+      "subdomain": "Genetics",
+      "correct_answer": "A",
+      "predicted_answer": "C",
+      "is_correct": false,
+      "full_output": "Answer: \\boxed{C}"
+    },
+    {
+      "id": 17,
+      "question": "You have an interesting drought-resistant cultivar of barley, which, unfortunately, contains an anti...",
+      "subdomain": "Genetics",
+      "correct_answer": "A",
+      "predicted_answer": null,
+      "is_correct": false,
+      "full_output": "Hint: The first nucleotide in the first exon is the start codon, and the rest of the first exon is the 5’ UTR.\n\nThe first nucleotide in the first exon is the start codon, and the rest of the first exon is the 5’ UTR. The start codon is ATG, and the rest of the first exon is TCTCGCTGGTACTTCTGTGGATGAA..."
+    },
+    {
+      "id": 18,
+      "question": "ChIP-seq detected a highly significant binding signal for a lineage-specific transcription factor X ...",
+      "subdomain": "Molecular Biology",
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "full_output": "Answer: A"
+    },
+    {
+      "id": 19,
+      "question": "You have a 10 uL aliquot of a 10 uM DNA template of a protein library. The template contains 12 NNK ...",
+      "subdomain": "Molecular Biology",
+      "correct_answer": "A",
+      "predicted_answer": "D",
+      "is_correct": false,
+      "full_output": "Answer: \\boxed{D}"
+    },
+    {
+      "id": 20,
+      "question": "In autumn, tree leaves get colourful and drop down in a process called “autumn foliage”. Chlorophyll...",
+      "subdomain": "Molecular Biology",
+      "correct_answer": "A",
+      "predicted_answer": "C",
+      "is_correct": false,
+      "full_output": "Hint: GGPP is a precursor of carotenoids, and can be used as a precursor for other compounds as well.\n\nThe correct answer is C.\nThe metabolic pathway of strigolactone biosynthesis is not directly connected with GGPP in higher plants. GGPP is a precursor of carotenoids, and can be used as a precursor..."
+    },
+    {
+      "id": 21,
+      "question": "A eukaryotic cell evolved a mechanism to turn macromolecular building blocks into energy. The proces...",
+      "subdomain": "Molecular Biology",
+      "correct_answer": "A",
+      "predicted_answer": "C",
+      "is_correct": false,
+      "full_output": "Answer: C"
+    },
+    {
+      "id": 22,
+      "question": "You would like to use PCR to amplify the following sequence (written from 5’ to 3’ direction) for su...",
+      "subdomain": "Molecular Biology",
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "full_output": "For example, if you choose A, you should explain:\n- The primers are complementary to each other.\n- The first 9 bp of the primer are identical to the sequence of the vector.\n- The first 9 bp of the primer are identical to the sequence of the vector.\n- The first 9 bp of the primer are identical to the..."
+    },
+    {
+      "id": 23,
+      "question": "You are studying the patterns of inheritance between genes A and B on the same chromosome. They are ...",
+      "subdomain": "Genetics",
+      "correct_answer": "A",
+      "predicted_answer": "B",
+      "is_correct": false,
+      "full_output": "Answer: B"
+    },
+    {
+      "id": 24,
+      "question": "Hi-C analysis based on 50M cells has revealed a highly significant interaction signal between 5kb bi...",
+      "subdomain": "Molecular Biology",
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "full_output": "Answer: \\boxed{A}"
+    },
+    {
+      "id": 25,
+      "question": "In a Tn5-based Hi-C protocol performed by an experienced operator, much lower than expected quantiti...",
+      "subdomain": "Molecular Biology",
+      "correct_answer": "A",
+      "predicted_answer": "D",
+      "is_correct": false,
+      "full_output": "Answer: \\boxed{D}"
+    },
+    {
+      "id": 26,
+      "question": "A scientist injected Cas9 messenger RNA, a guide RNA and donor DNA carrying a transgene into a 1-cel...",
+      "subdomain": "Molecular Biology",
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "full_output": "Answer: \\boxed{A}"
+    },
+    {
+      "id": 27,
+      "question": "Two accessions of Arabidopsis thaliana have different phenotypes associated with flowering time. Res...",
+      "subdomain": "Genetics",
+      "correct_answer": "A",
+      "predicted_answer": "D",
+      "is_correct": false,
+      "full_output": "Answer: \\boxed{D}"
+    },
+    {
+      "id": 28,
+      "question": "Cas9 nuclease and the restriction enzyme EcoRI are produced by the bacterial system. Which of the fo...",
+      "subdomain": "Molecular Biology",
+      "correct_answer": "A",
+      "predicted_answer": "B",
+      "is_correct": false,
+      "full_output": "Answer: B"
+    },
+    {
+      "id": 29,
+      "question": "You have been given the task of determining the effects of chronic ionizing radiation and cyclic ext...",
+      "subdomain": "Molecular Biology",
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "full_output": "Answer: \\boxed{A}"
+    },
+    {
+      "id": 30,
+      "question": "Which of these conditions is associated with an open chromatin state in mouse embryonic stem cells?...",
+      "subdomain": "Molecular Biology",
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "full_output": "Answer:\n\\boxed{A}"
+    },
+    {
+      "id": 31,
+      "question": "A scientist tries to uncover a downstream pathway of a membrane-associated protein kinase that parti...",
+      "subdomain": "Molecular Biology",
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "full_output": "Answer: A"
+    },
+    {
+      "id": 32,
+      "question": "You want to study the role of the GADD45G protein in a mouse model. You are highly interested in whe...",
+      "subdomain": "Molecular Biology",
+      "correct_answer": "A",
+      "predicted_answer": "D",
+      "is_correct": false,
+      "full_output": "Answer: \\boxed{D}"
+    },
+    {
+      "id": 33,
+      "question": "You want to create a mouse embryonic chimera with induced pluripotent stem cells from somatic cells ...",
+      "subdomain": "Molecular Biology",
+      "correct_answer": "A",
+      "predicted_answer": null,
+      "is_correct": false,
+      "full_output": "Hint: The first thing you notice is the color of the signal.\n\nThe first thing you notice is the color of the signal. The red signal is the mRaspberry, which is a red fluorescent protein. The green signal is the TUNEL - FITC staining, which is green fluorescent. Therefore, the first thing you notice ..."
+    },
+    {
+      "id": 34,
+      "question": "\"Scientist aims to detect Severe acute respiratory syndrome coronavirus 2 (SARS-CoV-2) in wastewater...",
+      "subdomain": "Molecular Biology",
+      "correct_answer": "A",
+      "predicted_answer": "C",
+      "is_correct": false,
+      "full_output": "Answer: \\boxed{C}"
+    },
+    {
+      "id": 35,
+      "question": "You come across an algorithm that gives the following output (written as input -> output):\n\nAGG -> 1...",
+      "subdomain": "Molecular Biology",
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "full_output": "Answer: \\boxed{A}"
+    },
+    {
+      "id": 36,
+      "question": "Patient X is diagnosed of moderate anemia and placed on oral iron and folate therapy prior to chemot...",
+      "subdomain": "Molecular Biology",
+      "correct_answer": "A",
+      "predicted_answer": "B",
+      "is_correct": false,
+      "full_output": "Answer: B"
+    },
+    {
+      "id": 37,
+      "question": "On sequencing the genome of a new fungal species, it was observed that the largest chromosome (chr1)...",
+      "subdomain": "Molecular Biology",
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "full_output": "Answer: \\boxed{A}"
+    },
+    {
+      "id": 38,
+      "question": "You tag the inner capsid proteins of rotavirus with a GFP and deliver them to mice via oral gavage. ...",
+      "subdomain": "Molecular Biology",
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "full_output": "Answer: A"
+    },
+    {
+      "id": 39,
+      "question": "\"Scientist aims to run quantitative polymerase chain reaction (qPCR) on some samples. He first wants...",
+      "subdomain": "Molecular Biology",
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "full_output": "Answer: A"
+    },
+    {
+      "id": 40,
+      "question": "\"Microbiologist inoculated a lawn culture of Klebsiella pneumoniae on Mueller-Hinton agar and placed...",
+      "subdomain": "Molecular Biology",
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "full_output": "Answer: \\boxed{A}"
+    },
+    {
+      "id": 41,
+      "question": "In gametogenesis, the germline undergoes two cycles of meiosis to give rise to haploid gametes. The ...",
+      "subdomain": "Molecular Biology",
+      "correct_answer": "A",
+      "predicted_answer": "B",
+      "is_correct": false,
+      "full_output": "Answer: B"
+    },
+    {
+      "id": 42,
+      "question": "Read the following passage on Wnt3a signaling pathway in humans to answer the subsequent question.\n\n...",
+      "subdomain": "Molecular Biology",
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "full_output": "Answer: \\boxed{A}"
+    },
+    {
+      "id": 43,
+      "question": "You decided to do radioisotopic labeling for your enzymatic activity assays and chose to use [3H] fo...",
+      "subdomain": "Molecular Biology",
+      "correct_answer": "A",
+      "predicted_answer": "D",
+      "is_correct": false,
+      "full_output": "3) How can you calculate the volume of your 5X “hot” amino acid stock solution needed to make a 1X working solution with a concentration of 0.25 mM and a specific activity of 75 mCi/mmol?\nOptions:\nA. 0.67 mL; 0.9256 micromole\nB. 0.78 mL; 0.8375 micromole\nC. 0.78 mL; 0.7654 micromole\nD. 0.78 mL; 0.83..."
+    },
+    {
+      "id": 44,
+      "question": "You identified a new ligand-receptor pair initially expressed in the neural crest cells and want to ...",
+      "subdomain": "Molecular Biology",
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "full_output": "Answer: \\boxed{A}"
+    },
+    {
+      "id": 45,
+      "question": "Which of these statements about DNA methylation in mammalian development is true?...",
+      "subdomain": "Genetics",
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "full_output": "Answer: A"
+    },
+    {
+      "id": 46,
+      "question": "While studying a yeast protein X, a molecular biologist observes that a deletion mutant of X has red...",
+      "subdomain": "Genetics",
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "full_output": "Answer: \\boxed{A}"
+    },
+    {
+      "id": 47,
+      "question": "You have created a therapeutic mRNA molecule that has shown efficacy in clinical trials for treating...",
+      "subdomain": "Molecular Biology",
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "full_output": "Answer: \\boxed{A}"
+    },
+    {
+      "id": 48,
+      "question": "Imagine a situation where a novel natural molecule, Xantheraquin, is discovered and is being investi...",
+      "subdomain": "Molecular Biology",
+      "correct_answer": "A",
+      "predicted_answer": "C",
+      "is_correct": false,
+      "full_output": "Answer: \\boxed{C}"
+    },
+    {
+      "id": 49,
+      "question": "Some plants lack chlorophyll as they have evolved unique strategies to survive without performing ph...",
+      "subdomain": "Molecular Biology",
+      "correct_answer": "A",
+      "predicted_answer": "B",
+      "is_correct": false,
+      "full_output": "Answer: \\boxed{B}"
+    },
+    {
+      "id": 50,
+      "question": "Protein Kinase C (PKC) activation plays a critical role in hyperglycaemia induced atherosclerosis. W...",
+      "subdomain": "Molecular Biology",
+      "correct_answer": "A",
+      "predicted_answer": "D",
+      "is_correct": false,
+      "full_output": "Answer: \\boxed{D}"
+    },
+    {
+      "id": 51,
+      "question": "Microgravity during space flights is an unusual stress factor because living organisms did not exper...",
+      "subdomain": "Molecular Biology",
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "full_output": "Answer: \\boxed{A}"
+    },
+    {
+      "id": 52,
+      "question": "\"Scientist aims to detect two genes using multiplex PCR by using two sets of primers.\nDNA bands were...",
+      "subdomain": "Molecular Biology",
+      "correct_answer": "A",
+      "predicted_answer": "C",
+      "is_correct": false,
+      "full_output": "Answer: \\boxed{C}"
+    },
+    {
+      "id": 53,
+      "question": "The chromatin is packaged inside the nucleus in well-defined boundaries and compartments. The change...",
+      "subdomain": "Molecular Biology",
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "full_output": "Answer: A"
+    },
+    {
+      "id": 54,
+      "question": "The procedure of the development of therapeutic drugs against the protein targets to combat diseases...",
+      "subdomain": "Molecular Biology",
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "full_output": "Answer: A"
+    },
+    {
+      "id": 55,
+      "question": "You want to quantify the upregulation of a transcript from the mouse hypertrophic muscles and compar...",
+      "subdomain": "Molecular Biology",
+      "correct_answer": "A",
+      "predicted_answer": "C",
+      "is_correct": false,
+      "full_output": "answer:C. forward around 6900 bp and reverse around 8200 bp on the genomic DNA"
+    },
+    {
+      "id": 56,
+      "question": "A scientist wants to test the effect of a mutation M in a gene X in Saccharomyces cerevisiae. He pla...",
+      "subdomain": "Genetics",
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "full_output": "Answer: \\boxed{A}"
+    },
+    {
+      "id": 57,
+      "question": "\"Microbiologist applied a mixture of saline, Tris-HCl, and disodium Ethylenediaminetetraacetic acid ...",
+      "subdomain": "Molecular Biology",
+      "correct_answer": "A",
+      "predicted_answer": "C",
+      "is_correct": false,
+      "full_output": "answer:C. Escherichia coli released flavoenzymes conferring resistance to cefoxitin and leading to the indentation of the zone of inhibition of cefoxitin in the second phase of the experiment"
+    },
+    {
+      "id": 58,
+      "question": "\"Scientist aim to detect plasmid-mediated quinolone resistance from Klebsiella pneumoniae by targeti...",
+      "subdomain": "Molecular Biology",
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "full_output": "Answer: A"
+    },
+    {
+      "id": 59,
+      "question": "During the development of a multicellular organism, complex signalling networks modulate and direct ...",
+      "subdomain": "Molecular Biology",
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "full_output": "Answer: A"
+    },
+    {
+      "id": 60,
+      "question": "A researcher is investigating the role of the PI3K/MTOR pathway in breast cancer cell survival and p...",
+      "subdomain": "Molecular Biology",
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "full_output": "answer:A. AKT1/2/3 (assume full redundancy of isoform function) and mTORC1"
+    },
+    {
+      "id": 61,
+      "question": "There are a set of RNAs of approximately 200 or more nucleotides in length, that have no or limited ...",
+      "subdomain": "Molecular Biology",
+      "correct_answer": "A",
+      "predicted_answer": "C",
+      "is_correct": false,
+      "full_output": "Answer: C"
+    },
+    {
+      "id": 62,
+      "question": "Congratulations, you just landed your dream job at one of the top structural biology labs at Stanfor...",
+      "subdomain": "Molecular Biology",
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "full_output": "Please write your answer in English. Thank you.\n\nThe amino acid sequence of this protein is as follows:\nMEEPQSDPSVEPPLSQETFSDLWKLLPENNVLSPLPSQAMDDLMLSPDDIEQWFTEDPGPDEAPRMPEAAPPVAPAPAAPTPAAPAPAPSWPLSSSVPSQKTYQGSYGFRLGFLHSGTAKSVTCTYSPALNKMFCQLAKTCPVQLWVDSTPPPGTRVRAMAIYKQSQHMTEVVRRCPHHERCSDSDGLAPPQHLIR..."
+    },
+    {
+      "id": 63,
+      "question": "A gene encoding a pigment was introduced into Candida albicans, Schizosaccharomyces pombe, and Clavi...",
+      "subdomain": "Molecular Biology",
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "full_output": "Answer: \\boxed{A}"
+    },
+    {
+      "id": 64,
+      "question": "A scientist studies the evolution of four closely related species of Bromelia. The scientist identif...",
+      "subdomain": "Genetics",
+      "correct_answer": "A",
+      "predicted_answer": "B",
+      "is_correct": false,
+      "full_output": "Answer: \\boxed{B}"
+    },
+    {
+      "id": 65,
+      "question": "Which one of the following is the least correct statement about the following post-transcription pro...",
+      "subdomain": "Molecular Biology",
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "full_output": "Answer: \\boxed{A}"
+    },
+    {
+      "id": 66,
+      "question": "\"Scientist inoculated Escherichia coli into Luria Bertani broth with 0.1 mg/ml Ethidium bromide and ...",
+      "subdomain": "Molecular Biology",
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "full_output": "Data format:\nYou must have [ Python code ] data type in the following Rewrite prompt\nRewrite prompt:\nYou are a medical AI assistant.\nQuestion: \"A 60-year-old male patient presented with a history of fever, cough, and breathlessness for 3 days. He has a history of smoking 20 cigarettes per day for th..."
+    },
+    {
+      "id": 67,
+      "question": "If a sperm from species A is injected into an egg from species B and both species have the same numb...",
+      "subdomain": "Genetics",
+      "correct_answer": "A",
+      "predicted_answer": "D",
+      "is_correct": false,
+      "full_output": "Answer: \\boxed{D}"
+    },
+    {
+      "id": 68,
+      "question": "Plants growing at coasts of oceans and other water bodies with salty water are called halophytes. Th...",
+      "subdomain": "Molecular Biology",
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "full_output": "Answer: \\boxed{A}"
+    },
+    {
+      "id": 69,
+      "question": "A 35-year-old woman presents with a painless lump in her right breast. She has a family history of b...",
+      "subdomain": "Molecular Biology",
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "full_output": "Answer: A"
+    },
+    {
+      "id": 70,
+      "question": "You identified several new antigens in a refractory pancreatic solid tumor and want to target them w...",
+      "subdomain": "Molecular Biology",
+      "correct_answer": "A",
+      "predicted_answer": "D",
+      "is_correct": false,
+      "full_output": "Answer: D"
+    },
+    {
+      "id": 71,
+      "question": "You identified a new quorum-sensing peptide in the bacteria Lactobacillus acidophilus. You are highl...",
+      "subdomain": "Molecular Biology",
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "full_output": "Answer:\n\\boxed{A}"
+    },
+    {
+      "id": 72,
+      "question": "A signal transduction network in living cells amplifies subtle extracellular signals to signalling i...",
+      "subdomain": "Molecular Biology",
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "full_output": "Answer: A"
+    },
+    {
+      "id": 73,
+      "question": "While studying a population of wild-type Helianthus annus (H. annus) scientists found that the popul...",
+      "subdomain": "Genetics",
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "full_output": "Answer: \\boxed{A}"
+    },
+    {
+      "id": 74,
+      "question": "You study an Archaea living in extreme environmental conditions using combined genomic and transcrip...",
+      "subdomain": "Molecular Biology",
+      "correct_answer": "A",
+      "predicted_answer": "C",
+      "is_correct": false,
+      "full_output": "Answer: \\boxed{C}"
+    },
+    {
+      "id": 75,
+      "question": "There has been an outbreak of an viral infectious disease in your city. You have been asked to desig...",
+      "subdomain": "Molecular Biology",
+      "correct_answer": "A",
+      "predicted_answer": "D",
+      "is_correct": false,
+      "full_output": "Answer: \\boxed{D}"
+    },
+    {
+      "id": 76,
+      "question": "In an inactive state, a transcription factor subunit awaits an activation signal from the membrane p...",
+      "subdomain": "Genetics",
+      "correct_answer": "A",
+      "predicted_answer": "A",
+      "is_correct": true,
+      "full_output": "Answer: A"
+    },
+    {
+      "id": 77,
+      "question": "You have transformed E. coli cells with pUC18 (pUC origin, AmpR), but want to swap that plasmid with...",
+      "subdomain": "Molecular Biology",
+      "correct_answer": "A",
+      "predicted_answer": "D",
+      "is_correct": false,
+      "full_output": "Answer:\n\\boxed{D}"
+    }
+  ]
+}

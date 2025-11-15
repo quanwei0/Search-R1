@@ -1,5 +1,5 @@
 # Accept parameters from calling script, use defaults if not provided
-CUDA_DEVICES=${1:-"0,1,2,3"}
+CUDA_DEVICES=${1:-"6,7"}
 RETRIEVAL_PORT=${2:-"8001"}
 
 export CUDA_VISIBLE_DEVICES=$CUDA_DEVICES

@@ -16,7 +16,8 @@ export WANDB_ENTITY="rl_agent"
 WAND_PROJECT='Search-R1'
 
 
-export BASE_MODEL='meta-llama/Meta-Llama-3-8B-Instruct'
+# export BASE_MODEL='meta-llama/Meta-Llama-3-8B-Instruct'
+export BASE_MODEL='Qwen/Qwen3-8B'
 # export BASE_MODEL='Qwen/Qwen2.5-7B-Instruct'
 export EXPERIMENT_NAME=Medical-H200-search-r1-STPPO-continue-training-actor-critic-global-step-75-continue
 # export BASE_MODEL='Qwen/Qwen2.5-1.5B-Instruct'
@@ -56,7 +57,7 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     actor_rollout_ref.actor.optim.lr=1e-6 \
     actor_rollout_ref.model.enable_gradient_checkpointing=True \
     actor_rollout_ref.model.use_remove_padding=True \
-    actor_rollout_ref.actor.optim.lr_warmup_steps_ratio=0.300 \
+    actor_rollout_ref.actor.optim.lr_warmup_steps_ratio=0.600 \
     actor_rollout_ref.actor.ppo_mini_batch_size=128 \
     actor_rollout_ref.actor.ppo_micro_batch_size=32 \
     actor_rollout_ref.actor.fsdp_config.param_offload=True \
