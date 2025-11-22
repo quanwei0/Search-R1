@@ -50,6 +50,7 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     data.max_obs_length=500 \
     data.shuffle_train_dataloader=True \
     algorithm.adv_estimator=grpo \
+    +algorithm.use_mixed_outcome_reward=False \
     actor_rollout_ref.model.path=$BASE_MODEL \
     actor_rollout_ref.model.enable_gradient_checkpointing=true \
     actor_rollout_ref.model.use_remove_padding=True \
