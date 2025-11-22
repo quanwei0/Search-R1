@@ -1,7 +1,7 @@
 # Set shared configuration parameters
 export RETRIEVAL_CUDA_VISIBLE_DEVICES=0,1,2,3
 export RETRIEVAL_PORT=8001
-export DATA_DIR='./data/nq_hotpotqa_train'
+export DATA_DIR='./data/nq_search'
 
 source activate /opt/conda/envs/retriever
 # # Pass GPU devices and port to retrieval script
@@ -73,9 +73,9 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     actor_rollout_ref.rollout.n_agent=5 \
     actor_rollout_ref.rollout.temperature=1 \
     actor_rollout_ref.actor.state_masking=true \
-    trainer.logger=['wandb'] \
+    trainer.logger=['console','wandb'] \
     +trainer.val_only=false \
-    +trainer.val_before_train=true \
+    +trainer.val_before_train=false \
     trainer.default_hdfs_dir=null \
     trainer.n_gpus_per_node=8 \
     trainer.nnodes=1 \
