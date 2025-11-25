@@ -21,6 +21,7 @@ implement PPO
 import numpy as np
 import torch
 from collections import defaultdict
+from typing import Optional
 
 import verl.utils.torch_functional as verl_F
 
@@ -397,6 +398,8 @@ def compute_policy_loss(
         detach_ratio: detachment strategy ('soft', 'hard', or None)
         importance_sampling_level: importance sampling strategy
             - 'token': each token uses its own importance weight
+            - 'gspo': GSPO (Group Sequence Policy Optimization) - sequence-level importance ratio 
+                     combined with token-level gradients, uses seq-mean-token-mean aggregation
             - 'sequence': traditional sequence-level where all tokens share the same weight (average over sequence)
             - 'partial_sequence': partial-sequence-level GRPO where each token at position t uses 
                                  cumulative average of log_ratio from position 1 to t
@@ -417,19 +420,41 @@ def compute_policy_loss(
     """
     log_ratio = log_prob - old_log_prob
     log_ratio = torch.clamp(log_ratio, min=-20.0, max=20.0)
+
+    def _gspo_seq_mean_token_mean(loss_mat, mask):
+        seq_mask = torch.sum(mask, dim=-1)  # per-sequence token count
+        seq_losses = torch.sum(loss_mat * mask, dim=-1) / (seq_mask + 1e-8)  # token-mean
+        seq_valid_mask = (seq_mask > 0).float()  # exclude fully masked sequences
+        return verl_F.masked_mean(seq_losses, seq_valid_mask)
+
     # Compute importance weights based on the specified level
     if importance_sampling_level == "token":
         log_importance_weights = log_ratio
         print("="*80)
         print(f"[Debug] token-level importance sampling")
         print("="*80)
-    elif importance_sampling_level == "sequence":
+    elif importance_sampling_level == "gspo":
         print("="*80)
-        print(f"[Debug] traditional sequence-level importance sampling")
+        print(f"[Debug] GSPO (Group Sequence Policy Optimization) importance sampling")
         print("="*80)
-        # Traditional sequence-level importance sampling: all tokens share same weight (average over sequence)
-        log_importance_weights = (log_ratio * eos_mask).sum(-1) / eos_mask.sum(-1).clamp(min=1.0)
-        log_importance_weights = log_importance_weights.unsqueeze(-1)
+        # GSPO: Compute sequence-level importance ratio, then use combined ratio at token level
+        # Sequence-level importance ratio: s_i(θ) = (π_θ(yi|x)/π_θold(yi|x))^(1/|yi|)
+        # = exp [(1/|y_i|) * Σ_t log(π_θ(y_i,t|x,y_i,<t)/π_θold(y_i,t|x,y_i,<t))]
+        seq_lengths = torch.sum(eos_mask, dim=-1).clamp(min=1)
+        negative_approx_kl_seq = torch.sum(log_ratio * eos_mask, dim=-1) / seq_lengths
+        
+        # Combined ratio at token level:
+        # s_i,t(θ) = sg[s_i(θ)] · π_θ(y_i,t|x, y_i,<t) / sg[π_θ(y_i,t|x, y_i,<t)]
+        # In log space: log(s_i,t(θ)) = sg[log(s_i(θ))] + log_prob - sg[log_prob]
+        log_importance_weights = log_prob - log_prob.detach() + negative_approx_kl_seq.detach().unsqueeze(-1)
+        log_importance_weights = torch.clamp(log_importance_weights, max=10.0)  # clamp for numerical stability
+    # elif importance_sampling_level == "sequence":
+    #     print("="*80)
+    #     print(f"[Debug] traditional sequence-level importance sampling")
+    #     print("="*80)
+    #     # Traditional sequence-level importance sampling: all tokens share same weight (average over sequence)
+    #     log_importance_weights = (log_ratio * eos_mask).sum(-1) / eos_mask.sum(-1).clamp(min=1.0)
+    #     log_importance_weights = log_importance_weights.unsqueeze(-1)
     elif importance_sampling_level == "turn":
         print("="*80)
         print(f"[Debug] turn-level importance sampling")
@@ -485,7 +510,7 @@ def compute_policy_loss(
     else:
         raise ValueError(
             f"Unknown importance sampling level: {importance_sampling_level}. Possible values are 'token', "
-            "'sequence', 'partial_sequence', and 'turn'."
+            "'gspo', 'sequence', 'partial_sequence', and 'turn'."
         )
     
     negative_approx_kl = log_importance_weights
@@ -504,7 +529,11 @@ def compute_policy_loss(
         pg_losses1 = -ratio_detached * advantages * log_prob
         pg_losses2 = -clipped_ratio_detached * advantages * log_prob
 
-        pg_loss = verl_F.masked_mean(torch.max(pg_losses1, pg_losses2), eos_mask)
+        pg_losses = torch.max(pg_losses1, pg_losses2)
+        if importance_sampling_level == "gspo":
+            pg_loss = _gspo_seq_mean_token_mean(pg_losses, eos_mask)
+        else:
+            pg_loss = verl_F.masked_mean(pg_losses, eos_mask)
         pg_clipfrac = verl_F.masked_mean((pg_losses2 > pg_losses1).float(), eos_mask)
         
         # Compute clip gradient norm for hard detach
@@ -551,7 +580,10 @@ def compute_policy_loss(
         effective_ratio = ratio_detached * decay_mask
 
         pg_losses = -advantages * log_prob * effective_ratio
-        pg_loss = verl_F.masked_mean(pg_losses, eos_mask)
+        if importance_sampling_level == "gspo":
+            pg_loss = _gspo_seq_mean_token_mean(pg_losses, eos_mask)
+        else:
+            pg_loss = verl_F.masked_mean(pg_losses, eos_mask)
         pg_clipfrac = verl_F.masked_mean((decay_mask < 1.0).float(), eos_mask)
         
         # Compute clip gradient norm for soft detach
@@ -602,7 +634,11 @@ def compute_policy_loss(
             print(f"[Debug] Applying gradient stabilization with factor: {stabilization_factor.item():.6f}")
         
         # Compute standard PPO loss
-        pg_loss = verl_F.masked_mean(torch.max(pg_losses1, pg_losses2), eos_mask)
+        pg_losses = torch.max(pg_losses1, pg_losses2)
+        if importance_sampling_level == "gspo":
+            pg_loss = _gspo_seq_mean_token_mean(pg_losses, eos_mask)
+        else:
+            pg_loss = verl_F.masked_mean(pg_losses, eos_mask)
         
         # Apply stabilization factor to the final loss
         pg_loss = pg_loss * stabilization_factor
@@ -619,6 +655,94 @@ def compute_policy_loss(
             'stabilization_ratio': stabilization_ratio,
             'clipped_l2_norm': clipped_l2_norm.detach(),
             'non_clipped_l2_norm': non_clipped_l2_norm.detach()
+        }
+    elif detach_ratio=='grpo_variance_reduction':
+        print("="*80)
+        print(f"[Debug] GRPO variance reduction with {importance_sampling_level}-level importance sampling and the cliprange is",cliprange)
+        print("="*80)
+        
+        # Standard PPO losses for GRPO
+        pg_losses1 = -advantages * ratio
+        pg_losses2 = -advantages * torch.clamp(ratio, 1.0 - cliprange, 1.0 + cliprange)
+        
+        # Use token level ratio to identify clipped and non-clipped tokens
+        clipped_mask = ((token_level_ratio < (1.0 - cliprange)) | (token_level_ratio > (1.0 + cliprange))) & (eos_mask > 0)
+        non_clipped_mask = ((token_level_ratio >= (1.0 - cliprange)) & (token_level_ratio <= (1.0 + cliprange))) & (eos_mask > 0)
+        
+        # For GRPO: compute sequence-level (trajectory-level) clipping bias normalization
+        # Since all tokens in a trajectory have the same advantage, we can aggregate per sequence
+        batch_size = ratio.shape[0]
+        
+        # Compute per-sequence clipped and non-clipped L2 norms
+        clipped_l2_norms = []
+        non_clipped_l2_norms = []
+        stabilization_factors = []
+        
+        for b in range(batch_size):
+            # Get clipped tokens for this sequence
+            seq_clipped_mask = clipped_mask[b]
+            seq_non_clipped_mask = non_clipped_mask[b]
+            
+            if seq_clipped_mask.sum() > 0:
+                seq_clipped_is_adv = token_level_ratio[b] * advantages[b] * seq_clipped_mask
+                seq_clipped_l2 = torch.sqrt((seq_clipped_is_adv ** 2).sum() / seq_clipped_mask.sum().clamp(min=1e-8))
+            else:
+                seq_clipped_l2 = torch.tensor(0.0, device=ratio.device)
+            
+            if seq_non_clipped_mask.sum() > 0:
+                seq_non_clipped_is_adv = token_level_ratio[b] * advantages[b] * seq_non_clipped_mask
+                seq_non_clipped_l2 = torch.sqrt((seq_non_clipped_is_adv ** 2).sum() / seq_non_clipped_mask.sum().clamp(min=1e-8))
+            else:
+                seq_non_clipped_l2 = torch.tensor(1.0, device=ratio.device)
+            
+            # Compute per-sequence stabilization ratio
+            seq_stab_ratio = seq_clipped_l2 / (seq_non_clipped_l2 + 1e-8)
+            
+            # Apply stabilization factor if ratio > 3.0
+            if seq_stab_ratio > 3.0:
+                seq_stab_factor = 1.0 / seq_stab_ratio
+            else:
+                seq_stab_factor = torch.tensor(1.0, device=ratio.device)
+            
+            clipped_l2_norms.append(seq_clipped_l2)
+            non_clipped_l2_norms.append(seq_non_clipped_l2)
+            stabilization_factors.append(seq_stab_factor)
+        
+        # Convert to tensors
+        clipped_l2_tensor = torch.stack(clipped_l2_norms)
+        non_clipped_l2_tensor = torch.stack(non_clipped_l2_norms)
+        stabilization_factor_tensor = torch.stack(stabilization_factors).detach()
+        
+        # Apply per-sequence stabilization to losses
+        pg_losses1_stabilized = pg_losses1 * stabilization_factor_tensor.unsqueeze(-1)
+        pg_losses2_stabilized = pg_losses2 * stabilization_factor_tensor.unsqueeze(-1)
+        
+        # Compute final loss
+        pg_losses = torch.max(pg_losses1_stabilized, pg_losses2_stabilized)
+        if importance_sampling_level == "gspo":
+            pg_loss = _gspo_seq_mean_token_mean(pg_losses, eos_mask)
+        else:
+            pg_loss = verl_F.masked_mean(pg_losses, eos_mask)
+        pg_clipfrac = verl_F.masked_mean((pg_losses2 > pg_losses1).float(), eos_mask)
+        
+        # Compute clip gradient norm
+        clipped_grad = (ratio * advantages).abs() * clipped_mask
+        clip_grad_norm = verl_F.masked_mean(clipped_grad ** 2, eos_mask)
+        
+        # Compute average metrics for logging
+        avg_clipped_l2 = clipped_l2_tensor.mean()
+        avg_non_clipped_l2 = non_clipped_l2_tensor.mean()
+        avg_stabilization_ratio = (clipped_l2_tensor / (non_clipped_l2_tensor + 1e-8)).mean()
+        avg_stabilization_factor = stabilization_factor_tensor.mean()
+        
+        print(f"[Debug] GRPO Clipped L2 norm: {avg_clipped_l2.item():.6f}, Non-clipped L2 norm: {avg_non_clipped_l2.item():.6f}")
+        print(f"[Debug] GRPO Stabilization ratio: {avg_stabilization_ratio.item():.6f}, factor: {avg_stabilization_factor.item():.6f}")
+        
+        stabilization_metrics = {
+            'stabilization_factor': avg_stabilization_factor,
+            'stabilization_ratio': avg_stabilization_ratio,
+            'clipped_l2_norm': avg_clipped_l2,
+            'non_clipped_l2_norm': avg_non_clipped_l2
         }
     elif detach_ratio=='turn_level_variance_reduction':
         print("="*80)
@@ -710,7 +834,11 @@ def compute_policy_loss(
                 num_turns_processed += 1
         
         # Compute standard PPO loss
-        pg_loss = verl_F.masked_mean(torch.max(pg_losses1, pg_losses2), eos_mask)
+        pg_losses = torch.max(pg_losses1, pg_losses2)
+        if importance_sampling_level == "gspo":
+            pg_loss = _gspo_seq_mean_token_mean(pg_losses, eos_mask)
+        else:
+            pg_loss = verl_F.masked_mean(pg_losses, eos_mask)
         
         # Apply per-token stabilization factors to the final loss
         pg_loss = pg_loss * verl_F.masked_mean(stabilization_factor_per_token, eos_mask)
@@ -743,7 +871,11 @@ def compute_policy_loss(
         pg_losses1 = -advantages * ratio
         pg_losses2 = -advantages * torch.clamp(ratio, 1.0 - cliprange, 1.0 + cliprange)
 
-        pg_loss = verl_F.masked_mean(torch.max(pg_losses1, pg_losses2), eos_mask)
+        pg_losses = torch.max(pg_losses1, pg_losses2)
+        if importance_sampling_level == "gspo":
+            pg_loss = _gspo_seq_mean_token_mean(pg_losses, eos_mask)
+        else:
+            pg_loss = verl_F.masked_mean(pg_losses, eos_mask)
         pg_clipfrac = verl_F.masked_mean((pg_losses2 > pg_losses1).float(), eos_mask)
         
         # Compute clip gradient norm for standard PPO

@@ -20,7 +20,7 @@ WAND_PROJECT='Search-R1'
 
 
 export BASE_MODEL='Qwen/Qwen2.5-7B'
-export EXPERIMENT_NAME=H100-search-r1-grpo-qwen2.5-7b-em-seed3
+export EXPERIMENT_NAME=H100-search-r1-gspo-qwen2.5-7b-em-seed3
 # export BASE_MODEL='Qwen/Qwen2.5-1.5B-Instruct'
 # export EXPERIMENT_NAME=nq-search-r1-ppo-qwen2.5-1.5b-it-em
 # export BASE_MODEL='Qwen/Qwen2.5-3B'
@@ -74,6 +74,8 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     actor_rollout_ref.rollout.n_agent=5 \
     actor_rollout_ref.rollout.temperature=1 \
     actor_rollout_ref.actor.state_masking=true \
+    +actor_rollout_ref.actor.detach_ratio=grpo_variance_reduction \
+    +actor_rollout_ref.actor.importance_sampling_level=gspo \
     trainer.logger=['console','wandb'] \
     +trainer.val_only=false \
     +trainer.val_before_train=false \
