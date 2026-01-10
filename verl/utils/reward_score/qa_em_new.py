@@ -301,15 +301,17 @@ def compute_score_em_format_retrievel(
 ###################################################################################################
 def compute_score_final_em_format(final_turn_str, ground_truth):
 
-    if not final_format_check(final_turn_str):
-        return -1.0
-
     matches = list(re.finditer(r'<answer>(.*?)</answer>', final_turn_str, re.DOTALL))
+    
+    if len(matches) == 0:
+        return 0.0
     answer = matches[0].group(1).strip()
     if em_check(answer, ground_truth['target']):
         return 1.0
-    else:
+    elif final_format_check(final_turn_str):
         return 0.2
+    else:
+        return 0.0
 
 
 def final_format_check(final_turn_str: str) -> bool:

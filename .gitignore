@@ -121,7 +121,7 @@ log/
 
 **logs
 
-/plot
+/plot*
 /verl_checkpoints
 *.err
 *.out
