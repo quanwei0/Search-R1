@@ -2,17 +2,20 @@
 export CUDA_VISIBLE_DEVICES=0,1,2,3
 export RETRIEVAL_PORT=8001
 
-source activate /opt/conda/envs/retriever
+CONDA_PATH=$(conda info --base)
+. "$CONDA_PATH/etc/profile.d/conda.sh"
+
+conda activate /opt/conda/envs/retriever
 # Pass GPU devices and port to retrieval script
 bash retrieval_launch.sh "$CUDA_VISIBLE_DEVICES" "$RETRIEVAL_PORT" &
 sleep 60
 
-source activate /opt/conda/envs/vllm
+conda activate /opt/conda/envs/vllm
 
-bash vllm_serve/vllm_server.sh "4,5,6,7" 8002 "openai/gpt-oss-120b" &
+bash vllm_serve/vllm_server.sh "4,5,6,7" "0.0.0.0" 8002 "openai/gpt-oss-120b" &
 sleep 60
 
-source activate /opt/conda/envs/searchr1-test
+conda activate /opt/conda/envs/searchr1-test
 
 
 
@@ -43,6 +46,8 @@ export EXPERIMENT_NAME=qw-$EXPERIMENT_NAME-$(date +%Y%m%d-%H%M%S)
 export VLLM_ATTENTION_BACKEND=XFORMERS # vllm + qwen2-7b with flash_attn has some issues
 
 # max_prompt_length = (config['training']['max_start_length'] + config['training']['max_response_length'] * (config['training']['max_turns'] - 1) + config['training']['max_obs_length'] * config['training']['max_turns'])
+
+export CUDA_VISIBLE_DEVICES=0,1,2,3
 
 PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     data.train_files=$DATA_DIR/train.parquet \
@@ -95,7 +100,7 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     +trainer.val_only=False \
     +trainer.val_before_train=False \
     trainer.default_hdfs_dir=null \
-    trainer.n_gpus_per_node=8 \
+    trainer.n_gpus_per_node=4 \
     trainer.nnodes=1 \
     trainer.save_freq=600 \
     trainer.test_freq=-1 \
